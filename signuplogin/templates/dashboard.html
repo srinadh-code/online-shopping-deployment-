@@ -1,325 +1,4 @@
 {% comment %} 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", sans-serif;
-        }
-
-        body {
-            display: flex;
-            height: 100vh;
-            background: #f4f6f9;
-        }
-
-        /* HEADER */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: #4a90e2;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            color: white;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .search-bar input {
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: none;
-            outline: none;
-            width: 250px;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 250px;
-            background: #ffffff;
-            margin-top: 60px;
-            padding: 20px;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
-            overflow-y: auto;
-        }
-
-        .sidebar h3 {
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .menu-item {
-            margin-bottom: 10px;
-        }
-
-        .category {
-            padding: 12px;
-            background: #f1f3f6;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.3s;
-        }
-
-        .category:hover {
-            background: #4a90e2;
-            color: white;
-        }
-
-        .arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .subcategories {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-            padding-left: 15px;
-        }
-
-        .subcategories div {
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .subcategories div:hover {
-            background: #e6f0ff;
-            color: #4a90e2;
-        }
-
-        /* CONTENT */
-        .content {
-            flex: 1;
-            margin-top: 60px;
-            padding: 30px;
-        }
-
-        .welcome {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        /* RESPONSIVE */
-        @media(max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-
-            .search-bar input {
-                width: 150px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- HEADER -->
-    <div class="header">
-        <div class="logo">online shopping </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search products...">
-        </div>
-    </div>
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h3>Categories</h3>
-
-        <!-- Electronics -->
-        <div class="menu-item">
-            <div class="category" onclick="toggleMenu(this)">
-                Electronics <span class="arrow"></span>
-            </div>
-            <div class="subcategories">
-                <div>Computers</div>
-                <div>Laptops</div>
-                <div>Monitors</div>
-                <div>Keyboard</div>
-                <div>Mouse</div>
-            </div>
-        </div>
-
-        <!-- Cloths -->
-        <div class="menu-item">
-            <div class="category" onclick="toggleMenu(this)">
-                Cloths <span class="arrow"></span>
-            </div>
-            <div class="subcategories">
-                <div>Mens</div>
-                <div>Womens</div>
-                <div>Kids</div>
-                <div>Western</div>
-            </div>
-        </div>
-
-        <!-- Groceries -->
-        <div class="menu-item">
-            <div class="category" onclick="toggleMenu(this)">
-                Groceries <span class="arrow"></span>
-            </div>
-            <div class="subcategories">
-                <div>Makeup</div>
-                <div>Vegetables</div>
-                <div>House Hold</div>
-                <div>Decoration</div>
-            </div>
-        </div>
-
-        <!-- Furniture -->
-        <div class="menu-item">
-            <div class="category" onclick="toggleMenu(this)">
-                Furniture <span class="arrow"></span>
-            </div>
-            <div class="subcategories">
-                <div>Beds</div>
-                <div>Chairs</div>
-            </div>
-        </div>
-
-        <!-- Hardware -->
-        <div class="menu-item">
-            <div class="category" onclick="toggleMenu(this)">
-                Hardware <span class="arrow"></span>
-            </div>
-            <div class="subcategories">
-                <div>Monitors</div>
-                <div>Mother Board</div>
-                <div>IC</div>
-                <div>SD Card</div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- CONTENT -->
-    <div class="content">
-        <div class="welcome">
-            Welcome {{ username }} 
-        </div>
-    </div>
-
-    <script>
-        function toggleMenu(element) {
-            let submenu = element.nextElementSibling;
-            let arrow = element.querySelector(".arrow");
-
-            if (submenu.style.maxHeight) {
-                submenu.style.maxHeight = null;
-                arrow.style.transform = "rotate(0deg)";
-            } else {
-                submenu.style.maxHeight = submenu.scrollHeight + "px";
-                arrow.style.transform = "rotate(180deg)";
-            }
-        }
-    </script>
-
-</body>
-</html> {% endcomment %}
-
-{% comment %} <!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI; }
-
-        body { display:flex; height:100vh; background:#f4f6f9; }
-
-        .header {
-            position:fixed;
-            top:0; left:0; right:0;
-            height:60px;
-            background:#4a90e2;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 30px;
-            color:white;
-        }
-
-        .sidebar {
-            width:250px;
-            background:white;
-            margin-top:60px;
-            padding:20px;
-            box-shadow:2px 0 10px rgba(0,0,0,0.05);
-        }
-
-        .category {
-            padding:12px;
-            background:#f1f3f6;
-            border-radius:8px;
-            margin-bottom:10px;
-            font-weight:600;
-            cursor:pointer;
-            transition:0.3s;
-        }
-
-        .category:hover {
-            background:#4a90e2;
-            color:white;
-        }
-
-        .content {
-            flex:1;
-            margin-top:60px;
-            padding:30px;
-        }
-
-        a { text-decoration:none; color:inherit; }
-    </style>
-</head>
-
-<body>
-
-<div class="header">
-    <div>Online Shopping</div>
-</div>
-
-<div class="sidebar">
-    <h3>Categories</h3>
-
-    {% for category in categories %}
-        <a href="{% url 'category' category.id %}">
-            <div class="category">
-                {{ category.name }}
-            </div>
-        </a>
-    {% endfor %}
-</div>
-
-<div class="content">
-    <h2>Welcome {{ username }}</h2>
-    <p style="margin-top:20px;">Please select a category</p>
-</div>
-
-</body>
-</html> {% endcomment %}
 
 
 <!DOCTYPE html>
@@ -487,6 +166,295 @@ function toggleSub(id) {
     const arrow = document.getElementById("arrow-" + id);
 
     // Close all other dropdowns
+    document.querySelectorAll(".sub-list").forEach(el => {
+        if(el.id !== "sub-" + id){
+            el.style.maxHeight = null;
+        }
+    });
+
+    document.querySelectorAll(".arrow").forEach(el => {
+        if(el.id !== "arrow-" + id){
+            el.classList.remove("rotate");
+        }
+    });
+
+    if (sub.style.maxHeight) {
+        sub.style.maxHeight = null;
+        arrow.classList.remove("rotate");
+    } else {
+        sub.style.maxHeight = sub.scrollHeight + "px";
+        arrow.classList.add("rotate");
+    }
+}
+</script>
+
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Segoe UI;
+        }
+
+        body {
+            display:flex;
+            height:100vh;
+            background:#f4f6f9;
+        }
+
+        /* HEADER */
+        .header {
+            position:fixed;
+            top:0; left:0; right:0;
+            height:60px;
+            background:#4a90e2;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 30px;
+            color:white;
+            box-shadow:0 2px 10px rgba(0,0,0,0.1);
+            z-index:1000;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width:260px;
+            background:white;
+            margin-top:60px;
+            padding:20px;
+            box-shadow:2px 0 15px rgba(0,0,0,0.05);
+            overflow-y:auto;
+        }
+
+        .sidebar h3 {
+            margin-bottom:20px;
+        }
+
+        .category {
+            padding:12px;
+            background:#f1f3f6;
+            border-radius:8px;
+            margin-bottom:10px;
+            font-weight:600;
+            cursor:pointer;
+            transition:all 0.3s ease;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .category:hover {
+            background:#4a90e2;
+            color:white;
+        }
+
+        .arrow {
+            transition:transform 0.3s ease;
+        }
+
+        .arrow.rotate {
+            transform:rotate(90deg);
+        }
+
+        .sub-list {
+            max-height:0;
+            overflow:hidden;
+            transition:max-height 0.4s ease;
+            padding-left:15px;
+        }
+
+        .sub-list a {
+            display:block;
+            padding:8px 5px;
+            color:#333;
+            border-radius:6px;
+            transition:0.2s;
+        }
+
+        .sub-list a:hover {
+            background:#e0e7ff;
+            padding-left:12px;
+        }
+
+        /* CONTENT */
+        .content {
+            flex:1;
+            margin-top:60px;
+            padding:30px;
+            overflow-y:auto;
+        }
+
+        /* Horizontal Boxes */
+        .boxes-row {
+            display:flex;
+            gap:30px;
+            align-items:flex-start;
+        }
+
+        .box {
+            flex:1;
+            background:white;
+            padding:20px;
+            border-radius:12px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+            min-height:350px;
+        }
+
+        .box h3 {
+            margin-bottom:20px;
+        }
+
+        .products {
+            display:flex;
+            flex-wrap:wrap;
+            gap:15px;
+        }
+
+        .product-card {
+            width:160px;
+            background:#f9f9f9;
+            padding:10px;
+            border-radius:10px;
+            transition:0.3s;
+        }
+
+        .product-card:hover {
+            transform:translateY(-5px);
+        }
+
+        .product-card img {
+            width:100%;
+            height:120px;
+            object-fit:cover;
+            border-radius:6px;
+        }
+
+        .product-card h4 {
+            margin:8px 0 4px;
+            font-size:14px;
+        }
+
+        .price {
+            color:#4a90e2;
+            font-weight:bold;
+        }
+
+        a {
+            text-decoration:none;
+            color:inherit;
+        }
+
+        /* Responsive */
+        @media(max-width:900px){
+            .boxes-row {
+                flex-direction:column;
+            }
+        }
+
+        @media(max-width:768px){
+            .sidebar{
+                display:none;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div><strong>Online Shopping</strong></div>
+    <div>Welcome {{ username }}</div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h3>Categories</h3>
+
+    {% for category in categories %}
+        <div class="menu-item">
+
+            <div class="category" onclick="toggleSub({{ category.id }})">
+                {{ category.name }}
+                <span class="arrow" id="arrow-{{ category.id }}">▶</span>
+            </div>
+
+            <div class="sub-list" id="sub-{{ category.id }}">
+                {% for sub in category.subcategories.all %}
+                    <a href="{% url 'subcategory' sub.id %}">
+                        {{ sub.name }}
+                    </a>
+                {% empty %}
+                    <div style="padding:8px;">No subcategories</div>
+                {% endfor %}
+            </div>
+
+        </div>
+    {% endfor %}
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+    <div class="boxes-row">
+
+        <!-- Recently Viewed -->
+        <div class="box">
+            <h3>Recently Viewed</h3>
+
+            <div class="products">
+                {% for product in recently_viewed %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image.url }}">
+                    </a>
+                    <h4>{{ product.name }}</h4>
+                    <p class="price">₹{{ product.price }}</p>
+                </div>
+                {% empty %}
+                    <p>No recently viewed products.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recommended -->
+        <div class="box">
+            <h3>Recommended</h3>
+
+            <div class="products">
+                {% for product in recommended %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image.url }}">
+                    </a>
+                    <h4>{{ product.name }}</h4>
+                    <p class="price">₹{{ product.price }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+function toggleSub(id) {
+    const sub = document.getElementById("sub-" + id);
+    const arrow = document.getElementById("arrow-" + id);
+
     document.querySelectorAll(".sub-list").forEach(el => {
         if(el.id !== "sub-" + id){
             el.style.maxHeight = null;
