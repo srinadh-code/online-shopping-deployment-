@@ -10,4 +10,5 @@ urlpatterns = [
     path("dashboard/", views.dashboardview, name="dashboard"),
     path('category/<int:id>/', views.category_view, name='category'),
     path('subcategory/<int:id>/', views.subcategory_view, name='subcategory'),
+    path('product/<int:id>/', views.product_detail, name='product_detail'),
 ]
