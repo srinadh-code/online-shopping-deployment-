@@ -53,15 +53,15 @@ def loginview(request):
             
 
 
-def dashboardview(request):
-    username = request.session.get('username')
+# def dashboardview(request):
+#     username = request.session.get('username')
 
-    if not username:
-        return redirect('login')   
+#     if not username:
+#         return redirect('login')   
 
-    return render(request, "dashboard.html", {   
-        "username": username
-    })
+#     return render(request, "dashboard.html", {   
+#         "username": username
+#     })
 
         
 def logoutview(request):
