@@ -1,0 +1,432 @@
+{% comment %} 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background: #f5f7fa;
+        }
+
+        /* HEADER */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #719ecb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            color: white;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .search-bar input {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            width: 250px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: white;
+            margin-top: 60px;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 15px;
+        }
+
+        .category {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .category:hover {
+            background: #f0f0f0;
+        }
+
+        .subcategories {
+            margin-left: 15px;
+            display: none;
+        }
+
+        .subcategories div {
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .subcategories div:hover {
+            color: #1e90ff;
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            margin-top: 60px;
+            padding: 30px;
+        }
+
+        .welcome {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .search-bar input {
+                width: 150px;
+            }
+        }
+        .category {
+    font-weight: bold;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">SKComputers</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h3>Categories</h3>
+        
+        <div class="category" onclick="toggleSub(this)">Electronics</div>
+       
+        <div class="subcategories" >
+            <div>Computers</div>
+            <div>Laptops</div>
+            <div>Monitors</div>
+            <div>Keyboard</div>
+            <div>Mouse</div>
+        </div>
+
+        <div class="category" onclick="toggleSub(this)">Cloths</div>
+        <div class="subcategories" >
+            <div>mens</div>
+            <div>womens</div>
+            <div>child</div>
+            <div>western</div>
+        </div>
+        <div class="category" onclick="toggleSub(this)">groceries</div>
+        <div class="subcategories" >
+            <div>makeup</div>
+            <div>vegitables</div>
+            <div>house hold</div>
+            <div>Decoration</div>
+        </div>
+        <div class="category" onclick="toggleSub(this)">Furniture</div>
+        <div class="subcategories" >
+        
+            <div>beds</div>
+            <div>chairs</div>
+        </div>
+        <div class="category" onclick="toggleSub(this)">Hardware</div>
+        <div class="subcategories" >
+            <div>moniters</div>
+            <div>mother board</div>
+            <div>IC</div>
+            <div>SD card</div>
+        </div>
+    </div>
+
+
+
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="welcome">
+            Welcome {{ username }} 
+
+
+<script>
+function toggleSub(element) {
+    var sub = element.nextElementSibling;
+
+    if (sub.style.display === "block") {
+        sub.style.display = "none";
+    } else {
+        sub.style.display = "block";
+    }
+}
+</script>
+
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background: #f4f6f9;
+        }
+
+        /* HEADER */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #4a90e2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            color: white;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .search-bar input {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            width: 250px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #ffffff;
+            margin-top: 60px;
+            padding: 20px;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            margin-bottom: 10px;
+        }
+
+        .category {
+            padding: 12px;
+            background: #f1f3f6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .category:hover {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .subcategories {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            padding-left: 15px;
+        }
+
+        .subcategories div {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .subcategories div:hover {
+            background: #e6f0ff;
+            color: #4a90e2;
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            margin-top: 60px;
+            padding: 30px;
+        }
+
+        .welcome {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .search-bar input {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">online shopping </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h3>Categories</h3>
+
+        <!-- Electronics -->
+        <div class="menu-item">
+            <div class="category" onclick="toggleMenu(this)">
+                Electronics <span class="arrow"></span>
+            </div>
+            <div class="subcategories">
+                <div>Computers</div>
+                <div>Laptops</div>
+                <div>Monitors</div>
+                <div>Keyboard</div>
+                <div>Mouse</div>
+            </div>
+        </div>
+
+        <!-- Cloths -->
+        <div class="menu-item">
+            <div class="category" onclick="toggleMenu(this)">
+                Cloths <span class="arrow"></span>
+            </div>
+            <div class="subcategories">
+                <div>Mens</div>
+                <div>Womens</div>
+                <div>Kids</div>
+                <div>Western</div>
+            </div>
+        </div>
+
+        <!-- Groceries -->
+        <div class="menu-item">
+            <div class="category" onclick="toggleMenu(this)">
+                Groceries <span class="arrow"></span>
+            </div>
+            <div class="subcategories">
+                <div>Makeup</div>
+                <div>Vegetables</div>
+                <div>House Hold</div>
+                <div>Decoration</div>
+            </div>
+        </div>
+
+        <!-- Furniture -->
+        <div class="menu-item">
+            <div class="category" onclick="toggleMenu(this)">
+                Furniture <span class="arrow"></span>
+            </div>
+            <div class="subcategories">
+                <div>Beds</div>
+                <div>Chairs</div>
+            </div>
+        </div>
+
+        <!-- Hardware -->
+        <div class="menu-item">
+            <div class="category" onclick="toggleMenu(this)">
+                Hardware <span class="arrow"></span>
+            </div>
+            <div class="subcategories">
+                <div>Monitors</div>
+                <div>Mother Board</div>
+                <div>IC</div>
+                <div>SD Card</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="welcome">
+            Welcome {{ username }} 
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu(element) {
+            let submenu = element.nextElementSibling;
+            let arrow = element.querySelector(".arrow");
+
+            if (submenu.style.maxHeight) {
+                submenu.style.maxHeight = null;
+                arrow.style.transform = "rotate(0deg)";
+            } else {
+                submenu.style.maxHeight = submenu.scrollHeight + "px";
+                arrow.style.transform = "rotate(180deg)";
+            }
+        }
+    </script>
+
+</body>
+</html>

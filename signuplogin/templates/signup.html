@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        {% comment %} body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #4e1d75, #7b2cbf, #9d4edd);
+        } {% endcomment %}
+
+                body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(rgba(27, 25, 25, 0.5), rgba(30, 28, 28, 0.5)),
+        url("{% static 'images/bg.jpg' %}") no-repeat center center;
+    background-size: cover;
+    font-family: sans-serif;
+}
+
+        .card {
+            width: 360px;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            text-align: center;
+            color: white;
+        }
+
+        .card h2 {
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+        }
+        
+
+        .input-group input::placeholder {
+            color: #ddd;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 5px;
+            text-align: left;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background: white;
+            color: #6a11cb;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .register-btn:hover {
+            background: #eee;
+        }
+
+        .success {
+            margin-top: 15px;
+            color: #00ff99;
+        }
+
+        .bottom-text {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .bottom-text a {
+            color: #00ff99;
+            font-weight: bold;
+            text-decoration: none;
+            
+        }
+
+        @media(max-width: 400px){
+            .card{
+                width: 90%;
+                padding: 30px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <h2>Register</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="input-group">
+            <input type="text" name="username" placeholder="Username">
+            {% if error.username %}
+                <div class="error">{{ error.username.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="input-group">
+            <input type="email" name="email" placeholder="Email">
+            {% if error.email %}
+                <div class="error">{{ error.email.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="input-group">
+            <input type="password" name="password" placeholder="Password">
+            {% if error.password %}
+                <div class="error">{{ error.password.0 }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="register-btn">Register</button>
+    </form>
+
+    {% if message %}
+        <div class="success">{{ message }}</div>
+    {% endif %}
+
+    <div class="bottom-text">
+        Already have an account? 
+        <a href="{% url 'login' %}">Login</a>
+    </div>
+
+</div>
+
+</body>
+</html>

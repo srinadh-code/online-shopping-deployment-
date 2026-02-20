@@ -1,0 +1,97 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify OTP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1fc8db, #2c7be5);
+            font-family: sans-serif;
+        }
+
+        .card {
+            width: 350px;
+            padding: 40px;
+            border-radius: 25px;
+            background: #f4f6fb;
+            box-shadow: 15px 15px 35px rgba(0,0,0,0.15),
+                        -10px -10px 25px rgba(255,255,255,0.9);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            background: #f4f6fb;
+            box-shadow: inset 6px 6px 12px rgba(0,0,0,0.08),
+                        inset -6px -6px 12px rgba(255,255,255,0.9);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(135deg, #2c7be5, #1fc8db);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .back {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #1e90ff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <h2>Verify OTP & Reset Password</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="otp" placeholder="Enter OTP">
+        <input type="password" name="new_password" placeholder="New Password">
+        <button type="submit">Reset Password</button>
+    </form>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <a href="{% url 'login' %}" class="back">Back to Login</a>
+
+</div>
+
+</body>
+</html>
