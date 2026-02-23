@@ -1,3 +1,113 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Segoe UI;
+        }
+
+        body{
+            background:#f4f6f9;
+        }
+
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .container{
+            padding:30px;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:white;
+            padding:15px;
+            border-radius:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            text-align:center;
+            transition:0.3s;
+        }
+
+        .card:hover{
+            transform:translateY(-5px);
+        }
+
+        .card img{
+            width:100%;
+            height:160px;
+            object-fit:cover;
+            border-radius:8px;
+        }
+
+        .price{
+            color:#4a90e2;
+            font-weight:bold;
+            margin-top:5px;
+        }
+
+        .back{
+            margin-bottom:20px;
+            display:inline-block;
+            padding:6px 12px;
+            background:#4a90e2;
+            color:white;
+            border-radius:6px;
+            text-decoration:none;
+        }
+
+        @media(max-width:768px){
+            .grid{
+                grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div><strong>{{ title }}</strong></div>
+    <div>Welcome {{ username }}</div>
+</div>
+
+<div class="container">
+
+    <a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
+
+    <div class="grid">
+        {% for product in products %}
+        <div class="card">
+            <img src="{{ product.image.url }}">
+            <h4>{{ product.name }}</h4>
+            <p class="price">₹{{ product.price }}</p>
+        </div>
+        {% empty %}
+            <p>No products available.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html> {% endcomment %}
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,108 +115,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI; }
+        body{
+            margin:0;
+            font-family:Segoe UI;
+            background:#f4f6f9;
+        }
 
-        body { display:flex; height:100vh; background:#f4f6f9; }
-
-        .header {
-            position:fixed;
-            top:0; left:0; right:0;
-            height:60px;
+        .header{
             background:#4a90e2;
-            display:flex;
-            align-items:center;
-            padding:0 30px;
             color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
         }
 
-        .sidebar {
-            width:250px;
-            background:white;
-            margin-top:60px;
-            padding:20px;
-        }
-
-        .category {
-            padding:12px;
-            background:#f1f3f6;
-            border-radius:8px;
-            margin-bottom:10px;
-            font-weight:600;
-        }
-
-        .content {
-            flex:1;
-            margin-top:60px;
+        .container{
             padding:30px;
         }
 
-        .products {
-            display:flex;
-            flex-wrap:wrap;
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
             gap:20px;
-            margin-top:20px;
         }
 
-        .product-card {
-            width:200px;
+        .card{
             background:white;
-            padding:10px;
-            border-radius:10px;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
+            padding:15px;
+            border-radius:12px;
+            text-align:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
             transition:0.3s;
         }
 
-        .product-card:hover {
+        .card:hover{
             transform:translateY(-5px);
         }
 
-        .product-card img {
+        .card img{
             width:100%;
-            height:150px;
+            height:160px;
             object-fit:cover;
             border-radius:8px;
         }
 
-        .price {
+        .price{
             color:#4a90e2;
             font-weight:bold;
         }
 
-        a { text-decoration:none; color:inherit; }
+        a{
+            text-decoration:none;
+            color:inherit;
+        }
+
+        .back{
+            display:inline-block;
+            margin-bottom:20px;
+            padding:6px 12px;
+            background:#4a90e2;
+            color:white;
+            border-radius:6px;
+        }
     </style>
 </head>
 
 <body>
 
 <div class="header">
-    <div>Online Shopping</div>
+    <div><strong>{{ subcategory.name }}</strong></div>
+    <div>Welcome {{ username }}</div>
 </div>
 
-<div class="sidebar">
-    <h3>Categories</h3>
+<div class="container">
 
-    {% for cat in categories %}
-        <a href="{% url 'category' cat.id %}">
-            <div class="category">{{ cat.name }}</div>
-        </a>
-    {% endfor %}
-</div>
+    <a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
 
-<div class="content">
-    <h2>{{ subcategory.name }}</h2>
+    <h2>Products</h2>
 
-    <div class="products">
+    <div class="grid">
         {% for product in products %}
-        <div class="product-card">
-            <img src="{{ product.image.url }}">
-            <h4>{{ product.name }}</h4>
-            <p class="price">₹{{ product.price }}</p>
-        </div>
+        <a href="{% url 'product_detail' product.id %}">
+            <div class="card">
+                <img src="{{ product.image.url }}">
+                <h4>{{ product.name }}</h4>
+                <p class="price">₹{{ product.price }}</p>
+            </div>
+        </a>
         {% empty %}
-            <p>No products available</p>
+            <p>No products available.</p>
         {% endfor %}
     </div>
+
 </div>
 
 </body>

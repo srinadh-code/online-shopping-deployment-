@@ -1,42 +1,70 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Category, SubCategory, Product
 
 
-from django.shortcuts import render, redirect
-from .models import Category, Product,SubCategory
-
-# def dashboardview(request):
-#     username = request.session.get('username')
-
-#     if not username:
-#         return redirect('login')
-
-#     categories = Category.objects.all()
-#     products = Product.objects.all()
-
-#     return render(request, "dashboard.html", {
-#         "username": username,
-#         "categories": categories,
-#         "products": products
-#     })
-    
+# ================= DASHBOARD + SEARCH =================
 def dashboardview(request):
     username = request.session.get('username')
-
     if not username:
         return redirect('login')
 
     categories = Category.objects.all()
+    query = request.GET.get('q')
+
+    # ---------------- SEARCH SYSTEM ----------------
+    if query:
+
+        # 1️⃣ Category Search
+        category = Category.objects.filter(
+            name__icontains=query
+        ).first()
+
+        if category:
+            subcategories = SubCategory.objects.filter(category=category)
+            return render(request, "category.html", {
+                "username": username,
+                "category": category,
+                "subcategories": subcategories
+            })
+
+        # 2️⃣ SubCategory Search
+        subcategory = SubCategory.objects.filter(
+            name__icontains=query
+        ).first()
+
+        if subcategory:
+            products = Product.objects.filter(subcategory=subcategory)
+            return render(request, "products.html", {
+                "username": username,
+                "subcategory": subcategory,
+                "products": products,
+                "title": subcategory.name
+            })
+
+        # 3️⃣ Product Search
+        products = Product.objects.filter(
+            name__icontains=query
+        )
+
+        return render(request, "products.html", {
+            "username": username,
+            "products": products,
+            "title": "Search Results"
+        })
+
+    # ---------------- NORMAL DASHBOARD ----------------
 
     # Recently Viewed
     recent_ids = request.session.get('recently_viewed', [])
     recently_viewed = Product.objects.filter(id__in=recent_ids)
 
-    # Maintain correct order
+    # Maintain order
     recently_viewed = sorted(
         recently_viewed,
         key=lambda x: recent_ids.index(x.id)
     )
 
-    #  Recommended (Random 4)
+    # Recommended
     recommended = Product.objects.all().order_by('?')[:4]
 
     return render(request, "dashboard.html", {
@@ -45,46 +73,59 @@ def dashboardview(request):
         "recently_viewed": recently_viewed,
         "recommended": recommended
     })
-def category_view(request, id):
-    category = Category.objects.get(id=id)
+
+
+# ================= CATEGORY PAGE =================
+def category_view(request, category_id):
+    username = request.session.get('username')
+    if not username:
+        return redirect('login')
+
+    category = get_object_or_404(Category, id=category_id)
     subcategories = SubCategory.objects.filter(category=category)
 
     return render(request, "category.html", {
+        "username": username,
         "category": category,
         "subcategories": subcategories
     })
-    
-def subcategory_view(request, id):
-    subcategory = SubCategory.objects.get(id=id)
+
+
+# ================= SUBCATEGORY PAGE =================
+def subcategory_view(request, subcategory_id):
+    username = request.session.get('username')
+    if not username:
+        return redirect('login')
+
+    subcategory = get_object_or_404(SubCategory, id=subcategory_id)
     products = Product.objects.filter(subcategory=subcategory)
 
     return render(request, "products.html", {
+        "username": username,
+        "subcategory": subcategory,
         "products": products,
-        "subcategory": subcategory
+        "title": subcategory.name
     })
-    
-    
-    
-    
-def product_detail(request, id):
-    product = Product.objects.get(id=id)
 
-    # Get existing session list or empty list
+
+# ================= PRODUCT DETAIL PAGE =================
+def product_detail(request, product_id):
+    username = request.session.get('username')
+    if not username:
+        return redirect('login')
+
+    product = get_object_or_404(Product, id=product_id)
+
+    # Recently viewed logic
     recent = request.session.get('recently_viewed', [])
 
-    # Remove if already exists (to avoid duplicates)
-    if id in recent:
-        recent.remove(id)
+    if product.id in recent:
+        recent.remove(product.id)
 
-    # Insert at beginning
-    recent.insert(0, id)
-
-    # Keep only last 5 products
-    recent = recent[:5]
-
-    # Save back to session
-    request.session['recently_viewed'] = recent
+    recent.insert(0, product.id)
+    request.session['recently_viewed'] = recent[:5]
 
     return render(request, "product_detail.html", {
+        "username": username,
         "product": product
     })

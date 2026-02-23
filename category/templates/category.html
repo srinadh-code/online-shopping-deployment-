@@ -1,21 +1,186 @@
+{% comment %} 
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>{{ category.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body{
+            font-family:Segoe UI;
+            background:#f4f6f9;
+            margin:0;
+        }
+
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+        }
+
+        .container{
+            padding:30px;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:white;
+            padding:15px;
+            border-radius:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            text-align:center;
+            transition:0.3s;
+        }
+
+        .card:hover{
+            transform:translateY(-5px);
+        }
+
+        .card img{
+            width:100%;
+            height:160px;
+            object-fit:cover;
+            border-radius:8px;
+        }
+
+        a{
+            text-decoration:none;
+            color:inherit;
+        }
+    </style>
 </head>
 <body>
 
-<h2>{{ category.name }}</h2>
+<div class="header">
+    <div><strong>{{ category.name }}</strong></div>
+    <div>Welcome {{ username }}</div>
+</div>
 
-{% for product in products %}
-    <div>
-        <img src="{{ product.image.url }}" width="150">
-        <h4>{{ product.name }}</h4>
-        <p>₹{{ product.price }}</p>
+<div class="container">
+    <h2>Subcategories</h2>
+
+    <div class="grid">
+        {% for sub in subcategories %}
+        <a href="{% url 'subcategory' sub.id %}">
+            <div class="card">
+                {% if sub.image %}
+                    <img src="{{ sub.image.url }}">
+                {% endif %}
+                <h4>{{ sub.name }}</h4>
+            </div>
+        </a>
+        {% empty %}
+            <p>No subcategories found.</p>
+        {% endfor %}
     </div>
-{% empty %}
-    <p>No products found.</p>
-{% endfor %}
+</div>
+
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ category.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family:Segoe UI;
+            background:#f4f6f9;
+        }
+
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+        }
+
+        .container{
+            padding:30px;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:white;
+            padding:15px;
+            border-radius:12px;
+            text-align:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            transition:0.3s;
+        }
+
+        .card:hover{
+            transform:translateY(-5px);
+        }
+
+        .card img{
+            width:100%;
+            height:160px;
+            object-fit:cover;
+            border-radius:8px;
+        }
+
+        a{
+            text-decoration:none;
+            color:inherit;
+        }
+
+        .back{
+            display:inline-block;
+            margin-bottom:20px;
+            padding:6px 12px;
+            background:#4a90e2;
+            color:white;
+            border-radius:6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div><strong>{{ category.name }}</strong></div>
+    <div>Welcome {{ username }}</div>
+</div>
+
+<div class="container">
+
+    <a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
+
+    <h2>Subcategories</h2>
+
+    <div class="grid">
+        {% for sub in subcategories %}
+        <a href="{% url 'subcategory' sub.id %}">
+            <div class="card">
+                {% if sub.image %}
+                    <img src="{{ sub.image.url }}">
+                {% endif %}
+                <h4>{{ sub.name }}</h4>
+            </div>
+        </a>
+        {% empty %}
+            <p>No subcategories available.</p>
+        {% endfor %}
+    </div>
+
+</div>
 
 </body>
 </html>

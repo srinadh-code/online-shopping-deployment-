@@ -1,3 +1,97 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Segoe UI;
+        }
+
+        body{
+            background:#f4f6f9;
+        }
+
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+        }
+
+        .container{
+            padding:40px;
+            display:flex;
+            gap:40px;
+            align-items:flex-start;
+        }
+
+        .image-box img{
+            width:350px;
+            border-radius:12px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .details{
+            max-width:500px;
+        }
+
+        .price{
+            font-size:22px;
+            color:#4a90e2;
+            font-weight:bold;
+            margin:15px 0;
+        }
+
+        .btn{
+            background:#4a90e2;
+            color:white;
+            padding:10px 20px;
+            border-radius:8px;
+            display:inline-block;
+            margin-top:15px;
+            cursor:pointer;
+        }
+
+        a{
+            text-decoration:none;
+            color:white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div><strong>Product Detail</strong></div>
+    <div>Welcome {{ username }}</div>
+</div>
+
+<div class="container">
+
+    <div class="image-box">
+        <img src="{{ product.image.url }}">
+    </div>
+
+    <div class="details">
+        <h2>{{ product.name }}</h2>
+        <p class="price">₹{{ product.price }}</p>
+        <p>{{ product.description }}</p>
+
+        <div class="btn">Add to Cart</div>
+    </div>
+
+</div>
+
+</body>
+</html> {% endcomment %}
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,150 +99,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        * {
+        body{
             margin:0;
-            padding:0;
-            box-sizing:border-box;
             font-family:Segoe UI;
-        }
-
-        body {
             background:#f4f6f9;
-            padding:40px;
         }
 
-        .container {
-            max-width:1100px;
-            margin:auto;
-            background:white;
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+        }
+
+        .container{
             padding:40px;
-            border-radius:15px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.08);
             display:flex;
             gap:40px;
-            flex-wrap:wrap;
+            align-items:flex-start;
         }
 
-        .product-image {
-            flex:1;
-            min-width:300px;
-        }
-
-        .product-image img {
-            width:100%;
-            max-width:400px;
+        .image-box img{
+            width:350px;
             border-radius:12px;
-            transition:0.3s;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .product-image img:hover {
-            transform:scale(1.05);
+        .details{
+            max-width:500px;
         }
 
-        .product-info {
-            flex:1;
-            min-width:300px;
-        }
-
-        .product-info h1 {
-            margin-bottom:15px;
-            font-size:28px;
-        }
-
-        .price {
-            font-size:24px;
+        .price{
+            font-size:22px;
             color:#4a90e2;
             font-weight:bold;
             margin:15px 0;
         }
 
-        .description {
-            margin:20px 0;
-            line-height:1.6;
-            color:#555;
-        }
-
-        .buttons {
-            margin-top:25px;
-            display:flex;
-            gap:15px;
-        }
-
-        .btn {
-            padding:12px 25px;
-            border:none;
-            border-radius:8px;
-            cursor:pointer;
-            font-weight:600;
-            transition:0.3s;
-        }
-
-        .btn-cart {
+        .back{
+            display:inline-block;
+            margin:20px;
+            padding:6px 12px;
             background:#4a90e2;
             color:white;
-        }
-
-        .btn-cart:hover {
-            background:#357bd8;
-        }
-
-        .btn-buy {
-            background:#28a745;
-            color:white;
-        }
-
-        .btn-buy:hover {
-            background:#1e7e34;
-        }
-
-        .back-link {
-            display:inline-block;
-            margin-bottom:25px;
-            color:#4a90e2;
+            border-radius:6px;
             text-decoration:none;
-            font-weight:500;
-        }
-
-        @media(max-width:768px){
-            .container {
-                flex-direction:column;
-                text-align:center;
-            }
-
-            .product-image img {
-                margin:auto;
-            }
-
-            .buttons {
-                justify-content:center;
-            }
         }
     </style>
 </head>
 
 <body>
 
-<a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+<div class="header">
+    <div><strong>Product Detail</strong></div>
+    <div>Welcome {{ username }}</div>
+</div>
+
+<a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
 
 <div class="container">
 
-    <div class="product-image">
-        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+    <div class="image-box">
+        <img src="{{ product.image.url }}">
     </div>
 
-    <div class="product-info">
-        <h1>{{ product.name }}</h1>
-
-        <div class="price">₹{{ product.price }}</div>
-
-        <div class="description">
-            {{ product.description }}
-        </div>
-
-        <div class="buttons">
-            <button class="btn btn-cart">Add to Cart</button>
-            <button class="btn btn-buy">Buy Now</button>
-        </div>
+    <div class="details">
+        <h2>{{ product.name }}</h2>
+        <p class="price">₹{{ product.price }}</p>
+        <p>{{ product.description }}</p>
     </div>
 
 </div>
