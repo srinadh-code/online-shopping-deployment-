@@ -1,20 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Category, SubCategory, Product
-
-
-# ================= DASHBOARD + SEARCH =================
+#  dashboard search
 def dashboardview(request):
     username = request.session.get('username')
     if not username:
         return redirect('login')
-
     categories = Category.objects.all()
     query = request.GET.get('q')
-
-    # ---------------- SEARCH SYSTEM ----------------
     if query:
-
-        # 1️⃣ Category Search
+ #  Category Search
         category = Category.objects.filter(
             name__icontains=query
         ).first()
@@ -27,7 +21,7 @@ def dashboardview(request):
                 "subcategories": subcategories
             })
 
-        # 2️⃣ SubCategory Search
+ # SubCategory Search
         subcategory = SubCategory.objects.filter(
             name__icontains=query
         ).first()
@@ -41,7 +35,7 @@ def dashboardview(request):
                 "title": subcategory.name
             })
 
-        # 3️⃣ Product Search
+ #  Product Search
         products = Product.objects.filter(
             name__icontains=query
         )
@@ -52,13 +46,11 @@ def dashboardview(request):
             "title": "Search Results"
         })
 
-    # ---------------- NORMAL DASHBOARD ----------------
-
-    # Recently Viewed
+ # dashboard normal
+    # recently viewed  
     recent_ids = request.session.get('recently_viewed', [])
     recently_viewed = Product.objects.filter(id__in=recent_ids)
-
-    # Maintain order
+        # maintain order
     recently_viewed = sorted(
         recently_viewed,
         key=lambda x: recent_ids.index(x.id)
@@ -75,7 +67,7 @@ def dashboardview(request):
     })
 
 
-# ================= CATEGORY PAGE =================
+# category page
 def category_view(request, category_id):
     username = request.session.get('username')
     if not username:
@@ -91,7 +83,7 @@ def category_view(request, category_id):
     })
 
 
-# ================= SUBCATEGORY PAGE =================
+# subcategory page
 def subcategory_view(request, subcategory_id):
     username = request.session.get('username')
     if not username:
@@ -108,7 +100,7 @@ def subcategory_view(request, subcategory_id):
     })
 
 
-# ================= PRODUCT DETAIL PAGE =================
+#  PRODUCT DETAIL PAGE 
 def product_detail(request, product_id):
     username = request.session.get('username')
     if not username:
