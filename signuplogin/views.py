@@ -1,75 +1,95 @@
 
-from django.shortcuts import render,redirect
-from .serializers import SignupSerializer
-from .models import Signup
+from .models import OTP
+
+
+from django.views import View
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import logout
+class signupview(View):
+
+    def get(self, request):
+        return render(request, "signup.html")
+
+    def post(self, request):
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if User.objects.filter(username=username).exists():
+            return render(request, "signup.html", {
+                "error": "Username already exists"
+            })
+
+        if User.objects.filter(email=email).exists():
+            return render(request, "signup.html", {
+                "error": "Email already registered"
+            })
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        return render(request, "signup.html", {
+            "message": "Account created successfully!"
+        })
+        
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+
+class loginview(View):
+
+    def get(self, request):
+        return render(request, "login.html")
+
+    def post(self, request):
+        username_or_email = request.POST.get("username_or_email")
+        password = request.POST.get("password")
+
+        # Try username
+        user = authenticate(request, username=username_or_email, password=password)
+
+        # If not, try email
+        if user is None:
+            try:
+                user_obj = User.objects.get(email=username_or_email)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
+
+        if user is not None:
+            login(request, user)
+            return redirect("dashboard")
+        else:
+            return render(request, "login.html", {
+                "error": "Invalid username/email or password"
+            })
+
+
+class logoutview(View):
+
+    def get(self, request):
+        logout(request)
+        return redirect("login")
 import random
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import OTP
-from django.db .models import Q
-def signupview(request):
-    message = ""
-    error = {}
 
-    if request.method == "POST":
-        serializer = SignupSerializer(data=request.POST)
+class ForgotPasswordView(View):
 
-        if serializer.is_valid():
-            serializer.save()
-            message = "Account created successfully!"
-        else:
-            error = serializer.errors
+    def get(self, request):
+        return render(request, "forgot_password.html")
 
-    return render(request, "signup.html", {
-        "message": message,
-        "error": error
-    })
-
-def loginview(request):
-    message=""
-    error={}
-    
-    if request.method =="POST":
-        username_or_email=request.POST.get("username_or_email" )
-        password=request.POST.get("password")
-        
-        try:
-            user=Signup.objects.get (Q(username= username_or_email)| Q(email=username_or_email))
-            
-            if user.password==password:
-                request.session['username'] = user.username
-                
-                return redirect('dashboard')  
-            else:
-                message = "incorrect password"
-                
-        except Signup.DoesNotExist:
-            error = "user does not exist"
-            
-    return render(request ,"login.html",{
-        "message":message,
-        "error":error
-    })
-            
-
-        
-def logoutview(request):
-    request.session.flush()
-    return redirect('login')
-
-        
-
-def forgot_password_view(request):
-    error = ""
-
-    if request.method == "POST":
+    def post(self, request):
         email = request.POST.get("email")
 
         try:
-            user = Signup.objects.get(email=email)
+            user = User.objects.get(email=email)
 
             otp_code = str(random.randint(100000, 999999))
-
             OTP.objects.create(user=user, code=otp_code)
 
             send_mail(
@@ -83,34 +103,40 @@ def forgot_password_view(request):
             request.session['reset_email'] = email
             return redirect('verify_reset_otp')
 
-        except Signup.DoesNotExist:
-            error = "Email not registered"
+        except User.DoesNotExist:
+            return render(request, "forgot_password.html", {
+                "error": "Email not registered"
+            })
+class VerifyResetOTPView(View):
 
-    return render(request, "forgot_password.html", {"error": error})
-def verify_reset_otp_view(request):
-    error = ""
+    def get(self, request):
+        if not request.session.get('reset_email'):
+            return redirect('forgot_password')
 
-    email = request.session.get('reset_email')
+        return render(request, "verify_reset_otp.html")
 
-    if not email:
-        return redirect('forgot_password')
+    def post(self, request):
+        email = request.session.get('reset_email')
 
-    if request.method == "POST":
+        if not email:
+            return redirect('forgot_password')
+
         entered_otp = request.POST.get("otp")
         new_password = request.POST.get("new_password")
 
         try:
-            user = Signup.objects.get(email=email)
+            user = User.objects.get(email=email)
             otp_record = OTP.objects.filter(user=user).last()
 
             if otp_record and otp_record.code == entered_otp:
-                user.password = new_password
+                user.set_password(new_password)   
                 user.save()
+
                 return redirect('login')
             else:
-                error = "Invalid OTP"
+                return render(request, "verify_reset_otp.html", {
+                    "error": "Invalid OTP"
+                })
 
-        except Signup.DoesNotExist:
-            error = "Something went wrong"
-
-    return render(request, "verify_reset_otp.html", {"error": error})
+        except User.DoesNotExist:
+            return redirect('forgot_password')

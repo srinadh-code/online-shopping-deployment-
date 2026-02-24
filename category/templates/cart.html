@@ -1,0 +1,357 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family:Segoe UI;
+            background:#f4f6f9;
+        }
+
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .container{
+            max-width:1100px;
+            margin:40px auto;
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        .cart-item{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            border-bottom:1px solid #eee;
+            padding:15px 0;
+        }
+
+        .left{
+            display:flex;
+            align-items:center;
+            gap:20px;
+        }
+
+        .left img{
+            width:80px;
+            height:80px;
+            object-fit:cover;
+            border-radius:8px;
+        }
+
+        .details h4{
+            margin:0;
+        }
+
+        .price{
+            color:#4a90e2;
+            font-weight:bold;
+        }
+
+        .remove-btn{
+            background:#dc3545;
+            color:white;
+            border:none;
+            padding:6px 12px;
+            border-radius:6px;
+            cursor:pointer;
+        }
+
+        .total-box{
+            text-align:right;
+            margin-top:30px;
+        }
+
+        .checkout{
+            margin-top:20px;
+            padding:12px 25px;
+            background:#28a745;
+            color:white;
+            border:none;
+            border-radius:8px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .continue{
+            display:inline-block;
+            margin-top:15px;
+            text-decoration:none;
+            color:#4a90e2;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div><strong>Your Cart</strong></div>
+    <div>Welcome {{ request.user.username }}</div>
+</div>
+
+<div class="container">
+
+    {% for item in items %}
+        <div class="cart-item">
+
+            <div class="left">
+                <img src="{{ item.product.image.url }}">
+                <div class="details">
+                    <h4>{{ item.product.name }}</h4>
+                    <p class="price">₹{{ item.product.price }}</p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p>Total: ₹{{ item.product.price|floatformat:2|add:"0" }}</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button type="submit" class="remove-btn">Remove</button>
+            </form>
+
+        </div>
+    {% empty %}
+        <p>Your cart is empty.</p>
+    {% endfor %}
+
+    {% if items %}
+        <div class="total-box">
+            <h3>Grand Total: ₹{{ total }}</h3>
+            <button class="checkout">Proceed to Checkout</button>
+        </div>
+    {% endif %}
+    
+
+    <a href="{% url 'dashboard' %}" class="continue">← Continue Shopping</a>
+
+</div>
+
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family:Segoe UI, sans-serif;
+            background:#f5f7fa;
+        }
+
+        .header{
+            background:#4a90e2;
+            color:white;
+            padding:18px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .container{
+            max-width:1100px;
+            margin:40px auto;
+            display:flex;
+            gap:30px;
+        }
+
+        /* LEFT SIDE - CART ITEMS */
+        .cart-box{
+            flex:2;
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.05);
+        }
+
+        .cart-item{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            border-bottom:1px solid #eee;
+            padding:20px 0;
+        }
+
+        .left{
+            display:flex;
+            align-items:center;
+            gap:20px;
+        }
+
+        .left img{
+            width:90px;
+            height:90px;
+            object-fit:cover;
+            border-radius:10px;
+        }
+
+        .details h4{
+            margin:0 0 5px 0;
+        }
+
+        .price{
+            color:#4a90e2;
+            font-weight:bold;
+        }
+
+        .quantity{
+            background:#f0f3f8;
+            padding:4px 10px;
+            border-radius:6px;
+            font-size:13px;
+            display:inline-block;
+            margin-top:5px;
+        }
+
+        .remove-btn{
+            background:#ff4d4d;
+            color:white;
+            border:none;
+            padding:8px 14px;
+            border-radius:6px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .remove-btn:hover{
+            background:#e60000;
+        }
+
+        /* RIGHT SIDE - SUMMARY */
+        .summary-box{
+            flex:1;
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.05);
+            height:fit-content;
+        }
+
+        .summary-box h3{
+            margin-top:0;
+        }
+
+        .summary-line{
+            display:flex;
+            justify-content:space-between;
+            margin:15px 0;
+        }
+
+        .checkout-btn{
+            width:100%;
+            padding:14px;
+            background:#28a745;
+            color:white;
+            border:none;
+            border-radius:8px;
+            font-weight:bold;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .checkout-btn:hover{
+            background:#218838;
+        }
+
+        .continue{
+            display:inline-block;
+            margin-top:20px;
+            text-decoration:none;
+            color:#4a90e2;
+            font-weight:500;
+        }
+
+        @media(max-width:900px){
+            .container{
+                flex-direction:column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div><strong>Your Cart</strong></div>
+    <div>Welcome {{ request.user.username }}</div>
+</div>
+
+<div class="container">
+
+    <!-- CART ITEMS -->
+    <div class="cart-box">
+
+        {% for item in items %}
+            <div class="cart-item">
+
+                <div class="left">
+                    <img src="{{ item.product.image.url }}">
+                    <div class="details">
+                        <h4>{{ item.product.name }}</h4>
+                        <p class="price">₹{{ item.product.price }}</p>
+                        <div class="quantity">
+                            Qty: {{ item.quantity }}
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="remove-btn">
+                        Remove
+                    </button>
+                </form>
+
+            </div>
+        {% empty %}
+            <p>Your cart is empty.</p>
+        {% endfor %}
+
+        <a href="{% url 'dashboard' %}" class="continue">
+            ← Continue Shopping
+        </a>
+
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    {% if items %}
+    <div class="summary-box">
+        <h3>Order Summary</h3>
+
+        <div class="summary-line">
+            <span>Total Items</span>
+            <span>{{ items|length }}</span>
+        </div>
+
+        <div class="summary-line">
+            <strong>Grand Total</strong>
+            <strong>₹{{ total }}</strong>
+        </div>
+
+        <form method="POST" action="{% url 'place_order' %}">
+            {% csrf_token %}
+            <button type="submit" class="checkout-btn">
+                Place Order
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
