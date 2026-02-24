@@ -1,5 +1,3 @@
-
-
 from django.urls import path
 from . import views
 
@@ -23,4 +21,10 @@ urlpatterns = [
     path("place-order/", views.place_order, name="place_order"),
     
     path("my-orders/", views.my_orders, name="my_orders"),
+    path("toggle-wishlist/<int:product_id>/", views.toggle_wishlist, name="toggle_wishlist"),
+    path("wishlist/", views.wishlist_view, name="wishlist"),
+    path("remove-from-wishlist/<int:item_id>/",
+     views.remove_from_wishlist,
+     name="remove_from_wishlist"),
 ]
+

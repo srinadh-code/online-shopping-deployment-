@@ -1,229 +1,212 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Segoe UI;
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-        body{
-            background:#f4f6f9;
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
 
-        /* HEADER */
-        .header{
-            position:fixed;
-            top:0; left:0; right:0;
-            height:60px;
-            background:skyblue;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 30px;
-            color:white;
-            z-index:1000;
-        }
+body{
+    background:linear-gradient(135deg,#eef2f3,#dfe9f3);
+}
 
-        .search-bar input{
-            padding:8px 15px;
-            border-radius:20px;
-            border:none;
-            outline:none;
-            width:250px;
-        }
+/* HEADER */
+.header{
+    position:fixed;
+    top:0; left:0; right:0;
+    height:70px;
+    background:linear-gradient(90deg,#1e3c72,#2a5298);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 40px;
+    color:white;
+    box-shadow:0 4px 20px rgba(0,0,0,0.2);
+    z-index:1000;
+}
 
-        .header-right{
-            display:flex;
-            align-items:center;
-            gap:20px;
-        }
+.search-bar input{
+    padding:10px 20px;
+    border-radius:30px;
+    border:none;
+    outline:none;
+    width:300px;
+}
 
-        .cart-btn{
-            background:white;
-            color:#4a90e2;
-            padding:6px 14px;
-            border-radius:20px;
-            text-decoration:none;
-            font-weight:600;
-            transition:0.3s;
-        }
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:25px;
+}
 
-        .cart-btn:hover{
-            background:#e6f0ff;
-        }
+.cart-btn{
+    background:white;
+    color:#1e3c72;
+    padding:8px 20px;
+    border-radius:30px;
+    text-decoration:none;
+    font-weight:600;
+}
 
-        /* MAIN WRAPPER */
-        .main-wrapper{
-            display:flex;
-            margin-top:60px;
-            min-height:calc(100vh - 60px);
-        }
+.main-wrapper{
+    display:flex;
+    margin-top:70px;
+    min-height:calc(100vh - 70px);
+}
 
-        /* SIDEBAR */
-        .sidebar{
-            width:260px;
-            background:white;
-            padding:20px;
-            box-shadow:2px 0 15px rgba(0,0,0,0.05);
-        }
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,0.6);
+    padding:25px;
+}
 
-        .sidebar h3{
-            margin-bottom:20px;
-        }
+.category{
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:10px;
+    cursor:pointer;
+    background:white;
+}
 
-        .category{
-            padding:12px;
-            background:#f1f3f6;
-            border-radius:8px;
-            margin-bottom:10px;
-            font-weight:600;
-            cursor:pointer;
-            transition:0.3s;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        }
+.sub-list{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.4s ease;
+    padding-left:15px;
+}
 
-        .category:hover{
-            background:#4a90e2;
-            color:white;
-        }
+.sub-list a{
+    display:block;
+    padding:8px;
+    text-decoration:none;
+    color:#333;
+}
 
-        .sub-list{
-            max-height:0;
-            overflow:hidden;
-            transition:max-height 0.4s ease;
-            padding-left:15px;
-        }
+/* CONTENT */
+.content{
+    flex:1;
+    padding:40px;
+}
 
-        .sub-list a{
-            display:block;
-            padding:8px;
-            border-radius:6px;
-            text-decoration:none;
-            color:#333;
-        }
+.boxes-row{
+    display:flex;
+    gap:30px;
+}
 
-        .sub-list a:hover{
-            background:#e0e7ff;
-        }
+.box{
+    flex:1;
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
 
-        /* CONTENT */
-        .content{
-            flex:1;
-            padding:30px;
-        }
+.products{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap:25px;
+}
 
-        .boxes-row{
-            display:flex;
-            gap:30px;
-        }
+.product-card{
+    position:relative;
+    background:white;
+    padding:20px;
+    border-radius:18px;
+    text-align:center;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
 
-        .box{
-            flex:1;
-            background:white;
-            padding:20px;
-            border-radius:12px;
-            box-shadow:0 4px 15px rgba(0,0,0,0.08);
-        }
+.product-card:hover{
+    transform:translateY(-8px);
+}
 
-        .products{
-            display:grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap:20px;
-        }
+/* ❤️ Heart */
+.wishlist-btn{
+    position:absolute;
+    top:12px;
+    right:12px;
+    background:white;
+    border:none;
+    font-size:22px;
+    cursor:pointer;
+    border-radius:50%;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    transition:0.2s;
+}
 
-        .product-card{
-            background:white;
-            padding:15px;
-            border-radius:12px;
-            text-align:center;
-            box-shadow:0 6px 15px rgba(0,0,0,0.08);
-            transition:0.3s;
-        }
+.wishlist-btn:hover{
+    transform:scale(1.15);
+}
 
-        .product-card:hover{
-            transform: translateY(-5px);
-        }
+.product-card img{
+    width:100%;
+    height:180px;
+    object-fit:contain;
+    background:#f7f9fc;
+    padding:15px;
+    border-radius:12px;
+}
 
-        .product-card img{
-            width:100%;
-            height:200px;
-            object-fit:contain;
-            background:#f5f5f5;
-            padding:10px;
-            border-radius:8px;
-        }
+.price{
+    color:#2ecc71;
+    font-weight:700;
+}
 
-        .price{
-            color:green;
-            font-weight:bold;
-        }
+/* FOOTER */
+.footer{
+    background:#0f172a;
+    color:#cbd5e1;
+    padding-top:50px;
+    margin-top:40px;
+}
 
-        a{
-            text-decoration:none;
-            color:inherit;
-        }
+.footer-container{
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap:40px;
+    padding:0 20px 50px;
+}
 
-        /* FOOTER */
-        .footer{
-            background:#1f1f1f;
-            color:#ccc;
-            padding-top:40px;
-        }
+.footer-bottom{
+    text-align:center;
+    padding:18px;
+    background:#020617;
+}
+.wishlist-btn-header{
+    background:white;
+    color:#e74c3c;
+    padding:8px 20px;
+    border-radius:30px;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s;
+}
 
-        .footer-container{
-            max-width:1100px;
-            margin:auto;
-            display:grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-            gap:30px;
-            padding:0 20px 40px;
-        }
-
-        .footer-section h4{
-            color:white;
-            margin-bottom:15px;
-        }
-
-        .footer-section p{
-            margin:6px 0;
-            font-size:14px;
-            cursor:pointer;
-        }
-
-        .footer-section p:hover{
-            color:white;
-        }
-
-        .footer-bottom{
-            text-align:center;
-            padding:15px;
-            background:#111;
-            font-size:14px;
-        }
-
-        @media(max-width:900px){
-            .boxes-row{
-                flex-direction:column;
-            }
-
-            .main-wrapper{
-                flex-direction:column;
-            }
-
-            .sidebar{
-                width:100%;
-            }
-        }
-
-    </style>
+.wishlist-btn-header:hover{
+    background:#e74c3c;
+    color:white;
+}
+</style>
 </head>
 
 <body>
@@ -236,118 +219,190 @@
         <input type="text" name="q" placeholder="Search...">
     </form>
 
-    <div class="header-right">
-        <a href="{% url 'cart' %}" class="cart-btn">🛒 Cart</a>
-        <span>Welcome {{ username }}</span>
-    </div>
+   <div class="header-right">
+
+    <a href="{% url 'wishlist' %}" class="wishlist-btn-header">
+        ❤️ Wishlist ({{ wishlist_count }})
+    </a>
+
+    <a href="{% url 'cart' %}" class="cart-btn">
+        🛒 Cart
+    </a>
+
+    <span>Welcome {{ username }}</span>
+
+</div>
+    
 </div>
 
 <div class="main-wrapper">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h3>Categories</h3>
-        {% for category in categories %}
-        <div>
-            <div class="category" onclick="toggleSub({{ category.id }})">
-                {{ category.name }}
-            </div>
-
-            <div class="sub-list" id="sub-{{ category.id }}">
-                {% for sub in category.subcategories.all %}
-                <a href="{% url 'subcategory' sub.id %}">
-                    {{ sub.name }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- CONTENT -->
-    <div class="content">
-
-        <div class="boxes-row">
-
-            <div class="box">
-                <h3>Recently Viewed</h3>
-                <div class="products">
-                    {% for product in recently_viewed %}
-                    <div class="product-card">
-                        <a href="{% url 'product_detail' product.id %}">
-                            <img src="{{ product.image.url }}">
-                        </a>
-                        <h4>{{ product.name }}</h4>
-                        <p class="price">₹{{ product.price }}</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="box">
-                <h3>Recommended</h3>
-                <div class="products">
-                    {% for product in recommended %}
-                    <div class="product-card">
-                        <a href="{% url 'product_detail' product.id %}">
-                            <img src="{{ product.image.url }}">
-                        </a>
-                        <h4>{{ product.name }}</h4>
-                        <p class="price">₹{{ product.price }}</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h3>Categories</h3>
+    {% for category in categories %}
+    <div>
+        <div class="category" onclick="toggleSub({{ category.id }})">
+            {{ category.name }}
         </div>
 
+        <div class="sub-list" id="sub-{{ category.id }}">
+            {% for sub in category.subcategories.all %}
+            <a href="{% url 'subcategory' sub.id %}">
+                {{ sub.name }}
+            </a>
+            {% endfor %}
+        </div>
     </div>
+    {% endfor %}
+</div>
 
+<!-- CONTENT -->
+<div class="content">
+
+<div class="boxes-row">
+
+<!-- Recently Viewed -->
+<div class="box">
+<h3>Recently Viewed</h3>
+<div class="products">
+{% for product in recently_viewed %}
+<div class="product-card">
+
+{% comment %} <button class="wishlist-btn"
+onclick="toggleWishlist({{ product.id }})">
+
+{% if product.id in wishlist_product_ids %}
+❤️
+{% else %}
+🤍
+{% endif %}
+
+</button> {% endcomment %}
+<button 
+    class="wishlist-btn"
+    onclick="toggleWishlist({{ product.id }})"
+    id="wishlist-{{ product.id }}">
+
+    {% if product.id in wishlist_product_ids %}
+        <span style="color:red;">❤️</span>
+    {% else %}
+        <span style="color:#ccc;">🤍</span>
+    {% endif %}
+
+</button>
+
+<a href="{% url 'product_detail' product.id %}">
+<img src="{{ product.image.url }}">
+</a>
+
+<h4>{{ product.name }}</h4>
+<p class="price">₹{{ product.price }}</p>
+
+</div>
+{% endfor %}
+</div>
+</div>
+
+<!-- Recommended -->
+<div class="box">
+<h3>Recommended</h3>
+<div class="products">
+{% for product in recommended %}
+<div class="product-card">
+
+{% comment %} <button class="wishlist-btn"
+onclick="toggleWishlist({{ product.id }})">
+
+{% if product.id in wishlist_product_ids %}
+❤️
+{% else %}
+🤍
+{% endif %}
+
+</button> {% endcomment %}
+<button 
+    class="wishlist-btn"
+    onclick="toggleWishlist({{ product.id }})"
+    id="wishlist-{{ product.id }}">
+
+    {% if product.id in wishlist_product_ids %}
+        <span style="color:red;">❤️</span>
+    {% else %}
+        <span style="color:#ccc;">🤍</span>
+    {% endif %}
+
+</button>
+
+<a href="{% url 'product_detail' product.id %}">
+<img src="{{ product.image.url }}">
+</a>
+
+<h4>{{ product.name }}</h4>
+<p class="price">₹{{ product.price }}</p>
+
+</div>
+{% endfor %}
+</div>
+</div>
+
+</div>
+</div>
 </div>
 
 <!-- FOOTER -->
 <footer class="footer">
-    <div class="footer-container">
-        <div class="footer-section">
-            <h4>About</h4>
-            <p>About Us</p>
-            <p>Careers</p>
-            <p>Corporate Information</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>Help</h4>
-            <p>Payments</p>
-            <p>Shipping</p>
-            <p>Returns</p>
-            <p>FAQ</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>Policy</h4>
-            <p>Privacy Policy</p>
-            <p>Terms of Use</p>
-            <p>Security</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>Contact</h4>
-            <p>Email: srinadhyalagandula@gmail.com</p>
-            <p>Phone: +91 9988998899</p>
-        </div>
-    </div>
-
-    <div class="footer-bottom">
-        © 2026 Online Shopping. All Rights Reserved.
-    </div>
+<div class="footer-container">
+<div><h4>About</h4><p>About Us</p><p>Careers</p></div>
+<div><h4>Help</h4><p>Payments</p><p>Shipping</p></div>
+<div><h4>Policy</h4><p>Privacy Policy</p></div>
+<div><h4>Contact</h4><p>Email: srinadhyalagandula@gmail.com</p></div>
+</div>
+<div class="footer-bottom">
+© 2026 Online Shopping
+</div>
 </footer>
 
-<script>
+{% comment %} <script>
 function toggleSub(id){
     const sub = document.getElementById("sub-" + id);
     sub.style.maxHeight = sub.style.maxHeight ? null : sub.scrollHeight + "px";
 }
-</script>
 
+function toggleWishlist(productId){
+    fetch(`/toggle-wishlist/${productId}/`)
+    .then(response => response.json())
+    .then(data => {
+        location.reload();
+    });
+}
+</script> {% endcomment %}
+<script>
+function toggleWishlist(productId){
+
+    fetch(`/toggle-wishlist/${productId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        const btn = document.getElementById("wishlist-" + productId);
+
+        if(data.status === "added"){
+            btn.innerHTML = '<span style="color:red;">❤️</span>';
+        } else {
+            btn.innerHTML = '<span style="color:#ccc;">🤍</span>';
+        }
+
+        // OPTIONAL: reload to update count
+        location.reload();
+    });
+}
+
+</script>
 </body>
 </html>

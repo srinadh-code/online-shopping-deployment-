@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Wishlist</title>
+
+<style>
+body{
+    font-family:Poppins;
+    background:#f4f6f9;
+    margin:0;
+}
+
+.container{
+    max-width:1000px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 0;
+    border-bottom:1px solid #eee;
+}
+
+.left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.left img{
+    width:80px;
+    height:80px;
+    object-fit:contain;
+    background:#f7f9fc;
+    padding:10px;
+    border-radius:10px;
+}
+
+.remove-btn{
+    background:#dc3545;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>❤️ My Wishlist</h2>
+
+{% for item in items %}
+<div class="item">
+
+<div class="left">
+<img src="{{ item.product.image.url }}">
+<div>
+<strong>{{ item.product.name }}</strong><br>
+₹{{ item.product.price }}
+</div>
+</div>
+
+<form method="POST" action="{% url 'remove_from_wishlist' item.id %}">
+{% csrf_token %}
+<button class="remove-btn">Remove</button>
+</form>
+
+</div>
+{% empty %}
+<p>Your wishlist is empty.</p>
+{% endfor %}
+
+<a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

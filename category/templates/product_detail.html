@@ -157,7 +157,6 @@
                 justify-content:center;
             }
         }
-
     </style>
 </head>
 
@@ -165,7 +164,7 @@
 
 <div class="header">
     <div><strong>Product Detail</strong></div>
-    <div>Welcome {{ username }}</div>
+    <div>Welcome {{ request.user.username }}</div>
 </div>
 
 <a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
@@ -185,17 +184,29 @@
         </div>
 
         <!-- Quantity -->
-        <div class="quantity-box">
-            <button onclick="decrease()">-</button>
-            <input type="text" id="quantity" value="1">
-            <button onclick="increase()">+</button>
-        </div>
+       <form method="POST" action="{% url 'add_to_cart' product.id %}">
+    {% csrf_token %}
 
-        <!-- Buttons -->
-        <div class="buttons">
-            <button class="btn btn-cart">Add to Cart</button>
-            <button class="btn btn-buy">Buy Now</button>
-        </div>
+    <!-- Quantity -->
+    <div class="quantity-box">
+        <button type="button" onclick="decrease()">-</button>
+        <input type="number" name="quantity" id="quantity" value="1" min="1">
+        <button type="button" onclick="increase()">+</button>
+    </div>
+
+    <div class="buttons">
+        <button type="submit" name="action" value="add" class="btn btn-cart">
+            Add to Cart
+        </button>
+
+        <button type="submit" formaction="{% url 'buy_now' product.id %}" 
+                name="action" value="buy" class="btn btn-buy">
+            Buy Now
+        </button>
+    </div>
+
+</form>
+
     </div>
 
 </div>
@@ -216,7 +227,6 @@ function decrease(){
 
 </body>
 </html> {% endcomment %}
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -262,6 +272,10 @@ function decrease(){
             box-shadow:0 8px 25px rgba(0,0,0,0.08);
         }
 
+        .image-box{
+            position:relative;
+        }
+
         .image-box img{
             width:400px;
             border-radius:12px;
@@ -270,6 +284,29 @@ function decrease(){
 
         .image-box img:hover{
             transform:scale(1.05);
+        }
+
+        /* ❤️ HEART STYLE */
+        .wishlist-btn{
+            position:absolute;
+            top:15px;
+            right:15px;
+            background:white;
+            border:none;
+            font-size:28px;
+            cursor:pointer;
+            border-radius:50%;
+            width:45px;
+            height:45px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+            transition:0.2s;
+        }
+
+        .wishlist-btn:hover{
+            transform:scale(1.1);
         }
 
         .details{
@@ -311,7 +348,7 @@ function decrease(){
         }
 
         .quantity-box input{
-            width:50px;
+            width:60px;
             text-align:center;
             padding:6px;
             border-radius:5px;
@@ -388,10 +425,26 @@ function decrease(){
 
 <div class="container">
 
+    <!-- IMAGE SECTION -->
     <div class="image-box">
         <img src="{{ product.image.url }}">
+
+        <!-- ❤️ Wishlist Toggle -->
+        <button 
+            id="wishlist-btn"
+            class="wishlist-btn"
+            onclick="toggleWishlist({{ product.id }})">
+
+            {% if in_wishlist %}
+                ❤️
+            {% else %}
+                🤍
+            {% endif %}
+
+        </button>
     </div>
 
+    <!-- DETAILS SECTION -->
     <div class="details">
         <h2>{{ product.name }}</h2>
         <p class="price">₹{{ product.price }}</p>
@@ -400,29 +453,28 @@ function decrease(){
             {{ product.description }}
         </div>
 
-        <!-- Quantity -->
-       <form method="POST" action="{% url 'add_to_cart' product.id %}">
-    {% csrf_token %}
+        <!-- Add to Cart / Buy Form -->
+        <form method="POST" action="{% url 'add_to_cart' product.id %}">
+            {% csrf_token %}
 
-    <!-- Quantity -->
-    <div class="quantity-box">
-        <button type="button" onclick="decrease()">-</button>
-        <input type="number" name="quantity" id="quantity" value="1" min="1">
-        <button type="button" onclick="increase()">+</button>
-    </div>
+            <div class="quantity-box">
+                <button type="button" onclick="decrease()">-</button>
+                <input type="number" name="quantity" id="quantity" value="1" min="1">
+                <button type="button" onclick="increase()">+</button>
+            </div>
 
-    <div class="buttons">
-        <button type="submit" name="action" value="add" class="btn btn-cart">
-            Add to Cart
-        </button>
+            <div class="buttons">
+                <button type="submit" class="btn btn-cart">
+                    Add to Cart
+                </button>
 
-        <button type="submit" formaction="{% url 'buy_now' product.id %}" 
-                name="action" value="buy" class="btn btn-buy">
-            Buy Now
-        </button>
-    </div>
-
-</form>
+                <button type="submit"
+                        formaction="{% url 'buy_now' product.id %}"
+                        class="btn btn-buy">
+                    Buy Now
+                </button>
+            </div>
+        </form>
 
     </div>
 
@@ -439,6 +491,23 @@ function decrease(){
     if(parseInt(qty.value) > 1){
         qty.value = parseInt(qty.value) - 1;
     }
+}
+
+function toggleWishlist(productId){
+
+    fetch(`/toggle-wishlist/${productId}/`)
+    .then(response => response.json())
+    .then(data => {
+
+        const btn = document.getElementById("wishlist-btn");
+
+        if(data.status === "added"){
+            btn.innerHTML = "❤️";
+        } else {
+            btn.innerHTML = "🤍";
+        }
+
+    });
 }
 </script>
 

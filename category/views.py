@@ -2,48 +2,61 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from .models import Category, SubCategory, Product
-from .models import Cart, CartItem
+from .models import Cart, CartItem,Wishlist,WishlistItem
 from django.shortcuts import redirect
-
 @login_required
 def dashboardview(request):
 
     username = request.user.username
     categories = Category.objects.all()
 
+    # ======================
+    # WISHLIST FIX
+    # ======================
+    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+    wishlist_product_ids = list(
+        wishlist.items.values_list("product_id", flat=True)
+    )
+
+    wishlist_count = wishlist.items.count()
+    # ======================
+
     query = request.GET.get('q', '').strip()
 
-   #SEARCH SECTIO
+    # SEARCH SECTION
     if query:
 
-        # 1️ Check Category Match
         category = Category.objects.filter(name__icontains=query).first()
         if category:
             subcategories = SubCategory.objects.filter(category=category)
             return render(request, "category.html", {
                 "category": category,
                 "subcategories": subcategories,
-                "username": username
+                "username": username,
+                "wishlist_count": wishlist_count
             })
- # Check SubCategory Match
+
         subcategory = SubCategory.objects.filter(name__icontains=query).first()
         if subcategory:
             products = Product.objects.filter(subcategory=subcategory)
             return render(request, "products.html", {
                 "subcategory": subcategory,
                 "products": products,
-                "username": username
+                "username": username,
+                "wishlist_count": wishlist_count
             })
-#  Otherwise Search Products
+
         products = Product.objects.filter(name__icontains=query)
 
         return render(request, "products.html", {
             "products": products,
             "subcategory": None,
-            "username": username
+            "username": username,
+            "wishlist_count": wishlist_count
         })
 
-    # RECENTLY VIEWED --
+    # Recently Viewed
     recent_ids = request.session.get('recently_viewed', [])
     recently_viewed = Product.objects.filter(id__in=recent_ids)
 
@@ -52,16 +65,17 @@ def dashboardview(request):
         key=lambda x: recent_ids.index(x.id)
     )
 
-    # - RECOMMENDED 
     recommended = Product.objects.all().order_by('?')[:4]
 
-    #  NORMAL DASHBOARD 
     return render(request, "dashboard.html", {
         "username": username,
         "categories": categories,
         "recently_viewed": recently_viewed,
-        "recommended": recommended
-    }) 
+        "recommended": recommended,
+        "wishlist_product_ids": wishlist_product_ids,
+        "wishlist_count": wishlist_count
+    })
+
 
 @login_required
 def category_view(request, category_id):
@@ -82,8 +96,10 @@ def subcategory_view(request, subcategory_id):
         "products": products,
         "title": subcategory.name
     })
+
 @login_required
 def product_detail(request, product_id):
+
     product = get_object_or_404(Product, id=product_id)
 
     # Recently viewed
@@ -95,8 +111,17 @@ def product_detail(request, product_id):
     recent.insert(0, product.id)
     request.session['recently_viewed'] = recent[:5]
 
+    # Wishlist check
+    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+    in_wishlist = WishlistItem.objects.filter(
+        wishlist=wishlist,
+        product=product
+    ).exists()
+
     return render(request, "product_detail.html", {
-        "product": product
+        "product": product,
+        "in_wishlist": in_wishlist
     })
     
 @login_required
@@ -180,3 +205,55 @@ def my_orders(request):
     return render(request, "my_orders.html", {
         "orders": orders
     })
+
+from django.http import JsonResponse
+@login_required
+def wishlist_view(request):
+
+    wishlist, created = Wishlist.objects.get_or_create(
+        user=request.user
+    )
+
+    items = wishlist.items.select_related("product")
+
+    return render(request, "wishlist.html", {
+        "items": items
+    })
+
+
+@login_required
+def toggle_wishlist(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id)
+
+    wishlist, created = Wishlist.objects.get_or_create(
+        user=request.user
+    )
+
+    wishlist_item = WishlistItem.objects.filter(
+        wishlist=wishlist,
+        product=product
+    ).first()
+
+    if wishlist_item:
+        wishlist_item.delete()
+        status = "removed"
+    else:
+        WishlistItem.objects.create(
+            wishlist=wishlist,
+            product=product
+        )
+        status = "added"
+
+    return JsonResponse({"status": status})
+@login_required
+def remove_from_wishlist(request, item_id):
+
+    item = get_object_or_404(
+        WishlistItem,
+        id=item_id,
+        wishlist__user=request.user
+    )
+
+    item.delete()
+    return redirect("wishlist")
