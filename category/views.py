@@ -10,9 +10,8 @@ def dashboardview(request):
     username = request.user.username
     categories = Category.objects.all()
 
-    # ======================
     # WISHLIST FIX
-    # ======================
+   
     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
 
     wishlist_product_ids = list(
@@ -20,7 +19,7 @@ def dashboardview(request):
     )
 
     wishlist_count = wishlist.items.count()
-    # ======================
+  
 
     query = request.GET.get('q', '').strip()
 

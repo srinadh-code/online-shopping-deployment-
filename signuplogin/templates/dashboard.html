@@ -81,12 +81,15 @@ body{
 }
 
 .sub-list{
-    max-height:0;
-    overflow:hidden;
-    transition:max-height 0.4s ease;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
     padding-left:15px;
 }
 
+.sub-list.open{
+    max-height: 500px;   /* large enough value */
+}
 .sub-list a{
     display:block;
     padding:8px;
@@ -269,16 +272,6 @@ body{
 {% for product in recently_viewed %}
 <div class="product-card">
 
-{% comment %} <button class="wishlist-btn"
-onclick="toggleWishlist({{ product.id }})">
-
-{% if product.id in wishlist_product_ids %}
-❤️
-{% else %}
-🤍
-{% endif %}
-
-</button> {% endcomment %}
 <button 
     class="wishlist-btn"
     onclick="toggleWishlist({{ product.id }})"
@@ -311,16 +304,7 @@ onclick="toggleWishlist({{ product.id }})">
 {% for product in recommended %}
 <div class="product-card">
 
-{% comment %} <button class="wishlist-btn"
-onclick="toggleWishlist({{ product.id }})">
 
-{% if product.id in wishlist_product_ids %}
-❤️
-{% else %}
-🤍
-{% endif %}
-
-</button> {% endcomment %}
 <button 
     class="wishlist-btn"
     onclick="toggleWishlist({{ product.id }})"
@@ -363,20 +347,7 @@ onclick="toggleWishlist({{ product.id }})">
 </div>
 </footer>
 
-{% comment %} <script>
-function toggleSub(id){
-    const sub = document.getElementById("sub-" + id);
-    sub.style.maxHeight = sub.style.maxHeight ? null : sub.scrollHeight + "px";
-}
 
-function toggleWishlist(productId){
-    fetch(`/toggle-wishlist/${productId}/`)
-    .then(response => response.json())
-    .then(data => {
-        location.reload();
-    });
-}
-</script> {% endcomment %}
 <script>
 function toggleWishlist(productId){
 
@@ -403,6 +374,19 @@ function toggleWishlist(productId){
     });
 }
 
+</script>
+<script>
+function toggleSub(id){
+
+    const sub = document.getElementById("sub-" + id);
+
+    if(sub.style.maxHeight && sub.style.maxHeight !== "0px"){
+        sub.style.maxHeight = null;
+    } else {
+        sub.style.maxHeight = sub.scrollHeight + "px";
+    }
+
+}
 </script>
 </body>
 </html>
