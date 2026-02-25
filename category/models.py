@@ -11,11 +11,7 @@ class Category(models.Model):
         return self.name
 
 class SubCategory(models.Model):
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name="subcategories"
-    )
+    category = models.ForeignKey(Category,on_delete=models.CASCADE, related_name="subcategories")
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='subcategory_images/', blank=True, null=True)
 
@@ -32,6 +28,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -70,11 +67,7 @@ class Wishlist(models.Model):
 
 
 class WishlistItem(models.Model):
-    wishlist = models.ForeignKey(
-        Wishlist,
-        on_delete=models.CASCADE,
-        related_name="items"
-    )
+    wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE,  related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 

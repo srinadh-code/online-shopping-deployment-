@@ -47,6 +47,7 @@ def dashboardview(request):
             })
 
         products = Product.objects.filter(name__icontains=query)
+        
 
         return render(request, "products.html", {
             "products": products,
@@ -65,6 +66,8 @@ def dashboardview(request):
     )
 
     recommended = Product.objects.all().order_by('?')[:4]
+    # Just Arrived (latest 6 products)
+    just_arrived = Product.objects.order_by('-id')[:8]
 
     return render(request, "dashboard.html", {
         "username": username,
@@ -72,7 +75,8 @@ def dashboardview(request):
         "recently_viewed": recently_viewed,
         "recommended": recommended,
         "wishlist_product_ids": wishlist_product_ids,
-        "wishlist_count": wishlist_count
+        "wishlist_count": wishlist_count,
+        "just_arrived": just_arrived
     })
 
 

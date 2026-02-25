@@ -20,7 +20,8 @@ body{
     background:linear-gradient(135deg,#eef2f3,#dfe9f3);
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
+
 .header{
     position:fixed;
     top:0; left:0; right:0;
@@ -49,14 +50,24 @@ body{
     gap:25px;
 }
 
-.cart-btn{
+.cart-btn,
+.wishlist-btn-header{
     background:white;
-    color:#1e3c72;
     padding:8px 20px;
     border-radius:30px;
     text-decoration:none;
     font-weight:600;
 }
+
+.cart-btn{
+    color:#1e3c72;
+}
+
+.wishlist-btn-header{
+    color:#e74c3c;
+}
+
+/* ================= LAYOUT ================= */
 
 .main-wrapper{
     display:flex;
@@ -64,11 +75,12 @@ body{
     min-height:calc(100vh - 70px);
 }
 
-/* SIDEBAR */
+/* ================= SIDEBAR ================= */
+
 .sidebar{
     width:260px;
+    background:rgba(255,255,255,0.7);
     backdrop-filter:blur(20px);
-    background:rgba(255,255,255,0.6);
     padding:25px;
 }
 
@@ -81,15 +93,16 @@ body{
 }
 
 .sub-list{
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.2s ease-in-out;
+    max-height:0;
+    overflow:hidden;
+    transition:0.3s ease;
     padding-left:15px;
 }
 
 .sub-list.open{
-    max-height: 500px;   /* large enough value */
+    max-height:500px;
 }
+
 .sub-list a{
     display:block;
     padding:8px;
@@ -97,11 +110,48 @@ body{
     color:#333;
 }
 
-/* CONTENT */
+/* ================= CONTENT ================= */
+
 .content{
     flex:1;
     padding:40px;
 }
+
+/* ================= JUST ARRIVED ================= */
+
+.future-section{
+    margin-bottom:60px;
+}
+
+.slider-container{
+    overflow:hidden;
+    width:100%;
+}
+
+.slider{
+    display:flex;
+    gap:30px;
+    transition:transform 0.5s ease;
+}
+
+.slide{
+    min-width:220px;
+    background:white;
+    padding:15px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 6px 15px rgba(0,0,0,0.1);
+}
+
+.slide img{
+    width:100%;
+    height:150px;
+    object-fit:contain;
+    background:#f7f9fc;
+    border-radius:10px;
+}
+
+/* ================= PRODUCT SECTIONS ================= */
 
 .boxes-row{
     display:flex;
@@ -123,7 +173,6 @@ body{
 }
 
 .product-card{
-    position:relative;
     background:white;
     padding:20px;
     border-radius:18px;
@@ -134,29 +183,6 @@ body{
 
 .product-card:hover{
     transform:translateY(-8px);
-}
-
-/* ❤️ Heart */
-.wishlist-btn{
-    position:absolute;
-    top:12px;
-    right:12px;
-    background:white;
-    border:none;
-    font-size:22px;
-    cursor:pointer;
-    border-radius:50%;
-    width:38px;
-    height:38px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
-    transition:0.2s;
-}
-
-.wishlist-btn:hover{
-    transform:scale(1.15);
 }
 
 .product-card img{
@@ -173,7 +199,8 @@ body{
     font-weight:700;
 }
 
-/* FOOTER */
+/* ================= FOOTER ================= */
+
 .footer{
     background:#0f172a;
     color:#cbd5e1;
@@ -195,20 +222,6 @@ body{
     padding:18px;
     background:#020617;
 }
-.wishlist-btn-header{
-    background:white;
-    color:#e74c3c;
-    padding:8px 20px;
-    border-radius:30px;
-    text-decoration:none;
-    font-weight:600;
-    transition:0.3s;
-}
-
-.wishlist-btn-header:hover{
-    background:#e74c3c;
-    color:white;
-}
 </style>
 </head>
 
@@ -222,20 +235,13 @@ body{
         <input type="text" name="q" placeholder="Search...">
     </form>
 
-   <div class="header-right">
-
-    <a href="{% url 'wishlist' %}" class="wishlist-btn-header">
-        ❤️ Wishlist ({{ wishlist_count }})
-    </a>
-
-    <a href="{% url 'cart' %}" class="cart-btn">
-        🛒 Cart
-    </a>
-
-    <span>Welcome {{ username }}</span>
-
-</div>
-    
+    <div class="header-right">
+        <a href="{% url 'wishlist' %}" class="wishlist-btn-header">
+            ❤️ Wishlist ({{ wishlist_count }})
+        </a>
+        <a href="{% url 'cart' %}" class="cart-btn">🛒 Cart</a>
+        <span>Welcome {{ username }}</span>
+    </div>
 </div>
 
 <div class="main-wrapper">
@@ -263,74 +269,61 @@ body{
 <!-- CONTENT -->
 <div class="content">
 
-<div class="boxes-row">
+    <!-- JUST ARRIVED -->
+    <div class="future-section">
+        <h2 style="margin-bottom:20px;">🔥 Just Arrived</h2>
 
-<!-- Recently Viewed -->
-<div class="box">
-<h3>Recently Viewed</h3>
-<div class="products">
-{% for product in recently_viewed %}
-<div class="product-card">
+        <div class="slider-container">
+            <div class="slider" id="productSlider">
 
-<button 
-    class="wishlist-btn"
-    onclick="toggleWishlist({{ product.id }})"
-    id="wishlist-{{ product.id }}">
+                {% for product in just_arrived %}
+                <div class="slide">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image.url }}">
+                        <h4>{{ product.name }}</h4>
+                        <p class="price">₹{{ product.price }}</p>
+                    </a>
+                </div>
+                {% endfor %}
 
-    {% if product.id in wishlist_product_ids %}
-        <span style="color:red;">❤️</span>
-    {% else %}
-        <span style="color:#ccc;">🤍</span>
-    {% endif %}
+            </div>
+        </div>
+    </div>
 
-</button>
+    <!-- RECENT + RECOMMENDED -->
+    <div class="boxes-row">
 
-<a href="{% url 'product_detail' product.id %}">
-<img src="{{ product.image.url }}">
-</a>
+        <div class="box">
+            <h3>Recently Viewed</h3>
+            <div class="products">
+                {% for product in recently_viewed %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image.url }}">
+                    </a>
+                    <h4>{{ product.name }}</h4>
+                    <p class="price">₹{{ product.price }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
-<h4>{{ product.name }}</h4>
-<p class="price">₹{{ product.price }}</p>
+        <div class="box">
+            <h3>Recommended</h3>
+            <div class="products">
+                {% for product in recommended %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image.url }}">
+                    </a>
+                    <h4>{{ product.name }}</h4>
+                    <p class="price">₹{{ product.price }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
-</div>
-{% endfor %}
-</div>
-</div>
-
-<!-- Recommended -->
-<div class="box">
-<h3>Recommended</h3>
-<div class="products">
-{% for product in recommended %}
-<div class="product-card">
-
-
-<button 
-    class="wishlist-btn"
-    onclick="toggleWishlist({{ product.id }})"
-    id="wishlist-{{ product.id }}">
-
-    {% if product.id in wishlist_product_ids %}
-        <span style="color:red;">❤️</span>
-    {% else %}
-        <span style="color:#ccc;">🤍</span>
-    {% endif %}
-
-</button>
-
-<a href="{% url 'product_detail' product.id %}">
-<img src="{{ product.image.url }}">
-</a>
-
-<h4>{{ product.name }}</h4>
-<p class="price">₹{{ product.price }}</p>
-
-</div>
-{% endfor %}
-</div>
-</div>
-
-</div>
+    </div>
 </div>
 </div>
 
@@ -347,46 +340,33 @@ body{
 </div>
 </footer>
 
-
-<script>
-function toggleWishlist(productId){
-
-    fetch(`/toggle-wishlist/${productId}/`, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}",
-            "Content-Type": "application/json"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-
-        const btn = document.getElementById("wishlist-" + productId);
-
-        if(data.status === "added"){
-            btn.innerHTML = '<span style="color:red;">❤️</span>';
-        } else {
-            btn.innerHTML = '<span style="color:#ccc;">🤍</span>';
-        }
-
-        // OPTIONAL: reload to update count
-        location.reload();
-    });
-}
-
-</script>
 <script>
 function toggleSub(id){
-
     const sub = document.getElementById("sub-" + id);
-
-    if(sub.style.maxHeight && sub.style.maxHeight !== "0px"){
-        sub.style.maxHeight = null;
-    } else {
-        sub.style.maxHeight = sub.scrollHeight + "px";
-    }
-
+    sub.classList.toggle("open");
 }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const slider = document.getElementById("productSlider");
+    let scrollAmount = 0;
+
+    function autoScroll(){
+        scrollAmount += 1;
+        slider.style.transform = `translateX(-${scrollAmount}px)`;
+
+        if(scrollAmount >= slider.scrollWidth / 2){
+            scrollAmount = 0;
+        }
+
+        requestAnimationFrame(autoScroll);
+    }
+
+    autoScroll();
+});
+</script>
+
 </body>
 </html>
