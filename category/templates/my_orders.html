@@ -148,57 +148,76 @@
                 gap:5px;
             }
         }
+        
 
     </style>
 </head>
 
 <body>
-
-<div class="header">
-    <strong>My Orders</strong>
-    <div>Welcome {{ request.user.username }}</div>
-</div>
-
 <div class="container">
 
-    {% for order in orders %}
-        <div class="order-card">
+{% for order in orders %}
 
-            <div class="order-header">
-                <div>
-                    <div class="order-id">Order #{{ order.id }}</div>
-                    <div class="order-date">{{ order.created_at }}</div>
-                </div>
+    <div class="order-card">
 
-                <div class="status {{ order.status }}">
-                    {{ order.status }}
-                </div>
-            </div>
+        <div class="order-content">
 
-            <div class="product-list">
+            <!-- LEFT -->
+            <div class="left">
+                <div class="order-id">Order #{{ order.id }}</div>
+                <div class="order-date">{{ order.created_at }}</div>
+
                 {% for item in order.items.all %}
                     <div class="item">
-                        <span>{{ item.product.name }} (x{{ item.quantity }})</span>
-                        <span>₹{{ item.price|floatformat:2 }}</span>
+                        {{ item.product.name }} (x{{ item.quantity }})
                     </div>
                 {% endfor %}
             </div>
 
-            <div class="total">
-                Total: ₹{{ order.total_amount }}
+            <!-- RIGHT -->
+            <div class="right">
+
+                <!-- ✅ ONLY FIRST ORDER -->
+                {% if forloop.first and order.discount_amount > 0 %}
+
+                    <div class="original">
+                        ₹{{ order.total_amount|add:order.discount_amount }}
+                    </div>
+
+                    <div class="discount">
+                        🎉 First Order Discount -₹{{ order.discount_amount }}
+                    </div>
+
+                    <div class="final">
+                        ₹{{ order.total_amount }}
+                    </div>
+
+                    <div class="saved">
+                        You saved ₹{{ order.discount_amount }}
+                    </div>
+
+                {% else %}
+
+                    <div class="final">
+                        ₹{{ order.total_amount }}
+                    </div>
+
+                {% endif %}
+
             </div>
 
         </div>
 
-    {% empty %}
-        <div class="empty">
-            <h3>You have no orders yet 😔</h3>
-        </div>
-    {% endfor %}
+    </div>
 
-    <a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
+{% empty %}
+
+    <div class="empty">
+        <h3>You have no orders yet 😔</h3>
+    </div>
+
+{% endfor %}
 
 </div>
 
-</body>
-</html>
+<a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
