@@ -193,6 +193,45 @@
 
     <h2>Products</h2>
 
+    
+<form method="GET">
+
+    <h4>Filter by Price</h4>
+
+    {% for min,max in price_ranges %}
+        <label>
+            <input type="radio" name="price_range"
+                   value="{{ min }}-{{ max }}"
+                   {% if request.GET.price_range == min|stringformat:"s"|add:"-"|add:max|stringformat:"s" %}
+                   checked
+                   {% endif %}
+                   onchange="this.form.submit()">
+
+            ₹{{ min }} - ₹{{ max }}
+        </label>
+    {% endfor %}
+
+    <br><br>
+
+    <h4>Sort by Price</h4>
+
+    <select name="sort" onchange="this.form.submit()">
+
+        <option value="">Default</option>
+
+        <option value="price_low"
+        {% if request.GET.sort == "price_low" %}selected{% endif %}>
+            Price Low → High
+        </option>
+
+        <option value="price_high"
+        {% if request.GET.sort == "price_high" %}selected{% endif %}>
+            Price High → Low
+        </option>
+
+    </select>
+
+</form>
     <div class="grid">
         {% for product in products %}
         <a href="{% url 'product_detail' product.id %}">

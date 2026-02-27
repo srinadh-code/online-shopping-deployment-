@@ -130,22 +130,22 @@
 
         <div class="input-group">
             <input type="text" name="username" placeholder="Username">
-            {% if error.username %}
-                <div class="error">{{ error.username.0 }}</div>
+            {% if errors.username %}
+                <div class="error">{{ errors.username.0 }}</div>
             {% endif %}
         </div>
 
         <div class="input-group">
             <input type="email" name="email" placeholder="Email">
-            {% if error.email %}
-                <div class="error">{{ error.email.0 }}</div>
+            {% if errors.email %}
+                <div class="error">{{ errors.email.0 }}</div>
             {% endif %}
         </div>
 
         <div class="input-group">
             <input type="password" name="password" placeholder="Password">
-            {% if error.password %}
-                <div class="error">{{ error.password.0 }}</div>
+            {% if errors.password %}
+                <div class="error">{{ errors.password.0 }}</div>
             {% endif %}
         </div>
 

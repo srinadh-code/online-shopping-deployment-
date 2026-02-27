@@ -157,12 +157,48 @@
                 justify-content:center;
             }
         }
+
+        .star {
+    font-size: 28px;
+    color: lightgray;
+    cursor: pointer;
+}
+
+.star.active {
+    color: gold;
+}
+
+textarea {
+    width: 100%;
+    height: 70px;
+    margin-top: 10px;
+}
     </style>
 </head>
 
 <body>
 
+    <script>
+const stars = document.querySelectorAll(".star");
+const ratingInput = document.getElementById("rating-input");
+
+stars.forEach((star, index) => {
+    star.addEventListener("click", () => {
+
+        let value = star.getAttribute("data-value");
+        ratingInput.value = value;
+
+        stars.forEach(s => s.classList.remove("active"));
+
+        for (let i = 0; i < value; i++) {
+            stars[i].classList.add("active");
+        }
+    });
+});
+</script>
+
 <div class="header">
+    <h1>TEST REVIEW SECTION</h1>
     <div><strong>Product Detail</strong></div>
     <div>Welcome {{ request.user.username }}</div>
 </div>
@@ -176,7 +212,8 @@
     </div>
 
     <div class="details">
-        <h2>{{ product.name }}</h2>
+        <h1>TEST REVIEW SECTION</h1>
+        <h2>{{ product.name }}  section</h2>
         <p class="price">₹{{ product.price }}</p>
 
         <div class="description">
@@ -197,6 +234,7 @@
     <div class="buttons">
         <button type="submit" name="action" value="add" class="btn btn-cart">
             Add to Cart
+            customer
         </button>
 
         <button type="submit" formaction="{% url 'buy_now' product.id %}" 
@@ -204,6 +242,62 @@
             Buy Now
         </button>
     </div>
+
+    <hr>
+
+<h3>Customer Reviews</h3>
+
+<h4>
+Average Rating:
+{% if avg_rating %}
+    {{ avg_rating|floatformat:1 }} ⭐
+{% else %}
+    No ratings yet
+{% endif %}
+</h4>
+
+{% if user.is_authenticated %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <!-- Hidden rating -->
+    <input type="hidden" name="rating" id="rating-input">
+
+    <!-- Stars -->
+    <div class="star-rating">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+    </div>
+
+    <textarea name="comment" placeholder="Write your review..."></textarea>
+
+    <button type="submit">Submit Review</button>
+
+</form>
+
+{% else %}
+<p>Login to review</p>
+{% endif %}
+
+<hr>
+
+<h4>All Reviews</h4>
+
+{% for review in reviews %}
+    <p><b>{{ review.user.username }}</b></p>
+    <p>
+        {% for i in "12345"|slice:":review.rating" %}
+            ⭐
+        {% endfor %}
+    </p>
+    <p>{{ review.comment }}</p>
+{% empty %}
+    <p>No reviews yet</p>
+{% endfor %}
 
 </form>
 
@@ -411,6 +505,19 @@ function decrease(){
                 justify-content:center;
             }
         }
+
+        .star {
+            font-size: 25px;
+            color: gray;
+            cursor: pointer;
+        }
+.star.active {
+    color: gold;
+}
+
+.star-rating .star.active {
+    color: gold;
+}
     </style>
 </head>
 
@@ -476,8 +583,63 @@ function decrease(){
             </div>
         </form>
 
+
+        <h3>Customer Reviews</h3>
+
+<h4>
+Average Rating:
+{% if avg_rating %}
+    {{ avg_rating|floatformat:1 }} ⭐
+{% else %}
+    No ratings yet
+{% endif %}
+</h4>
+
+{% if user.is_authenticated %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="rating" id="rating-input">
+
+    <div class="star-rating">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
     </div>
 
+    <textarea name="comment" placeholder="Write review"></textarea>
+    <button type="submit">Submit</button>
+
+</form>
+
+{% endif %}
+
+<h4>All Reviews</h4>
+
+{% for review in reviews %}
+    <p><b>{{ review.user.username }}</b></p>
+
+    <p>
+    {% for i in "12345"|slice:":review.rating" %}
+        ⭐
+    {% endfor %}
+    </p>
+
+    <p>{{ review.comment }}</p>
+{% empty %}
+    <p>No reviews yet</p>
+{% endfor %}
+
+       
+
+
+
+
+
+</div>
 </div>
 
 <script>
@@ -509,6 +671,58 @@ function toggleWishlist(productId){
 
     });
 }
+
+document.addEventListener("DOMContentLoaded", function()
+{
+
+const stars = document.querySelectorAll(".star");
+const ratingInput = document.getElementById("rating-input");
+
+console.log(stars.length)
+
+stars.forEach((star, index) => {
+    star.addEventListener("click", () => {
+
+        let value = star.getAttribute("data-value");
+        console.log("clicked",value)
+        ratingInput.value = value;
+
+        console.log("Hidden input now:", ratingInput.value);
+
+        stars.forEach(s => s.classList.remove("active"));
+
+        for (let i = 0; i < value; i++) {
+            stars[i].classList.add("active");
+        }
+        console.log("selected rating",value);
+    });
+});
+
+});
+
+
+// stars.forEach(star => {
+
+//     star.addEventListener("mouseover", function(){
+//         let val = this.dataset.value;
+//         highlight(val);
+//         console.log("js load");
+//     });
+
+//     star.addEventListener("click", function(){
+//         ratingInput.value = this.dataset.value;
+//     });
+
+// });
+
+// function highlight(val){
+//     stars.forEach(s => s.classList.remove("active"));
+//     for(let i=0;i<val;i++){
+//         stars[i].classList.add("active");
+//     }
+// }
+
+
 </script>
 
 </body>
