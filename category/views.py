@@ -6,79 +6,98 @@ from .models import Cart, CartItem,Wishlist,WishlistItem
 from django.shortcuts import redirect
 @login_required
 def dashboardview(request):
-
+    # USER INFO
     username = request.user.username
-    categories = Category.objects.all()
-
-    # WISHLIST FIX
-   
-    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-
-    wishlist_product_ids = list(
-        wishlist.items.values_list("product_id", flat=True)
+    # CATEGORIES WITH SUBCATEGORIES
+    categories = Category.objects.prefetch_related(
+        "subcategories"
+    ).all()
+    # WISHLIST INFO
+    wishlist, _ = Wishlist.objects.get_or_create(
+        user=request.user
     )
-
+    wishlist_product_ids = list(
+        wishlist.items.values_list(
+            "product_id",
+            flat=True
+        )
+    )
+    
     wishlist_count = wishlist.items.count()
-  
+    # SEARCH FUNCTIONALITY
+    query = request.GET.get("q", "").strip()
 
-    query = request.GET.get('q', '').strip()
-
-    # SEARCH SECTION
     if query:
 
-        category = Category.objects.filter(name__icontains=query).first()
-        if category:
-            subcategories = SubCategory.objects.filter(category=category)
-            return render(request, "category.html", {
-                "category": category,
-                "subcategories": subcategories,
-                "username": username,
-                "wishlist_count": wishlist_count
-            })
+        products = Product.objects.filter(
+            name__icontains=query
+        ).only(
+            "id", "name", "price", "image"
+        )[:50]
 
-        subcategory = SubCategory.objects.filter(name__icontains=query).first()
-        if subcategory:
-            products = Product.objects.filter(subcategory=subcategory)
-            return render(request, "products.html", {
-                "subcategory": subcategory,
+        return render(
+            request,
+            "products.html",
+            {
                 "products": products,
                 "username": username,
-                "wishlist_count": wishlist_count
-            })
+                "wishlist_count": wishlist_count,
+                "wishlist_product_ids": wishlist_product_ids
+            }
+        )
 
-        products = Product.objects.filter(name__icontains=query)
-        
+    # JUST ARRIVED
+    # Send more products for auto rotation
 
-        return render(request, "products.html", {
-            "products": products,
-            "subcategory": None,
-            "username": username,
-            "wishlist_count": wishlist_count
-        })
+    just_arrived = list(
+        Product.objects
+        .only("id", "name", "price", "image")
+        .order_by("-id")[:12]
+    )
+    # RECENTLY VIEWED
+    # STATIC — changes only when user opens product
 
-    # Recently Viewed
-    recent_ids = request.session.get('recently_viewed', [])
-    recently_viewed = Product.objects.filter(id__in=recent_ids)
+    recent_ids = request.session.get(
+        "recently_viewed",
+        []
+    )[:12]
 
-    recently_viewed = sorted(
-        recently_viewed,
-        key=lambda x: recent_ids.index(x.id)
+    recently_viewed_queryset = Product.objects.filter(
+        id__in=recent_ids
+    ).only(
+        "id", "name", "price", "image"
     )
 
-    recommended = Product.objects.all().order_by('?')[:4]
-    # Just Arrived (latest 6 products)
-    just_arrived = Product.objects.order_by('-id')[:8]
+    recently_viewed = list(recently_viewed_queryset)
 
-    return render(request, "dashboard.html", {
+    # Preserve order based on session
+    recently_viewed.sort(
+        key=lambda x: recent_ids.index(x.id)
+    )
+    # RECOMMENDED
+    # Send more products for rotation
+   
+    recommended = list(
+        Product.objects
+        .only("id", "name", "price", "image")
+        .order_by("?")[:12]
+    )
+    # FINAL CONTEXT
+   
+    context = {
         "username": username,
         "categories": categories,
+        "just_arrived": just_arrived,
         "recently_viewed": recently_viewed,
         "recommended": recommended,
         "wishlist_product_ids": wishlist_product_ids,
         "wishlist_count": wishlist_count,
-        "just_arrived": just_arrived
-    })
-
+    }
+    return render(
+        request,
+        "dashboard.html",
+        context
+    )
 
 @login_required
 def category_view(request, category_id):

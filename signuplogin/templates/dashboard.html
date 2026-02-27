@@ -3,370 +3,552 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ================= RESET ================= */
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
 }
 
 body{
-    background:linear-gradient(135deg,#eef2f3,#dfe9f3);
+background:#f1f3f6;
 }
+
 
 /* ================= HEADER ================= */
 
 .header{
-    position:fixed;
-    top:0; left:0; right:0;
-    height:70px;
-    background:linear-gradient(90deg,#1e3c72,#2a5298);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 40px;
-    color:white;
-    box-shadow:0 4px 20px rgba(0,0,0,0.2);
-    z-index:1000;
+
+position:fixed;
+top:0;
+left:0;
+right:0;
+
+height:70px;
+
+background:#2874f0;
+color:white;
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+padding:0 30px;
+
+z-index:1000;
+}
+
+.logo{
+font-size:20px;
+font-weight:bold;
 }
 
 .search-bar input{
-    padding:10px 20px;
-    border-radius:30px;
-    border:none;
-    outline:none;
-    width:300px;
+
+width:400px;
+padding:10px;
+border:none;
+border-radius:4px;
+outline:none;
+
 }
 
 .header-right{
-    display:flex;
-    align-items:center;
-    gap:25px;
+
+display:flex;
+align-items:center;
+gap:20px;
 }
 
-.cart-btn,
-.wishlist-btn-header{
-    background:white;
-    padding:8px 20px;
-    border-radius:30px;
-    text-decoration:none;
-    font-weight:600;
+.header-right a{
+
+color:white;
+text-decoration:none;
+font-weight:bold;
+
+padding:6px 10px;
+border-radius:5px;
 }
 
-.cart-btn{
-    color:#1e3c72;
+.header-right a:hover{
+
+background:rgba(255,255,255,0.2);
 }
 
-.wishlist-btn-header{
-    color:#e74c3c;
-}
 
 /* ================= LAYOUT ================= */
 
-.main-wrapper{
-    display:flex;
-    margin-top:70px;
-    min-height:calc(100vh - 70px);
+.wrapper{
+
+display:flex;
+margin-top:70px;
+
 }
+
 
 /* ================= SIDEBAR ================= */
 
 .sidebar{
-    width:260px;
-    background:rgba(255,255,255,0.7);
-    backdrop-filter:blur(20px);
-    padding:25px;
+
+width:260px;
+background:white;
+
+padding:15px;
+
+border-right:1px solid #ddd;
+
 }
 
-.category{
-    padding:14px;
-    border-radius:12px;
-    margin-bottom:10px;
-    cursor:pointer;
-    background:white;
+.category-btn{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:12px;
+
+cursor:pointer;
+
+border-radius:6px;
 }
 
-.sub-list{
-    max-height:0;
-    overflow:hidden;
-    transition:0.3s ease;
-    padding-left:15px;
+.category-btn:hover{
+
+background:#f5f7fa;
+
 }
 
-.sub-list.open{
-    max-height:500px;
+.arrow{
+
+transition:0.3s;
+
 }
 
-.sub-list a{
-    display:block;
-    padding:8px;
-    text-decoration:none;
-    color:#333;
+.category-btn.active .arrow{
+
+transform:rotate(90deg);
+
 }
 
-/* ================= CONTENT ================= */
+.subcategory{
 
-.content{
-    flex:1;
-    padding:40px;
+max-height:0;
+overflow:hidden;
+
+transition:max-height 0.3s ease;
+
+padding-left:15px;
 }
+
+.subcategory a{
+
+display:block;
+
+padding:8px;
+
+text-decoration:none;
+
+color:#333;
+
+border-radius:5px;
+}
+
+.subcategory a:hover{
+
+background:#f1f3f6;
+
+}
+
+
+/* ================= MAIN ================= */
+
+.main{
+
+flex:1;
+padding:20px;
+
+}
+
+
+/* ================= SECTION ================= */
+
+.section{
+
+background:white;
+
+padding:20px;
+
+margin-bottom:20px;
+
+border-radius:8px;
+
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+
+}
+
+.section h2{
+
+margin-bottom:15px;
+
+}
+
 
 /* ================= JUST ARRIVED ================= */
 
-.future-section{
-    margin-bottom:60px;
+#justContainer{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:15px;
+
 }
 
-.slider-container{
-    overflow:hidden;
-    width:100%;
+
+/* ================= BOTTOM SECTION ================= */
+
+.bottom-row{
+
+display:flex;
+
+gap:20px;
+
 }
 
-.slider{
-    display:flex;
-    gap:30px;
-    transition:transform 0.5s ease;
+.bottom-row .section{
+
+flex:1;
+
 }
 
-.slide{
-    min-width:220px;
-    background:white;
-    padding:15px;
-    border-radius:15px;
-    text-align:center;
-    box-shadow:0 6px 15px rgba(0,0,0,0.1);
+#recentContainer,
+#recommendedContainer{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:15px;
+
 }
 
-.slide img{
-    width:100%;
-    height:150px;
-    object-fit:contain;
-    background:#f7f9fc;
-    border-radius:10px;
+
+/* ================= CARD ================= */
+
+.card{
+
+background:white;
+
+padding:10px;
+
+border-radius:8px;
+
+text-align:center;
+
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+
+transition:0.3s;
+
 }
 
-/* ================= PRODUCT SECTIONS ================= */
+.card:hover{
 
-.boxes-row{
-    display:flex;
-    gap:30px;
+transform:translateY(-5px);
+
 }
 
-.box{
-    flex:1;
-    background:white;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.1);
-}
+.card img{
 
-.products{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap:25px;
-}
+width:100%;
+height:140px;
 
-.product-card{
-    background:white;
-    padding:20px;
-    border-radius:18px;
-    text-align:center;
-    box-shadow:0 8px 25px rgba(0,0,0,0.08);
-    transition:0.3s;
-}
+object-fit:contain;
 
-.product-card:hover{
-    transform:translateY(-8px);
-}
-
-.product-card img{
-    width:100%;
-    height:180px;
-    object-fit:contain;
-    background:#f7f9fc;
-    padding:15px;
-    border-radius:12px;
 }
 
 .price{
-    color:#2ecc71;
-    font-weight:700;
+
+color:#2ecc71;
+font-weight:bold;
+
 }
 
-/* ================= FOOTER ================= */
-
-.footer{
-    background:#0f172a;
-    color:#cbd5e1;
-    padding-top:50px;
-    margin-top:40px;
-}
-
-.footer-container{
-    max-width:1200px;
-    margin:auto;
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-    gap:40px;
-    padding:0 20px 50px;
-}
-
-.footer-bottom{
-    text-align:center;
-    padding:18px;
-    background:#020617;
-}
 </style>
+
 </head>
 
 <body>
 
-<!-- HEADER -->
+
+<!-- ================= HEADER ================= -->
+
 <div class="header">
-    <div><strong>Online Shopping</strong></div>
 
-    <form method="GET" action="{% url 'dashboard' %}" class="search-bar">
-        <input type="text" name="q" placeholder="Search...">
-    </form>
-
-    <div class="header-right">
-        <a href="{% url 'wishlist' %}" class="wishlist-btn-header">
-            ❤️ Wishlist ({{ wishlist_count }})
-        </a>
-        <a href="{% url 'cart' %}" class="cart-btn">🛒 Cart</a>
-        <span>Welcome {{ username }}</span>
-    </div>
+<div class="logo">
+Online Shopping
 </div>
 
-<div class="main-wrapper">
+<form method="GET" action="{% url 'dashboard' %}" class="search-bar">
 
-<!-- SIDEBAR -->
+<input type="text" name="q" placeholder="Search products">
+
+</form>
+
+<div class="header-right">
+
+<a href="{% url 'wishlist' %}">
+❤️ Wishlist ({{ wishlist_count }})
+</a>
+
+<a href="{% url 'cart' %}">
+🛒 Cart
+</a>
+
+<span>
+Welcome {{ username }}
+</span>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= BODY ================= -->
+
+<div class="wrapper">
+
+
+<!-- ================= SIDEBAR ================= -->
+
 <div class="sidebar">
-    <h3>Categories</h3>
-    {% for category in categories %}
-    <div>
-        <div class="category" onclick="toggleSub({{ category.id }})">
-            {{ category.name }}
-        </div>
 
-        <div class="sub-list" id="sub-{{ category.id }}">
-            {% for sub in category.subcategories.all %}
-            <a href="{% url 'subcategory' sub.id %}">
-                {{ sub.name }}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
+<h3>Categories</h3>
+
+{% for category in categories %}
+
+<div class="category-btn">
+
+<span>{{ category.name }}</span>
+
+<span class="arrow">▶</span>
+
 </div>
 
-<!-- CONTENT -->
-<div class="content">
+<div class="subcategory">
 
-    <!-- JUST ARRIVED -->
-    <div class="future-section">
-        <h2 style="margin-bottom:20px;">🔥 Just Arrived</h2>
+{% for sub in category.subcategories.all %}
 
-        <div class="slider-container">
-            <div class="slider" id="productSlider">
+<a href="{% url 'subcategory' sub.id %}">
+{{ sub.name }}
+</a>
 
-                {% for product in just_arrived %}
-                <div class="slide">
-                    <a href="{% url 'product_detail' product.id %}">
-                        <img src="{{ product.image.url }}">
-                        <h4>{{ product.name }}</h4>
-                        <p class="price">₹{{ product.price }}</p>
-                    </a>
-                </div>
-                {% endfor %}
+{% endfor %}
 
-            </div>
-        </div>
-    </div>
-
-    <!-- RECENT + RECOMMENDED -->
-    <div class="boxes-row">
-
-        <div class="box">
-            <h3>Recently Viewed</h3>
-            <div class="products">
-                {% for product in recently_viewed %}
-                <div class="product-card">
-                    <a href="{% url 'product_detail' product.id %}">
-                        <img src="{{ product.image.url }}">
-                    </a>
-                    <h4>{{ product.name }}</h4>
-                    <p class="price">₹{{ product.price }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="box">
-            <h3>Recommended</h3>
-            <div class="products">
-                {% for product in recommended %}
-                <div class="product-card">
-                    <a href="{% url 'product_detail' product.id %}">
-                        <img src="{{ product.image.url }}">
-                    </a>
-                    <h4>{{ product.name }}</h4>
-                    <p class="price">₹{{ product.price }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-    </div>
-</div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-<div class="footer-container">
-<div><h4>About</h4><p>About Us</p><p>Careers</p></div>
-<div><h4>Help</h4><p>Payments</p><p>Shipping</p></div>
-<div><h4>Policy</h4><p>Privacy Policy</p></div>
-<div><h4>Contact</h4><p>Email: srinadhyalagandula@gmail.com</p></div>
+{% endfor %}
+
 </div>
-<div class="footer-bottom">
-© 2026 Online Shopping
+
+
+
+<!-- ================= MAIN CONTENT ================= -->
+
+<div class="main">
+
+
+<!-- JUST ARRIVED -->
+
+<div class="section">
+
+<h2>Just Arrived</h2>
+
+<div id="justContainer"></div>
+
 </div>
-</footer>
+
+
+
+<!-- RECENT + RECOMMENDED -->
+
+<div class="bottom-row">
+
+
+<div class="section">
+
+<h2>Recently Viewed</h2>
+
+<div id="recentContainer"></div>
+
+</div>
+
+
+<div class="section">
+
+<h2>Recommended</h2>
+
+<div id="recommendedContainer"></div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
 
 <script>
-function toggleSub(id){
-    const sub = document.getElementById("sub-" + id);
-    sub.classList.toggle("open");
+
+/* CATEGORY TOGGLE */
+
+const buttons=document.querySelectorAll(".category-btn");
+
+buttons.forEach((btn,index)=>{
+
+btn.onclick=()=>{
+
+const subs=document.querySelectorAll(".subcategory");
+
+const isOpen=subs[index].style.maxHeight;
+
+subs.forEach(sub=>sub.style.maxHeight=null);
+
+buttons.forEach(b=>b.classList.remove("active"));
+
+if(!isOpen){
+
+subs[index].style.maxHeight=subs[index].scrollHeight+"px";
+
+btn.classList.add("active");
+
 }
-</script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function(){
+};
 
-    const slider = document.getElementById("productSlider");
-    let scrollAmount = 0;
-
-    function autoScroll(){
-        scrollAmount += 1;
-        slider.style.transform = `translateX(-${scrollAmount}px)`;
-
-        if(scrollAmount >= slider.scrollWidth / 2){
-            scrollAmount = 0;
-        }
-
-        requestAnimationFrame(autoScroll);
-    }
-
-    autoScroll();
 });
+
+
+/* DATA FROM DJANGO */
+
+let justData=[
+
+{% for p in just_arrived %}
+{id:"{{p.id}}",name:"{{p.name}}",price:"{{p.price}}",image:"{{p.image.url}}"},
+{% endfor %}
+
+];
+
+let recentData=[
+
+{% for p in recently_viewed %}
+{id:"{{p.id}}",name:"{{p.name}}",price:"{{p.price}}",image:"{{p.image.url}}"},
+{% endfor %}
+
+];
+
+let recommendedData=[
+
+{% for p in recommended %}
+{id:"{{p.id}}",name:"{{p.name}}",price:"{{p.price}}",image:"{{p.image.url}}"},
+{% endfor %}
+
+];
+
+
+/* RENDER FUNCTION */
+
+function render(container,data,start,count){
+
+if(data.length===0){
+
+container.innerHTML="No products";
+
+return;
+
+}
+
+container.innerHTML="";
+
+for(let i=0;i<count;i++){
+
+let p=data[(start+i)%data.length];
+
+container.innerHTML+=`
+
+<div class="card">
+
+<a href="/product/${p.id}/">
+
+<img src="${p.image}">
+
+</a>
+
+<p>${p.name}</p>
+
+<p class="price">₹${p.price}</p>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* INITIAL */
+
+render(justContainer,justData,0,4);
+
+render(recentContainer,recentData,0,4);
+
+render(recommendedContainer,recommendedData,0,4);
+
+
+/* AUTO ROTATE */
+
+let j=0;
+
+setInterval(()=>{
+
+j++;
+
+render(justContainer,justData,j,4);
+
+},3000);
+
+
+let r=0;
+
+setInterval(()=>{
+
+r++;
+
+render(recommendedContainer,recommendedData,r,4);
+
+},3000);
+
+
 </script>
+
 
 </body>
 </html>
