@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,21 +16,6 @@
             background: linear-gradient(135deg, #eef2f7, #d9e4f5);
         }
 
-        .header{
-            background: #1e293b;
-            color:white;
-            padding:18px 40px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .header strong{
-            font-size:20px;
-            letter-spacing:1px;
-        }
-
         .container{
             max-width:1100px;
             margin:40px auto;
@@ -41,22 +24,29 @@
 
         .order-card{
             background:white;
-            padding:25px;
-            border-radius:16px;
-            margin-bottom:25px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.08);
-            transition:0.3s ease;
+            padding:20px;
+            border-radius:14px;
+            margin-bottom:20px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.08);
+            transition:0.3s;
         }
 
         .order-card:hover{
-            transform:translateY(-4px);
-            box-shadow:0 12px 30px rgba(0,0,0,0.15);
+            transform:translateY(-5px);
         }
 
-        .order-header{
+        .order-content{
             display:flex;
             justify-content:space-between;
-            margin-bottom:15px;
+            align-items:center;
+        }
+
+        .left{
+            flex:1;
+        }
+
+        .right{
+            text-align:right;
         }
 
         .order-id{
@@ -66,72 +56,71 @@
 
         .order-date{
             color:#666;
-            font-size:14px;
-        }
-
-        .status{
-            padding:6px 14px;
-            border-radius:30px;
             font-size:13px;
-            font-weight:bold;
-        }
-
-        .status.Pending{
-            background:#fff3cd;
-            color:#856404;
-        }
-
-        .status.Shipped{
-            background:#d1ecf1;
-            color:#0c5460;
-        }
-
-        .status.Delivered{
-            background:#d4edda;
-            color:#155724;
-        }
-
-        .status.Cancelled{
-            background:#f8d7da;
-            color:#721c24;
-        }
-
-        .product-list{
-            margin-top:15px;
         }
 
         .item{
-            display:flex;
-            justify-content:space-between;
-            padding:8px 0;
-            border-bottom:1px solid #eee;
-            font-size:15px;
+            padding:6px 0;
+            font-size:14px;
         }
 
-        .item:last-child{
-            border-bottom:none;
-        }
-
-        .total{
-            margin-top:15px;
-            font-size:17px;
+        .price{
+            font-size:18px;
             font-weight:bold;
-            text-align:right;
+            margin-bottom:10px;
+        }
+
+        /* BUTTON */
+        .btn-return{
+            display:inline-block;
+            padding:10px 18px;
+            background:linear-gradient(135deg,#4CAF50,#2ecc71);
+            color:white;
+            border-radius:8px;
+            text-decoration:none;
+            font-size:14px;
+            transition:0.3s;
+            position:relative;
+        }
+
+        .btn-return:hover{
+            transform:scale(1.05);
+        }
+
+        /* RETURN STATUS */
+        .return-box{
+            margin-top:10px;
+            padding:10px;
+            background:#f1f3f5;
+            border-radius:8px;
+            font-size:14px;
+        }
+
+        /* TOAST */
+        #toast{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            background:#333;
+            color:#fff;
+            padding:10px 18px;
+            border-radius:6px;
+            opacity:0;
+            transition:0.4s;
+        }
+
+        #toast.show{
+            opacity:1;
         }
 
         .back{
             display:inline-block;
-            margin-top:25px;
-            padding:10px 18px;
+            margin-top:20px;
+            padding:10px 16px;
             background:#4a90e2;
             color:white;
             text-decoration:none;
-            border-radius:8px;
-            transition:0.3s;
-        }
-
-        .back:hover{
-            background:#2c6fd6;
+            border-radius:6px;
         }
 
         .empty{
@@ -139,85 +128,93 @@
             padding:40px;
             background:white;
             border-radius:12px;
-            box-shadow:0 6px 20px rgba(0,0,0,0.08);
         }
-
-        @media(max-width:768px){
-            .order-header{
-                flex-direction:column;
-                gap:5px;
-            }
-        }
-        
 
     </style>
 </head>
 
 <body>
+
 <div class="container">
 
 {% for order in orders %}
 
-    <div class="order-card">
+<div class="order-card">
 
-        <div class="order-content">
+    <div class="order-content">
 
-            <!-- LEFT -->
-            <div class="left">
-                <div class="order-id">Order #{{ order.id }}</div>
-                <div class="order-date">{{ order.created_at }}</div>
+        <!-- LEFT -->
+        <div class="left">
+            <div class="order-id">Order #{{ order.id }}</div>
+            <div class="order-date">{{ order.created_at }}</div>
 
-                {% for item in order.items.all %}
-                    <div class="item">
-                        {{ item.product.name }} (x{{ item.quantity }})
-                    </div>
-                {% endfor %}
+            {% for item in order.items.all %}
+                <div class="item">
+                    {{ item.product.name }} (x{{ item.quantity }})
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+
+            {% if forloop.first and order.discount_amount > 0 %}
+                <div style="text-decoration:line-through;">
+                    ₹{{ order.total_amount|add:order.discount_amount }}
+                </div>
+                <div style="color:green;">
+                    -₹{{ order.discount_amount }} discount
+                </div>
+            {% endif %}
+
+            <div class="price">
+                ₹{{ order.total_amount }}
             </div>
 
-            <!-- RIGHT -->
-            <div class="right">
-
-                <!-- ✅ ONLY FIRST ORDER -->
-                {% if forloop.first and order.discount_amount > 0 %}
-
-                    <div class="original">
-                        ₹{{ order.total_amount|add:order.discount_amount }}
-                    </div>
-
-                    <div class="discount">
-                        🎉 First Order Discount -₹{{ order.discount_amount }}
-                    </div>
-
-                    <div class="final">
-                        ₹{{ order.total_amount }}
-                    </div>
-
-                    <div class="saved">
-                        You saved ₹{{ order.discount_amount }}
-                    </div>
-
-                {% else %}
-
-                    <div class="final">
-                        ₹{{ order.total_amount }}
-                    </div>
-
-                {% endif %}
-
-            </div>
+            <!-- ✅ BUTTON FOR ALL ORDERS -->
+            <a href="{% url 'return_request' order.id %}" 
+               class="btn-return"
+               onclick="showToast()">
+               Return / Exchange
+            </a>
 
         </div>
 
     </div>
 
-{% empty %}
-
-    <div class="empty">
-        <h3>You have no orders yet 😔</h3>
-    </div>
-
-{% endfor %}
+    <!-- RETURN STATUS -->
+    {% for r in order.returns.all %}
+        <div class="return-box">
+            📦 {{ r.request_type }} Request: <b>{{ r.status }}</b><br>
+            💰 Refund: <span style="color:green">{{ r.refund_status }}</span>
+        </div>
+    {% endfor %}
 
 </div>
 
+{% empty %}
+    <div class="empty">
+        <h3>No Orders Yet 😔</h3>
+    </div>
+{% endfor %}
+
 <a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast">Opening Return Page...</div>
+
+<script>
+function showToast(){
+    let toast=document.getElementById("toast");
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+    },1200);
+}
+</script>
+
+</body>
+</html>

@@ -345,3 +345,40 @@ def order_success(request):
     return render(request, "order_success.html", {
         "is_first_order": is_first_order
     })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Order, ReturnRequest
+from django.utils import timezone
+from datetime import timedelta
+
+def return_request(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # 🔥 7-day policy
+    if order.created_at < timezone.now() - timedelta(days=7):
+        return redirect("my_orders")
+
+    if request.method == "POST":
+        request_type = request.POST.get("type")
+        reason = request.POST.get("reason")
+        image = request.FILES.get("image")
+
+        ReturnRequest.objects.create(
+            order=order,
+            user=request.user,
+            request_type=request_type,
+            reason=reason,
+            image=image
+        )
+
+        return redirect("my_orders")
+
+    return render(request, "return_form.html", {"order": order})  
+def save_model(self, request, obj, form, change):
+    if obj.status == "Approved":
+        obj.refund_status = "Completed"
+    super().save_model(request, obj, form, change)
+def my_returns(request):
+    returns = ReturnRequest.objects.filter(user=request.user)
+    return render(request, "my_returns.html", {"returns": returns})   
+  
