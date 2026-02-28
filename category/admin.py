@@ -1,18 +1,14 @@
 from django.contrib import admin
+from .models import Category,Product,SubCategory
+from .models import Cart, CartItem
+from django.contrib import admin
 from .models import (
-    Category,
-    SubCategory,
-    Product,
-    Cart,
-    CartItem,
-    Order,
-    OrderItem,
-    Wishlist,
-    WishlistItem,
+    Category, Product, SubCategory,
+    Cart, CartItem,
+    Order, OrderItem,
+    Wishlist, WishlistItem,
     ReturnRequest
 )
-
-# ✅ BASIC REGISTRATIONS
 admin.site.register(Category)
 admin.site.register(SubCategory)
 admin.site.register(Product)
@@ -24,7 +20,7 @@ admin.site.register(Wishlist)
 admin.site.register(WishlistItem)
 
 
-# ✅ RETURN REQUEST ADMIN (IMPORTANT)
+
 class ReturnRequestAdmin(admin.ModelAdmin):
     list_display = (
         'id',

@@ -1,5 +1,577 @@
+{% comment %} 
+
+
 <!DOCTYPE html>
 <html>
+
+<head>
+
+    <title>Dashboard</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f1f3f6;
+        }
+
+
+        /* HEADER */
+
+        .header {
+
+            background: linear-gradient(to right, #2874f0, #3f8cff);
+
+            color: white;
+
+            padding: 15px 30px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+
+        }
+
+        .search-bar {
+
+            display: flex;
+
+        }
+
+        .search-bar input {
+
+            padding: 10px;
+
+            width: 350px;
+
+            border: none;
+
+            outline: none;
+
+            border-radius: 4px 0 0 4px;
+
+        }
+
+        .search-bar button {
+
+            padding: 10px 18px;
+
+            border: none;
+
+            background: #ff9f00;
+
+            color: white;
+
+            cursor: pointer;
+
+            border-radius: 0 4px 4px 0;
+
+        }
+
+
+        /* LAYOUT */
+
+        .wrapper {
+
+            display: flex;
+
+        }
+
+
+        /* SIDEBAR */
+
+        .sidebar {
+
+            width: 260px;
+
+            background: white;
+
+            padding: 15px;
+
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+
+        }
+
+        .sidebar h3 {
+
+            margin-bottom: 10px;
+
+        }
+
+        .category-btn {
+
+            padding: 12px;
+
+            cursor: pointer;
+
+            background: #f5f7fa;
+
+            margin-top: 6px;
+
+            border-radius: 6px;
+
+            font-weight: 500;
+
+        }
+
+        .category-btn:hover {
+
+            background: #e3f2fd;
+
+        }
+
+        .subcategory {
+
+            display: none;
+
+            padding-left: 15px;
+
+        }
+
+        .subcategory a {
+
+            display: block;
+
+            padding: 6px;
+
+            text-decoration: none;
+
+            color: #444;
+
+            border-radius: 4px;
+
+        }
+
+        .subcategory a:hover {
+
+            background: #f1f3f6;
+
+        }
+
+
+        /* MAIN */
+
+        .main {
+
+            flex: 1;
+
+            padding: 20px;
+
+        }
+
+
+        /* SECTION */
+
+        .section {
+
+            background: white;
+
+            padding: 18px;
+
+            margin-bottom: 20px;
+
+            border-radius: 8px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+        }
+
+        .section h2 {
+
+            margin-bottom: 15px;
+
+        }
+
+
+        /* GRID 4 */
+
+        .grid-4 {
+
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        /* GRID 2x2 */
+
+        .grid-2 {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        /* SIDE BY SIDE */
+
+        .bottom-row {
+
+            display: flex;
+
+            gap: 20px;
+
+        }
+
+        .bottom-row .section {
+
+            flex: 1;
+
+        }
+
+
+        /* CARD */
+
+        .card {
+
+            background: white;
+
+            padding: 10px;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            transition: 0.25s;
+
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+        }
+
+        .card:hover {
+
+            transform: translateY(-5px);
+
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+
+        }
+
+        .card img {
+
+            width: 100%;
+
+            height: 150px;
+
+            object-fit: contain;
+
+        }
+
+        .price {
+
+            color: green;
+
+            font-weight: bold;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <h2>Online Shopping</h2>
+
+    <form method="GET" action="{% url 'dashboard' %}" class="search-bar">
+
+        <input type="text" name="q" placeholder="Search products">
+
+        <button type="submit">Search</button>
+
+    </form>
+
+    <div>
+
+        Welcome {{ username }}
+
+    </div>
+
+</div>
+
+
+
+<!-- BODY -->
+
+<div class="wrapper">
+
+
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h3>Categories</h3>
+
+        {% for category in categories %}
+
+        <div class="category-btn">
+
+            {{ category.name }}
+
+        </div>
+
+        <div class="subcategory">
+
+            {% for sub in category.subcategories.all %}
+
+            <a href="{% url 'subcategory' sub.id %}">
+
+                {{ sub.name }}
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+
+    <!-- MAIN -->
+
+    <div class="main">
+
+
+
+        <!-- JUST ARRIVED -->
+
+        <div class="section">
+
+            <h2>Just Arrived</h2>
+
+            <div id="justArrivedContainer" class="grid-4"></div>
+
+        </div>
+
+
+
+        <!-- RECENT + RECOMMENDED -->
+
+        <div class="bottom-row">
+
+
+
+            <!-- RECENTLY VIEWED -->
+
+            <div class="section">
+
+                <h2>Recently Viewed</h2>
+
+                <div class="grid-2">
+
+                    {% for product in recently_viewed|slice:":4" %}
+
+                    <div class="card">
+
+                        <a href="{% url 'product_detail' product.id %}">
+
+                            <img src="{{ product.image.url }}">
+
+                        </a>
+
+                        <p>{{ product.name }}</p>
+
+                        <p class="price">₹{{ product.price }}</p>
+
+                    </div>
+
+                    {% empty %}
+
+                    No recently viewed products
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- RECOMMENDED -->
+
+            <div class="section">
+
+                <h2>Recommended</h2>
+
+                <div class="grid-2">
+
+                    {% for product in recommended|slice:":4" %}
+
+                    <div class="card">
+
+                        <a href="{% url 'product_detail' product.id %}">
+
+                            <img src="{{ product.image.url }}">
+
+                        </a>
+
+                        <p>{{ product.name }}</p>
+
+                        <p class="price">₹{{ product.price }}</p>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+
+
+/* CATEGORY TOGGLE */
+
+document.querySelectorAll(".category-btn").forEach(btn => {
+
+    btn.onclick = () => {
+
+        let sub = btn.nextElementSibling;
+
+        sub.style.display = sub.style.display === "block" ? "none" : "block";
+
+    };
+
+});
+
+
+
+/* JUST ARRIVED ROTATION */
+
+let justArrived = [
+
+{% for product in just_arrived %}
+
+{
+
+id: "{{ product.id }}",
+
+name: "{{ product.name }}",
+
+price: "{{ product.price }}",
+
+image: "{{ product.image.url }}"
+
+},
+
+{% endfor %}
+
+];
+
+
+let index = 0;
+
+
+
+function renderJustArrived() {
+
+    let container = document.getElementById("justArrivedContainer");
+
+    container.innerHTML = "";
+
+    for (let i = 0; i < 4; i++) {
+
+        let p = justArrived[(index + i) % justArrived.length];
+
+        container.innerHTML += `
+
+        <div class="card">
+
+            <a href="/product/${p.id}/">
+
+                <img src="${p.image}">
+
+            </a>
+
+            <p>${p.name}</p>
+
+            <p class="price">₹${p.price}</p>
+
+        </div>
+
+        `;
+
+    }
+
+    index++;
+
+}
+
+
+
+renderJustArrived();
+
+setInterval(renderJustArrived, 5000);
+
+
+
+</script>
+
+
+
+</body>
+
+</html> {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+
 <head>
 
 <title>Dashboard</title>
@@ -8,277 +580,192 @@
 
 <style>
 
-/* ================= RESET ================= */
-
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial, sans-serif;
+font-family:"Segoe UI", Arial, sans-serif;
 }
 
 body{
 background:#f1f3f6;
 }
 
-
-/* ================= HEADER ================= */
+/* HEADER */
 
 .header{
-
-position:fixed;
-top:0;
-left:0;
-right:0;
-
-height:70px;
-
-background:#2874f0;
+background:linear-gradient(to right,#2874f0,#3f8cff);
 color:white;
-
+padding:15px 30px;
 display:flex;
-align-items:center;
 justify-content:space-between;
-
-padding:0 30px;
-
-z-index:1000;
+align-items:center;
+box-shadow:0 2px 8px rgba(0,0,0,0.2);
 }
 
-.logo{
-font-size:20px;
-font-weight:bold;
+.search-bar{
+display:flex;
+align-items:center;
 }
 
 .search-bar input{
-
-width:400px;
 padding:10px;
+width:350px;
 border:none;
-border-radius:4px;
 outline:none;
-
+border-radius:4px 0 0 4px;
 }
 
-.header-right{
-
-display:flex;
-align-items:center;
-gap:20px;
-}
-
-.header-right a{
-
+.search-btn{
+padding:10px 18px;
+border:none;
+background:#ff9f00;
 color:white;
-text-decoration:none;
-font-weight:bold;
-
-padding:6px 10px;
-border-radius:5px;
+cursor:pointer;
 }
 
-.header-right a:hover{
-
-background:rgba(255,255,255,0.2);
+.voice-btn{
+padding:10px 14px;
+border:none;
+background:#00c853;
+color:white;
+cursor:pointer;
+border-radius:0 4px 4px 0;
+font-size:16px;
 }
 
-
-/* ================= LAYOUT ================= */
+/* LAYOUT */
 
 .wrapper{
-
 display:flex;
-margin-top:70px;
-
 }
 
-
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 
 .sidebar{
-
 width:260px;
 background:white;
-
 padding:15px;
+box-shadow:2px 0 5px rgba(0,0,0,0.1);
+}
 
-border-right:1px solid #ddd;
-
+.sidebar h3{
+margin-bottom:10px;
 }
 
 .category-btn{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
 padding:12px;
-
 cursor:pointer;
-
+background:#f5f7fa;
+margin-top:6px;
 border-radius:6px;
+font-weight:500;
 }
 
 .category-btn:hover{
-
-background:#f5f7fa;
-
+background:#e3f2fd;
 }
 
-.arrow{
 
-transition:0.3s;
-
-}
-
-.category-btn.active .arrow{
-
-transform:rotate(90deg);
-
-}
-
-.subcategory{
-
-max-height:0;
-overflow:hidden;
-
-transition:max-height 0.3s ease;
-
-padding-left:15px;
-}
 
 .subcategory a{
-
 display:block;
-
-padding:8px;
-
+padding:6px;
 text-decoration:none;
-
-color:#333;
-
-border-radius:5px;
+color:#444;
+border-radius:4px;
 }
 
 .subcategory a:hover{
-
 background:#f1f3f6;
-
 }
 
-
-/* ================= MAIN ================= */
+/* MAIN */
 
 .main{
-
 flex:1;
 padding:20px;
-
 }
 
-
-/* ================= SECTION ================= */
+/* SECTION */
 
 .section{
-
 background:white;
-
-padding:20px;
-
+padding:18px;
 margin-bottom:20px;
-
 border-radius:8px;
-
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
 .section h2{
-
 margin-bottom:15px;
-
 }
 
+/* SLIDER */
 
-/* ================= JUST ARRIVED ================= */
+.slider-wrapper{
+overflow:hidden;
+width:100%;
+}
 
-#justContainer{
+.slider-track{
+display:flex;
+}
 
+.slide-group{
+min-width:100%;
 display:grid;
-
 grid-template-columns:repeat(4,1fr);
-
 gap:15px;
-
 }
 
+/* GRID */
 
-/* ================= BOTTOM SECTION ================= */
+.grid-2{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+}
 
 .bottom-row{
-
 display:flex;
-
 gap:20px;
-
 }
 
 .bottom-row .section{
-
 flex:1;
-
 }
 
-#recentContainer,
-#recommendedContainer{
-
-display:grid;
-
-grid-template-columns:repeat(2,1fr);
-
-gap:15px;
-
-}
-
-
-/* ================= CARD ================= */
+/* CARD */
 
 .card{
-
 background:white;
-
 padding:10px;
-
 border-radius:8px;
-
 text-align:center;
-
+transition:0.25s;
 box-shadow:0 2px 6px rgba(0,0,0,0.1);
-
-transition:0.3s;
-
 }
 
 .card:hover{
-
 transform:translateY(-5px);
-
+box-shadow:0 6px 16px rgba(0,0,0,0.2);
 }
 
 .card img{
-
 width:100%;
-height:140px;
-
+height:150px;
 object-fit:contain;
-
 }
 
 .price{
-
-color:#2ecc71;
+color:green;
 font-weight:bold;
-
+}
+.subcategory {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
 }
 
 </style>
@@ -288,46 +775,35 @@ font-weight:bold;
 <body>
 
 
-<!-- ================= HEADER ================= -->
+<!-- HEADER -->
 
 <div class="header">
 
-<div class="logo">
-Online Shopping
-</div>
+<h2>Online Shopping</h2>
 
 <form method="GET" action="{% url 'dashboard' %}" class="search-bar">
 
-<input type="text" name="q" placeholder="Search products">
+<input type="text" id="searchInput" name="q" placeholder="Search products">
+
+<button type="submit" class="search-btn">Search</button>
+
+<button type="button" onclick="startVoiceSearch()" class="voice-btn">🎤</button>
 
 </form>
 
-<div class="header-right">
-
-<a href="{% url 'wishlist' %}">
-❤️ Wishlist ({{ wishlist_count }})
-</a>
-
-<a href="{% url 'cart' %}">
-🛒 Cart
-</a>
-
-<span>
+<div>
 Welcome {{ username }}
-</span>
-
 </div>
 
 </div>
 
 
-
-<!-- ================= BODY ================= -->
+<!-- BODY -->
 
 <div class="wrapper">
 
 
-<!-- ================= SIDEBAR ================= -->
+<!-- SIDEBAR -->
 
 <div class="sidebar">
 
@@ -336,11 +812,7 @@ Welcome {{ username }}
 {% for category in categories %}
 
 <div class="category-btn">
-
-<span>{{ category.name }}</span>
-
-<span class="arrow">▶</span>
-
+{{ category.name }}
 </div>
 
 <div class="subcategory">
@@ -360,8 +832,7 @@ Welcome {{ username }}
 </div>
 
 
-
-<!-- ================= MAIN CONTENT ================= -->
+<!-- MAIN -->
 
 <div class="main">
 
@@ -372,10 +843,11 @@ Welcome {{ username }}
 
 <h2>Just Arrived</h2>
 
-<div id="justContainer"></div>
-
+<div class="slider-wrapper">
+<div id="justArrivedTrack" class="slider-track"></div>
 </div>
 
+</div>
 
 
 <!-- RECENT + RECOMMENDED -->
@@ -383,113 +855,207 @@ Welcome {{ username }}
 <div class="bottom-row">
 
 
+<!-- RECENTLY VIEWED -->
+
 <div class="section">
 
 <h2>Recently Viewed</h2>
 
-<div id="recentContainer"></div>
+<div class="grid-2">
+
+{% for product in recently_viewed|slice:":4" %}
+
+<div class="card">
+
+<a href="{% url 'product_detail' product.id %}">
+<img src="{{ product.image.url }}">
+</a>
+
+<p>{{ product.name }}</p>
+
+<p class="price">₹{{ product.price }}</p>
 
 </div>
 
+{% empty %}
+No recently viewed products
+{% endfor %}
+
+</div>
+
+</div>
+
+
+<!-- RECOMMENDED -->
 
 <div class="section">
 
 <h2>Recommended</h2>
 
-<div id="recommendedContainer"></div>
+<div class="grid-2">
+
+{% for product in recommended|slice:":4" %}
+
+<div class="card">
+
+<a href="{% url 'product_detail' product.id %}">
+<img src="{{ product.image.url }}">
+</a>
+
+<p>{{ product.name }}</p>
+
+<p class="price">₹{{ product.price }}</p>
+
+</div>
+
+{% endfor %}
+
+</div>
 
 </div>
 
 
 </div>
 
+</div>
 
 </div>
 
 
-</div>
-
-
-
-<!-- ================= JAVASCRIPT ================= -->
+<!-- JAVASCRIPT -->
 
 <script>
 
 /* CATEGORY TOGGLE */
 
-const buttons=document.querySelectorAll(".category-btn");
+{% comment %} document.querySelectorAll(".category-btn").forEach(btn => {
 
-buttons.forEach((btn,index)=>{
+btn.onclick = () => {
 
-btn.onclick=()=>{
+let sub = btn.nextElementSibling;
 
-const subs=document.querySelectorAll(".subcategory");
-
-const isOpen=subs[index].style.maxHeight;
-
-subs.forEach(sub=>sub.style.maxHeight=null);
-
-buttons.forEach(b=>b.classList.remove("active"));
-
-if(!isOpen){
-
-subs[index].style.maxHeight=subs[index].scrollHeight+"px";
-
-btn.classList.add("active");
-
-}
+sub.style.display =
+sub.style.display === "block" ? "none" : "block";
 
 };
+
+}); {% endcomment %}
+document.addEventListener("DOMContentLoaded", function () {
+
+    const categoryButtons = document.querySelectorAll(".category-btn");
+
+    categoryButtons.forEach(button => {
+
+        button.addEventListener("click", function () {
+
+            const subcategory = this.nextElementSibling;
+
+            const isOpen = subcategory.classList.contains("open");
+
+            // Close all subcategories
+            document.querySelectorAll(".subcategory").forEach(sub => {
+                sub.classList.remove("open");
+                sub.style.maxHeight = null;
+            });
+
+            // Open clicked one if it was closed
+            if (!isOpen) {
+                subcategory.classList.add("open");
+                subcategory.style.maxHeight = subcategory.scrollHeight + "px";
+            }
+
+        });
+
+    });
 
 });
 
 
-/* DATA FROM DJANGO */
-
-let justData=[
-
-{% for p in just_arrived %}
-{id:"{{p.id}}",name:"{{p.name}}",price:"{{p.price}}",image:"{{p.image.url}}"},
-{% endfor %}
-
-];
-
-let recentData=[
-
-{% for p in recently_viewed %}
-{id:"{{p.id}}",name:"{{p.name}}",price:"{{p.price}}",image:"{{p.image.url}}"},
-{% endfor %}
-
-];
-
-let recommendedData=[
-
-{% for p in recommended %}
-{id:"{{p.id}}",name:"{{p.name}}",price:"{{p.price}}",image:"{{p.image.url}}"},
-{% endfor %}
-
-];
 
 
-/* RENDER FUNCTION */
+function startVoiceSearch(){
 
-function render(container,data,start,count){
+    if(!('webkitSpeechRecognition' in window)){
+        alert("Voice search not supported in this browser");
+        return;
+    }
 
-if(data.length===0){
+    const recognition = new webkitSpeechRecognition();
 
-container.innerHTML="No products";
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-return;
+    recognition.start();
+
+    recognition.onstart = function(){
+        document.querySelector(".voice-btn").innerText = "Listening...";
+    };
+
+    recognition.onresult = function(event){
+
+        let text = event.results[0][0].transcript;
+
+        console.log("Voice detected:", text);
+
+        // ✅ CLEAN TEXT (IMPORTANT FIX)
+        text = text.trim().replace(".", "").replace(",", "");
+
+        // Put into search box
+        document.getElementById("searchInput").value = text;
+
+        // Submit form SAME as manual search
+        document.querySelector(".search-bar").submit();
+
+    };
+
+    recognition.onerror = function(event){
+        alert("Voice error: " + event.error);
+    };
+
+    recognition.onend = function(){
+        document.querySelector(".voice-btn").innerText = "🎤";
+    };
 
 }
 
-container.innerHTML="";
 
-for(let i=0;i<count;i++){
 
-let p=data[(start+i)%data.length];
+/* JUST ARRIVED SLIDER */
 
-container.innerHTML+=`
+let justArrived = [
+
+{% for product in just_arrived %}
+{
+id:"{{ product.id }}",
+name:"{{ product.name }}",
+price:"{{ product.price }}",
+image:"{{ product.image.url }}"
+},
+{% endfor %}
+
+];
+
+let track=document.getElementById("justArrivedTrack");
+
+if(track && justArrived.length>0){
+
+let groups=[];
+let current=0;
+
+for(let i=0;i<justArrived.length;i+=4){
+groups.push(justArrived.slice(i,i+4));
+}
+
+groups.forEach(group=>{
+
+let div=document.createElement("div");
+
+div.className="slide-group";
+
+group.forEach(p=>{
+
+div.innerHTML+=`
 
 <div class="card">
 
@@ -507,46 +1073,45 @@ container.innerHTML+=`
 
 `;
 
-}
+});
+
+track.appendChild(div);
+
+});
+
+let clone=track.children[0].cloneNode(true);
+
+track.appendChild(clone);
+
+function slide(){
+
+current++;
+
+track.style.transition="transform 0.7s";
+
+track.style.transform=`translateX(-${current*100}%)`;
 
 }
 
+track.addEventListener("transitionend",()=>{
 
-/* INITIAL */
+if(current===groups.length){
 
-render(justContainer,justData,0,4);
+track.style.transition="none";
 
-render(recentContainer,recentData,0,4);
+track.style.transform="translateX(0%)";
 
-render(recommendedContainer,recommendedData,0,4);
+current=0;
 
+}
 
-/* AUTO ROTATE */
+});
 
-let j=0;
+setInterval(slide,5000);
 
-setInterval(()=>{
-
-j++;
-
-render(justContainer,justData,j,4);
-
-},3000);
-
-
-let r=0;
-
-setInterval(()=>{
-
-r++;
-
-render(recommendedContainer,recommendedData,r,4);
-
-},3000);
-
+}
 
 </script>
-
 
 </body>
 </html>
