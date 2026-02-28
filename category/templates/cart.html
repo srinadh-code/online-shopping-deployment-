@@ -126,10 +126,24 @@
     {% endfor %}
 
     {% if items %}
-        <div class="total-box">
-            <h3>Grand Total: ₹{{ total }}</h3>
-            <button class="checkout">Proceed to Checkout</button>
-        </div>
+       <div class="summary-line">
+    <span>Total</span>
+    <span>₹{{ total }}</span>
+</div>
+
+{% if discount > 0 %}
+<div class="summary-line" style="color:green;">
+    <span>🎉 First Order Discount (30%)</span>
+    <span>- ₹{{ discount }}</span>
+</div>
+{% endif %}
+
+<hr>
+
+<div class="summary-line">
+    <strong>Final Amount</strong>
+    <strong>₹{{ final_total }}</strong>
+</div>
     {% endif %}
     
 

@@ -55,27 +55,6 @@ class loginview(View):
             return render(request, "login.html", {
                 "error": "Invalid username/email or password"
             })
-# from django.db.models import Q
-# from django.contrib.auth import authenticate, login
-
-# def post(self, request):
-#     username_or_email = request.POST.get("username_or_email")
-#     password = request.POST.get("password")
-
-#     user_obj = User.objects.filter(
-#         Q(username=username_or_email) | Q(email=username_or_email)
-#     ).first()
-
-#     user = None
-#     if user_obj:
-#         user = authenticate(request, username=user_obj.username, password=password)
-
-#     if user:
-#         login(request, user)
-#         return redirect("home")
-#     else:
-#         return render(request, "login.html", {"error": "Invalid credentials"})
-            
 class logoutview(View):
     def get(self, request):
         logout(request)
