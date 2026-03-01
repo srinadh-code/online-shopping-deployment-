@@ -2,7 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 
-
+from django.utils import timezone
+from datetime import timedelta
 from .models import (
     Category,
     SubCategory,
@@ -272,13 +273,44 @@ def place_order(request):
     return redirect('my_orders')
 
 
+
 @login_required
 def my_orders(request):
+
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(request, "my_orders.html", {
-        "orders": orders
-    })
+    now = timezone.now()
+
+    for order in orders:
+
+        if order.status == "Cancelled":
+            continue
+
+        diff = now - order.created_at
+
+        if diff >= timedelta(minutes=2):
+            order.status = "Delivered"
+
+        elif diff >= timedelta(minutes=1):
+            order.status = "Shipped"
+
+        else:
+            order.status = "Placed"
+
+        order.save()
+
+    return render(request, "my_orders.html", {"orders": orders})
+@login_required
+def cancel_order(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if order.status != "Delivered":
+        order.status = "Cancelled"
+        order.save()
+
+    return redirect("my_orders")
+
 @login_required
 def wishlist_view(request):
     wishlist, created = Wishlist.objects.get_or_create(
@@ -338,3 +370,40 @@ def order_success(request):
     return render(request, "order_success.html", {
         "is_first_order": is_first_order
     })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Order, ReturnRequest
+from django.utils import timezone
+from datetime import timedelta
+
+def return_request(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # 🔥 7-day policy
+    if order.created_at < timezone.now() - timedelta(days=7):
+        return redirect("my_orders")
+
+    if request.method == "POST":
+        request_type = request.POST.get("type")
+        reason = request.POST.get("reason")
+        image = request.FILES.get("image")
+
+        ReturnRequest.objects.create(
+            order=order,
+            user=request.user,
+            request_type=request_type,
+            reason=reason,
+            image=image
+        )
+
+        return redirect("my_orders")
+
+    return render(request, "return_form.html", {"order": order})  
+def save_model(self, request, obj, form, change):
+    if obj.status == "Approved":
+        obj.refund_status = "Completed"
+    super().save_model(request, obj, form, change)
+def my_returns(request):
+    returns = ReturnRequest.objects.filter(user=request.user)
+    return render(request, "my_returns.html", {"returns": returns})   
+  

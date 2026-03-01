@@ -459,7 +459,7 @@ function startVoiceSearch(){
 
         console.log("Voice detected:", text);
 
-        // ✅ CLEAN TEXT (IMPORTANT FIX)
+        //  CLEAN TEXT (IMPORTANT FIX)
         text = text.trim().replace(".", "").replace(",", "");
 
         // Put into search box
@@ -484,14 +484,17 @@ function startVoiceSearch(){
 
 /* JUST ARRIVED SLIDER */
 
+
+
 let justArrived = [
 
 {% for product in just_arrived %}
 {
-id:"{{ product.id }}",
-name:"{{ product.name }}",
-price:"{{ product.price }}",
-image:"{{ product.image.url }}"
+id: {{ product.id }},
+name: "{{ product.name|escapejs }}",
+price: "{{ product.price }}",
+image: "{{ product.image.url }}",
+inWishlist: {% if product.id in wishlist_product_ids %}true{% else %}false{% endif %}
 },
 {% endfor %}
 
@@ -517,25 +520,11 @@ div.className="slide-group";
 group.forEach(p=>{
 
 div.innerHTML+=`
-
-{% comment %} <div class="card">
-
-<a href="/product/${p.id}/">
-
-<img src="${p.image}">
-
-</a>
-
-<p>${p.name}</p>
-
-<p class="price">₹${p.price}</p>
-
-</div> {% endcomment %}
 <div class="card">
 
 <div class="wishlist-icon"
 onclick="toggleWishlist(${p.id}, this)">
-🤍
+${p.inWishlist ? "❤️" : "🤍"}
 </div>
 
 <a href="/product/${p.id}/">
@@ -589,11 +578,6 @@ current=0;
 setInterval(slide,5000);
 
 }
-
-
-
-
-
 
 function toggleWishlist(productId, element){
 

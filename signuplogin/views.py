@@ -59,6 +59,9 @@ class logoutview(View):
     def get(self, request):
         logout(request)
         return redirect("login")
+import random
+from django.core.mail import send_mail
+from django.conf import settings
 
 class ForgotPasswordView(View):
     def get(self, request):
@@ -75,7 +78,7 @@ class ForgotPasswordView(View):
             send_mail(
                 "Password Reset OTP",
                 f"Your OTP is {otp_code}",
-                settings.EMAIL_HOST_USER,
+                django.conf.settings.EMAIL_HOST_USER,
                 [email],
                 fail_silently=False,
             )

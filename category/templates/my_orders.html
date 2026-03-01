@@ -1,223 +1,343 @@
 
 
+
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Orders</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
+<style>
 
-        body{
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #eef2f7, #d9e4f5);
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Segoe UI", Arial;
+}
 
-        .header{
-            background: #1e293b;
-            color:white;
-            padding:18px 40px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.1);
-        }
+body{
+background:#f1f3f6;
+}
 
-        .header strong{
-            font-size:20px;
-            letter-spacing:1px;
-        }
+/* HEADER */
 
-        .container{
-            max-width:1100px;
-            margin:40px auto;
-            padding:20px;
-        }
+.header{
+background:linear-gradient(to right,#2874f0,#3f8cff);
+color:white;
+padding:16px 30px;
+font-size:20px;
+font-weight:600;
+box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
 
-        .order-card{
-            background:white;
-            padding:25px;
-            border-radius:16px;
-            margin-bottom:25px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.08);
-            transition:0.3s ease;
-        }
+/* CONTAINER */
 
-        .order-card:hover{
-            transform:translateY(-4px);
-            box-shadow:0 12px 30px rgba(0,0,0,0.15);
-        }
+.container{
+max-width:1000px;
+margin:30px auto;
+padding:10px;
+}
 
-        .order-header{
-            display:flex;
-            justify-content:space-between;
-            margin-bottom:15px;
-        }
+/* CARD */
 
-        .order-id{
-            font-weight:bold;
-            font-size:18px;
-        }
+.order-card{
 
-        .order-date{
-            color:#666;
-            font-size:14px;
-        }
+background:white;
+border-radius:12px;
+margin-bottom:18px;
+padding:18px;
+box-shadow:0 2px 10px rgba(0,0,0,0.08);
+transition:0.25s;
+border-left:6px solid #2874f0;
 
-        .status{
-            padding:6px 14px;
-            border-radius:30px;
-            font-size:13px;
-            font-weight:bold;
-        }
+}
 
-        .status.Pending{
-            background:#fff3cd;
-            color:#856404;
-        }
+.order-card:hover{
+transform:translateY(-4px);
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
 
-        .status.Shipped{
-            background:#d1ecf1;
-            color:#0c5460;
-        }
+/* FLEX */
 
-        .status.Delivered{
-            background:#d4edda;
-            color:#155724;
-        }
+.order-content{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-        .status.Cancelled{
-            background:#f8d7da;
-            color:#721c24;
-        }
+/* LEFT */
 
-        .product-list{
-            margin-top:15px;
-        }
+.order-id{
+font-size:18px;
+font-weight:600;
+margin-bottom:4px;
+}
 
-        .item{
-            display:flex;
-            justify-content:space-between;
-            padding:8px 0;
-            border-bottom:1px solid #eee;
-            font-size:15px;
-        }
+.order-date{
+font-size:13px;
+color:#777;
+margin-bottom:8px;
+}
 
-        .item:last-child{
-            border-bottom:none;
-        }
+.item{
+font-size:14px;
+color:#333;
+margin-top:3px;
+}
 
-        .total{
-            margin-top:15px;
-            font-size:17px;
-            font-weight:bold;
-            text-align:right;
-        }
+/* STATUS BADGE */
 
-        .back{
-            display:inline-block;
-            margin-top:25px;
-            padding:10px 18px;
-            background:#4a90e2;
-            color:white;
-            text-decoration:none;
-            border-radius:8px;
-            transition:0.3s;
-        }
+.status{
 
-        .back:hover{
-            background:#2c6fd6;
-        }
+display:inline-block;
+padding:4px 10px;
+border-radius:20px;
+font-size:13px;
+font-weight:500;
+margin-top:5px;
 
-        .empty{
-            text-align:center;
-            padding:40px;
-            background:white;
-            border-radius:12px;
-            box-shadow:0 6px 20px rgba(0,0,0,0.08);
-        }
+}
 
-        @media(max-width:768px){
-            .order-header{
-                flex-direction:column;
-                gap:5px;
-            }
-        }
-        
+.placed{
+background:#fff3cd;
+color:#856404;
+}
 
-    </style>
+.shipped{
+background:#d1ecf1;
+color:#0c5460;
+}
+
+.delivered{
+background:#d4edda;
+color:#155724;
+}
+
+.cancelled{
+background:#f8d7da;
+color:#721c24;
+}
+
+/* RIGHT */
+
+.right{
+text-align:right;
+}
+
+.price{
+font-size:20px;
+font-weight:600;
+margin-bottom:10px;
+}
+
+/* BUTTONS */
+
+.btn{
+display:inline-block;
+padding:8px 16px;
+border-radius:6px;
+text-decoration:none;
+font-size:14px;
+margin-top:5px;
+transition:0.2s;
+}
+
+.btn-return{
+background:#28a745;
+color:white;
+}
+
+.btn-return:hover{
+background:#218838;
+}
+
+.btn-cancel{
+background:#dc3545;
+color:white;
+}
+
+.btn-cancel:hover{
+background:#c82333;
+}
+
+/* RETURN BOX */
+
+.return-box{
+margin-top:10px;
+background:#f8f9fa;
+padding:10px;
+border-radius:8px;
+font-size:13px;
+}
+
+/* BACK BUTTON */
+
+.back{
+display:inline-block;
+margin-top:20px;
+background:#2874f0;
+color:white;
+padding:10px 18px;
+border-radius:6px;
+text-decoration:none;
+}
+
+.back:hover{
+background:#1d5ed8;
+}
+
+/* EMPTY */
+
+.empty{
+text-align:center;
+padding:40px;
+background:white;
+border-radius:10px;
+}
+
+</style>
 </head>
 
 <body>
+
+<div class="header">
+My Orders
+</div>
+
 <div class="container">
 
 {% for order in orders %}
 
-    <div class="order-card">
+<div class="order-card">
 
-        <div class="order-content">
+<div class="order-content">
 
-            <!-- LEFT -->
-            <div class="left">
-                <div class="order-id">Order #{{ order.id }}</div>
-                <div class="order-date">{{ order.created_at }}</div>
+<div>
 
-                {% for item in order.items.all %}
-                    <div class="item">
-                        {{ item.product.name }} (x{{ item.quantity }})
-                    </div>
-                {% endfor %}
-            </div>
+<div class="order-id">
+Order #{{ order.id }}
+</div>
 
-            <!-- RIGHT -->
-            <div class="right">
+<div class="order-date">
+{{ order.created_at }}
+</div>
 
-                <!-- ✅ ONLY FIRST ORDER -->
-                {% if forloop.first and order.discount_amount > 0 %}
+<!-- STATUS -->
 
-                    <div class="original">
-                        ₹{{ order.total_amount|add:order.discount_amount }}
-                    </div>
+{% if order.status == "Placed" %}
+<div class="status placed">🟡 Placed</div>
 
-                    <div class="discount">
-                        🎉 First Order Discount -₹{{ order.discount_amount }}
-                    </div>
+{% elif order.status == "Shipped" %}
+<div class="status shipped">🚚 Shipped</div>
 
-                    <div class="final">
-                        ₹{{ order.total_amount }}
-                    </div>
+{% elif order.status == "Delivered" %}
+<div class="status delivered">✅ Delivered</div>
 
-                    <div class="saved">
-                        You saved ₹{{ order.discount_amount }}
-                    </div>
+{% elif order.status == "Cancelled" %}
+<div class="status cancelled">❌ Cancelled</div>
 
-                {% else %}
+{% endif %}
 
-                    <div class="final">
-                        ₹{{ order.total_amount }}
-                    </div>
+<!-- ITEMS -->
 
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-{% empty %}
-
-    <div class="empty">
-        <h3>You have no orders yet 😔</h3>
-    </div>
-
+{% for item in order.items.all %}
+<div class="item">
+{{ item.product.name }} × {{ item.quantity }}
+</div>
 {% endfor %}
 
 </div>
 
-<a href="{% url 'dashboard' %}" class="back">← Back to Dashboard</a>
+<div class="right">
+
+{% if order.discount_amount > 0 %}
+
+<div style="text-decoration:line-through;color:#777;">
+₹{{ order.total_amount|add:order.discount_amount }}
+</div>
+
+<div style="color:green;font-size:13px;">
+-₹{{ order.discount_amount }} discount
+</div>
+
+{% endif %}
+
+<div class="price">
+₹{{ order.total_amount }}
+</div>
+
+<a href="{% url 'return_request' order.id %}" class="btn btn-return">
+Return / Exchange
+</a>
+
+{% if order.status != "Delivered" and order.status != "Cancelled" %}
+
+<br>
+
+<a href="{% url 'cancel_order' order.id %}" class="btn btn-cancel">
+Cancel Order
+</a>
+
+{% endif %}
+
+</div>
+
+</div>
+
+<!-- RETURN STATUS -->
+
+{% for r in order.returns.all %}
+<div class="return-box">
+
+Request: <b>{{ r.request_type }}</b><br>
+
+Status: {{ r.status }}<br>
+
+Refund: {{ r.refund_status }}
+
+</div>
+{% endfor %}
+
+</div>
+
+{% empty %}
+
+<div class="empty">
+
+<h3>No Orders Yet</h3>
+
+</div>
+
+{% endfor %}
+
+<a href="{% url 'dashboard' %}" class="back">
+← Back to Dashboard
+</a>
+
+</div>
+
+<!-- AUTO REFRESH -->
+
+<script>
+
+setInterval(function(){
+
+fetch(window.location.href)
+.then(res => res.text())
+.then(html => {
+
+let doc = new DOMParser().parseFromString(html,"text/html");
+
+document.querySelector(".container").innerHTML =
+doc.querySelector(".container").innerHTML;
+
+});
+
+},10000);
+
+</script>
+
+</body>
+</html>
