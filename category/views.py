@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+
 
 from .models import (
     Category,
@@ -186,31 +188,6 @@ def product_detail(request, product_id):
         "in_wishlist": in_wishlist
     })
 
-# @login_required
-# def product_detail(request, product_id):
-#     product = get_object_or_404(Product, id=product_id)
-#     # Recently viwed
-#     recent = request.session.get('recently_viewed', [])
-
-#     if product.id in recent:
-#         recent.remove(product.id)
-
-#     recent.insert(0, product.id)
-#     request.session['recently_viewed'] = recent[:5]
-
-#     # wishlist check
-#     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-
-#     in_wishlist = WishlistItem.objects.filter(
-#         wishlist=wishlist,
-#         product=product
-#     ).exists()
-
-#     return render(request, "product_detail.html", {
-#         "product": product,
-#         "in_wishlist": in_wishlist
-#     })
-    
 @login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
