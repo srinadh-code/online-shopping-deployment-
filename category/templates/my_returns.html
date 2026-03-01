@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Returns</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f6fa;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .pending { color: orange; }
+        .approved { color: green; }
+        .rejected { color: red; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>My Return / Exchange Requests</h2>
+
+    {% for r in returns %}
+        <div class="card">
+
+            <p><b>Order:</b> #{{ r.order.id }}</p>
+            <p><b>Type:</b> {{ r.request_type }}</p>
+            <p><b>Reason:</b> {{ r.reason }}</p>
+
+            {% if r.image %}
+                <img src="{{ r.image.url }}" width="100">
+            {% endif %}
+
+            <p class="status">
+                Status:
+                <span class="{{ r.status|lower }}">
+                    {{ r.status }}
+                </span>
+            </p>
+
+            <p>
+                Refund:
+                <b>{{ r.refund_status }}</b>
+            </p>
+
+            <p><small>{{ r.created_at }}</small></p>
+
+        </div>
+    {% empty %}
+        <p>No return requests found 😔</p>
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

@@ -1,12 +1,22 @@
 from django.db.models import Avg, Min, Max
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404,redirect
-from .models import Category, SubCategory, Product,Review
-from .models import Cart, CartItem,Wishlist,WishlistItem,  Order, OrderItem
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 
-
-
-
+from django.utils import timezone
+from datetime import timedelta
+from .models import (
+    Category,
+    SubCategory,
+    Product,
+    Cart,
+    CartItem,
+    Wishlist,
+    WishlistItem,
+    Order,
+    OrderItem,
+    Review
+)
 
 @login_required
 def dashboardview(request):
@@ -17,7 +27,8 @@ def dashboardview(request):
     # CATEGORIES WITH SUBCATEGORIES
     categories = Category.objects.prefetch_related("subcategories").all()
 
-    # WISHLIST INFO
+
+    # WISHLIST
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
     wishlist_product_ids = list(
@@ -26,52 +37,111 @@ def dashboardview(request):
 
     wishlist_count = wishlist.items.count()
 
-    # SEARCH SECTION
+
+    # ================= FINAL SEARCH LOGIC =================
+
     query = request.GET.get('q', '').strip()
 
     if query:
+
+        # 1️PRODUCT EXACT MATCH → OPEN PRODUCT DETAIL
+        product = Product.objects.filter(
+            name__iexact=query
+        ).first()
+
+        if product:
+            return redirect('product_detail', product_id=product.id)
+
+
+        # 2 SUBCATEGORY MATCH → SHOW PRODUCTS
+        subcategory = SubCategory.objects.filter(
+            name__icontains=query
+        ).first()
+
+        if subcategory:
+            return redirect(
+                'subcategory',
+                subcategory_id=subcategory.id
+            )
+
+
+        # 3 CATEGORY MATCH → SHOW SUBCATEGORIES
+        category = Category.objects.filter(
+            name__icontains=query
+        ).first()
+
+        if category:
+            return redirect(
+                'category',
+                category_id=category.id
+            )
+
+
+        # 4️ PARTIAL PRODUCT SEARCH → SHOW RESULTS PAGE
         products = Product.objects.filter(
             name__icontains=query
-        ).only("id", "name", "price", "image")[:50]
+        )
 
-        return render(request, "products.html", {
-            "products": products,
-            "username": username,
-            "wishlist_count": wishlist_count
-        })
+        if products.exists():
 
-    # RECENTLY VIEWED SECTION (FIXED)
+            return render(request, "products.html", {
+                "products": products,
+                "title": f"Search Results for '{query}'",
+                "username": username,
+                "wishlist_count": wishlist_count
+            })
+
+
+    # RECENTLY VIEWED 
+
     recent_ids = request.session.get('recently_viewed', [])
 
-    recently_viewed_queryset = Product.objects.filter(id__in=recent_ids)
+    recently_viewed_queryset = Product.objects.filter(
+        id__in=recent_ids
+    )
 
     recently_viewed = sorted(
         recently_viewed_queryset,
         key=lambda x: recent_ids.index(x.id)
     )
 
-    # RECOMMENDED PRODUCTS
-    recommended = Product.objects.all().order_by('?')[:4]
 
-    # JUST ARRIVED PRODUCTS
+    # RECOMMENDED 
+
+    recommended = Product.objects.exclude(
+        id__in=recent_ids
+    ).order_by('?')[:4]
+
+
+    #  JUST ARRIVED
+
     just_arrived = Product.objects.order_by('-id')[:8]
 
-    # FINAL RENDER
-    return render(request, "dashboard.html", {
+
+    # FINAL RENDER 
+
+    context = {
+
         "username": username,
         "categories": categories,
+
         "recently_viewed": recently_viewed,
         "recommended": recommended,
+
+        "just_arrived": just_arrived,
+
         "wishlist_product_ids": wishlist_product_ids,
-        "wishlist_count": wishlist_count,
-        "just_arrived": just_arrived
-    })
+
+        "wishlist_count": wishlist_count
+
+    }
+
+    return render(request, "dashboard.html", context)
 
 @login_required
 def category_view(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     subcategories = SubCategory.objects.filter(category=category)
-
     return render(request, "category.html", {
         "category": category,
         "subcategories": subcategories
@@ -127,23 +197,27 @@ def subcategory_view(request, subcategory_id):
         "title": subcategory.name,
         "price_ranges":price_ranges
     })
-
+    
 @login_required
 def product_detail(request, product_id):
 
     product = get_object_or_404(Product, id=product_id)
 
-    # Recently viewed
+    # Get recent list
     recent = request.session.get('recently_viewed', [])
 
-    if product.id in recent:
-        recent.remove(product.id)
+    # Remove if already exists
+    if product_id in recent:
+        recent.remove(product_id)
 
-    recent.insert(0, product.id)
+    # Add to beginning
+    recent.insert(0, product_id)
+
+    # Keep only last 5 unique
     request.session['recently_viewed'] = recent[:5]
 
-    # Wishlist check
-    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+    # wishlist check
+    wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
     in_wishlist = WishlistItem.objects.filter(
         wishlist=wishlist,
@@ -178,7 +252,7 @@ def product_detail(request, product_id):
         "reviews":reviews,
         "avg_rating":avg_rating
     })
-    
+
 @login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -195,8 +269,8 @@ def add_to_cart(request, product_id):
         CartItem.objects.create(cart=cart, product=product, quantity=quantity)
 
     return redirect('cart')
-from .utils import apply_first_order_discount
 
+from .utils import apply_first_order_discount
 @login_required
 def cart_view(request):
     cart = Cart.objects.get_or_create(user=request.user)[0]
@@ -228,7 +302,8 @@ def remove_from_cart(request, item_id):
     item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     item.delete()
     return redirect('cart')
-from .models import Order, OrderItem
+
+
 from .utils import apply_first_order_discount
 
 @login_required
@@ -249,9 +324,7 @@ def place_order(request):
         user=request.user,
         total_amount=final_total,
          discount_amount=discount   
-
     )
-
     for item in items:
         OrderItem.objects.create(
             order=order,
@@ -261,35 +334,58 @@ def place_order(request):
         )
 
     cart.items.all().delete()
-
     return redirect('my_orders')
-from .models import Order
+
+
 
 @login_required
 def my_orders(request):
-    orders = Order.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
 
-    return render(request, "my_orders.html", {
-        "orders": orders
-    })
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
 
-from django.http import JsonResponse
+    now = timezone.now()
+
+    for order in orders:
+
+        if order.status == "Cancelled":
+            continue
+
+        diff = now - order.created_at
+
+        if diff >= timedelta(minutes=1):
+            order.status = "Delivered"
+
+        elif diff >= timedelta(minutes=1):
+            order.status = "Shipped"
+
+        else:
+            order.status = "Placed"
+
+        order.save()
+
+    return render(request, "my_orders.html", {"orders": orders})
+@login_required
+def cancel_order(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if order.status != "Delivered":
+        order.status = "Cancelled"
+        order.save()
+
+    return redirect("my_orders")
+
 @login_required
 def wishlist_view(request):
-
     wishlist, created = Wishlist.objects.get_or_create(
         user=request.user
     )
-
     items = wishlist.items.select_related("product")
 
     return render(request, "wishlist.html", {
         "items": items
     })
-
-
+from django.http import JsonResponse
 @login_required
 def toggle_wishlist(request, product_id):
 
@@ -298,7 +394,6 @@ def toggle_wishlist(request, product_id):
     wishlist, created = Wishlist.objects.get_or_create(
         user=request.user
     )
-
     wishlist_item = WishlistItem.objects.filter(
         wishlist=wishlist,
         product=product
@@ -326,21 +421,53 @@ def remove_from_wishlist(request, item_id):
 
     item.delete()
     return redirect("wishlist")
-from django.http import HttpResponse
-from .models import Order
 
 def reset_orders(request):
     Order.objects.filter(user=request.user).delete()
     return HttpResponse("Orders Reset Done ")
 def order_success(request):
     user = request.user
-
     # Count how many orders user has
-    order_count = user.order_set.count()   # change 'order_set' if your model name is different
-
+    order_count = user.order_set.count()   
     # First order check
     is_first_order = order_count == 1
-
     return render(request, "order_success.html", {
         "is_first_order": is_first_order
     })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Order, ReturnRequest
+from django.utils import timezone
+from datetime import timedelta
+
+def return_request(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # 🔥 7-day policy
+    if order.created_at < timezone.now() - timedelta(days=7):
+        return redirect("my_orders")
+
+    if request.method == "POST":
+        request_type = request.POST.get("type")
+        reason = request.POST.get("reason")
+        image = request.FILES.get("image")
+
+        ReturnRequest.objects.create(
+            order=order,
+            user=request.user,
+            request_type=request_type,
+            reason=reason,
+            image=image
+        )
+
+        return redirect("my_orders")
+
+    return render(request, "return_form.html", {"order": order})  
+def save_model(self, request, obj, form, change):
+    if obj.status == "Approved":
+        obj.refund_status = "Completed"
+    super().save_model(request, obj, form, change)
+def my_returns(request):
+    returns = ReturnRequest.objects.filter(user=request.user)
+    return render(request, "my_returns.html", {"returns": returns})   
+  

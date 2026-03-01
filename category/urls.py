@@ -26,6 +26,10 @@ urlpatterns = [
     path("remove-from-wishlist/<int:item_id>/",
      views.remove_from_wishlist,
      name="remove_from_wishlist"),
-     path("reset-orders/", views.reset_orders),
+    path("reset-orders/", views.reset_orders),
+    path('return-request/<int:order_id>/', views.return_request, name='return_request'),
+    path('my-returns/', views.my_returns, name='my_returns'),
+    path("cancel-order/<int:order_id>/", views.cancel_order, name="cancel_order"),
+
 ]
 

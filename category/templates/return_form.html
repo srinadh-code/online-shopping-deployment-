@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Return / Exchange</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f1f3f6;
+        }
+
+        .container {
+            width: 500px;
+            margin: 60px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.6s ease;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 15px;
+        }
+
+        select, textarea, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        select:focus, textarea:focus {
+            border-color: #ff3f6c;
+            box-shadow: 0 0 5px rgba(255,63,108,0.4);
+        }
+
+        textarea {
+            height: 80px;
+            resize: none;
+        }
+
+        .btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 120px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            color: green;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h2>🔄 Return / Exchange</h2>
+
+        <form method="POST" enctype="multipart/form-data" id="returnForm">
+            {% csrf_token %}
+
+            <label>Type</label>
+            <select name="type">
+                <option value="Return">Return</option>
+                <option value="Exchange">Exchange</option>
+            </select>
+
+            <label>Reason</label>
+            <textarea name="reason" placeholder="Explain your issue..." required></textarea>
+
+            <label>Upload Image (optional)</label>
+            <input type="file" name="image" id="imageInput">
+
+            <div class="preview" id="preview"></div>
+
+            <button type="submit" class="btn">Submit Request</button>
+
+            <div class="success" id="successMsg">
+                ✅ Request Submitted Successfully!
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    // Image Preview
+    document.getElementById("imageInput").addEventListener("change", function(event) {
+        let preview = document.getElementById("preview");
+        preview.innerHTML = "";
+
+        let file = event.target.files[0];
+        if (file) {
+            let img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+            preview.appendChild(img);
+        }
+    });
+
+    // Fake success animation (UI only)
+    document.getElementById("returnForm").addEventListener("submit", function() {
+        document.getElementById("successMsg").style.display = "block";
+    });
+</script>
+
+</body>
+</html>
