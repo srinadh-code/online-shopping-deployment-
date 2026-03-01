@@ -1,94 +1,9 @@
-
-# from django.contrib.auth.decorators import login_required
-# from django.shortcuts import render, get_object_or_404
-# from .models import Category, SubCategory, Product,Review
-# from .models import Cart, CartItem,Wishlist,WishlistItem
-# from django.shortcuts import redirect
-from django.db.models import Min, Max,Avg
-
-
-# @login_required
-# def dashboardview(request):
-
-#     username = request.user.username
-#     categories = Category.objects.all()
-
-#     # WISHLIST FIX
-   
-#     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-
-#     wishlist_product_ids = list(
-#         wishlist.items.values_list("product_id", flat=True)
-#     )
-
-#     wishlist_count = wishlist.items.count()
-  
-
-#     query = request.GET.get('q', '').strip()
-
-#     # SEARCH SECTION
-#     if query:
-
-#         category = Category.objects.filter(name__icontains=query).first()
-#         if category:
-#             subcategories = SubCategory.objects.filter(category=category)
-#             return render(request, "category.html", {
-#                 "category": category,
-#                 "subcategories": subcategories,
-#                 "username": username,
-#                 "wishlist_count": wishlist_count
-#             })
-
-#         subcategory = SubCategory.objects.filter(name__icontains=query).first()
-#         if subcategory:
-#             products = Product.objects.filter(subcategory=subcategory)
-#             return render(request, "products.html", {
-#                 "subcategory": subcategory,
-#                 "products": products,
-#                 "username": username,
-#                 "wishlist_count": wishlist_count
-#             })
-
-#         products = Product.objects.filter(name__icontains=query)
-        
-
-#         return render(request, "products.html", {
-#             "products": products,
-#             "subcategory": None,
-#             "username": username,
-#             "wishlist_count": wishlist_count
-#         })
-
-#     # Recently Viewed
-#     recent_ids = request.session.get('recently_viewed', [])
-#     recently_viewed = Product.objects.filter(id__in=recent_ids)
-
-#     recently_viewed = sorted(
-#         recently_viewed,
-#         key=lambda x: recent_ids.index(x.id)
-#     )
-
-#     recommended = Product.objects.all().order_by('?')[:4]
-#     # Just Arrived (latest 6 products)
-#     just_arrived = Product.objects.order_by('-id')[:8]
-
-#     return render(request, "dashboard.html", {
-#         "username": username,
-#         "categories": categories,
-#         "recently_viewed": recently_viewed,
-#         "recommended": recommended,
-#         "wishlist_product_ids": wishlist_product_ids,
-#         "wishlist_count": wishlist_count,
-#         "just_arrived": just_arrived
-#     })
-
-
-
+from django.db.models import Avg, Min, Max
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
-from .models import Category, SubCategory, Product
-from .models import Cart, CartItem,Wishlist,WishlistItem
-from django.shortcuts import redirect
+from django.shortcuts import render, get_object_or_404,redirect
+from .models import Category, SubCategory, Product,Review
+from .models import Cart, CartItem,Wishlist,WishlistItem,  Order, OrderItem
+
 
 
 
@@ -96,125 +11,62 @@ from django.shortcuts import redirect
 @login_required
 def dashboardview(request):
 
- 
     # USER INFO
-   
     username = request.user.username
 
-
     # CATEGORIES WITH SUBCATEGORIES
-  
-    categories = Category.objects.prefetch_related(
-        "subcategories"
-    ).all()
-
+    categories = Category.objects.prefetch_related("subcategories").all()
 
     # WISHLIST INFO
- 
-    wishlist, _ = Wishlist.objects.get_or_create(
-        user=request.user
-    )
+    wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
     wishlist_product_ids = list(
-        wishlist.items.values_list(
-            "product_id",
-            flat=True
-        )
+        wishlist.items.values_list("product_id", flat=True)
     )
 
     wishlist_count = wishlist.items.count()
 
-
-    # SEARCH FUNCTIONALITY
-
-    query = request.GET.get("q", "").strip()
+    # SEARCH SECTION
+    query = request.GET.get('q', '').strip()
 
     if query:
-
         products = Product.objects.filter(
             name__icontains=query
-        ).only(
-            "id", "name", "price", "image"
-        )[:50]
+        ).only("id", "name", "price", "image")[:50]
 
-        return render(
-            request,
-            "products.html",
-            {
-                "products": products,
-                "username": username,
-                "wishlist_count": wishlist_count,
-                "wishlist_product_ids": wishlist_product_ids
-            }
-        )
+        return render(request, "products.html", {
+            "products": products,
+            "username": username,
+            "wishlist_count": wishlist_count
+        })
 
+    # RECENTLY VIEWED SECTION (FIXED)
+    recent_ids = request.session.get('recently_viewed', [])
 
+    recently_viewed_queryset = Product.objects.filter(id__in=recent_ids)
 
-    # JUST ARRIVED
-    # Send more products for auto rotation
-
-    just_arrived = list(
-        Product.objects
-        .only("id", "name", "price", "image")
-        .order_by("-id")[:12]
-    )
-
-
-
-    # RECENTLY VIEWED
-    # STATIC — changes only when user opens product
-
-    recent_ids = request.session.get(
-        "recently_viewed",
-        []
-    )[:12]
-
-    recently_viewed_queryset = Product.objects.filter(
-        id__in=recent_ids
-    ).only(
-        "id", "name", "price", "image"
-    )
-
-    recently_viewed = list(recently_viewed_queryset)
-
-    # Preserve order based on session
-    recently_viewed.sort(
+    recently_viewed = sorted(
+        recently_viewed_queryset,
         key=lambda x: recent_ids.index(x.id)
     )
-    # RECOMMENDED
-    # Send more products for rotation
-   
-    recommended = list(
-        Product.objects
-        .only("id", "name", "price", "image")
-        .order_by("?")[:12]
-    )
-    # FINAL CONTEXT
-   
-    context = {
 
+    # RECOMMENDED PRODUCTS
+    recommended = Product.objects.all().order_by('?')[:4]
+
+    # JUST ARRIVED PRODUCTS
+    just_arrived = Product.objects.order_by('-id')[:8]
+
+    # FINAL RENDER
+    return render(request, "dashboard.html", {
         "username": username,
-
         "categories": categories,
-
-        "just_arrived": just_arrived,
-
         "recently_viewed": recently_viewed,
-
         "recommended": recommended,
-
         "wishlist_product_ids": wishlist_product_ids,
-
         "wishlist_count": wishlist_count,
+        "just_arrived": just_arrived
+    })
 
-    }
-
-
-    return render(
-        request,
-        "dashboard.html",
-        context
-    )
 @login_required
 def category_view(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -308,11 +160,13 @@ def product_detail(request, product_id):
         comment = request.POST.get("comment")
 
         if rating:
-            Review.objects.create(
+            Review.objects.update_or_create(
                 product=product,
                 user=request.user,
-                rating=int(rating),
-                comment=comment
+                defaults={
+                "rating":int(rating),
+                "comment":comment
+                }
             )
         return redirect('product_detail', product_id=product.id)
 
@@ -341,15 +195,22 @@ def add_to_cart(request, product_id):
         CartItem.objects.create(cart=cart, product=product, quantity=quantity)
 
     return redirect('cart')
+from .utils import apply_first_order_discount
+
 @login_required
 def cart_view(request):
     cart = Cart.objects.get_or_create(user=request.user)[0]
     items = cart.items.all()
+
     total = sum(item.product.price * item.quantity for item in items)
+
+    final_total, discount, _ = apply_first_order_discount(request.user, total)
 
     return render(request, "cart.html", {
         "items": items,
-        "total": total
+        "total": total,
+        "discount": discount,
+        "final_total": final_total
     })
 @login_required
 def buy_now(request, product_id):
@@ -367,8 +228,8 @@ def remove_from_cart(request, item_id):
     item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     item.delete()
     return redirect('cart')
-
 from .models import Order, OrderItem
+from .utils import apply_first_order_discount
 
 @login_required
 def place_order(request):
@@ -380,13 +241,17 @@ def place_order(request):
 
     total = sum(item.product.price * item.quantity for item in items)
 
-    # Create Order
-    order = Order.objects.create(
-        user=request.user,
-        total_amount=total
+    final_total, discount, discount_applied = apply_first_order_discount(
+        request.user, total
     )
 
-    # Create OrderItems
+    order = Order.objects.create(   
+        user=request.user,
+        total_amount=final_total,
+         discount_amount=discount   
+
+    )
+
     for item in items:
         OrderItem.objects.create(
             order=order,
@@ -395,13 +260,16 @@ def place_order(request):
             price=item.product.price
         )
 
-    # Clear cart
     cart.items.all().delete()
 
     return redirect('my_orders')
+from .models import Order
+
 @login_required
 def my_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    orders = Order.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
 
     return render(request, "my_orders.html", {
         "orders": orders
@@ -458,3 +326,21 @@ def remove_from_wishlist(request, item_id):
 
     item.delete()
     return redirect("wishlist")
+from django.http import HttpResponse
+from .models import Order
+
+def reset_orders(request):
+    Order.objects.filter(user=request.user).delete()
+    return HttpResponse("Orders Reset Done ")
+def order_success(request):
+    user = request.user
+
+    # Count how many orders user has
+    order_count = user.order_set.count()   # change 'order_set' if your model name is different
+
+    # First order check
+    is_first_order = order_count == 1
+
+    return render(request, "order_success.html", {
+        "is_first_order": is_first_order
+    })

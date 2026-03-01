@@ -10,31 +10,8 @@ class signupview(View):
 
     def get(self, request):
         return render(request, "signup.html")
-
-    # def post(self, request):
-    #     username = request.POST.get("username")
-    #     email = request.POST.get("email")
-    #     password = request.POST.get("password")
-
-    #     if User.objects.filter(username=username).exists():
-    #         return render(request, "signup.html", {
-    #             "error": "Username already exists"
-    #         })
-
-    #     if User.objects.filter(email=email).exists():
-    #         return render(request, "signup.html", {
-    #             "error": "Email already registered"
-    #         })
-
-    #     User.objects.create_user(
-    #         username=username,
-    #         email=email,
-    #         password=password
-    #     )
-
-    #     return render(request, "signup.html", {
-    #         "message": "Account created successfully!"
-    #     })
+   
+   
         
     def post(self, request):
         print("signup")
@@ -42,19 +19,17 @@ class signupview(View):
         print("is valid",serializer.is_valid())
         print("errors",serializer.errors)
         if serializer.is_valid():
-            print("VALID")
             serializer.save()
 
             return render(request, "signup.html", {
                 "message": "Account created successfully!"
             })
-        print(serializer.errors)
         return render(request, "signup.html", {
             "errors": serializer.errors
         })
 
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+
+
 
 class loginview(View):
 
