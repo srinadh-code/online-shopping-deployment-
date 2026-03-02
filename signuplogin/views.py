@@ -16,10 +16,7 @@ class signupview(View):
    
         
     def post(self, request):
-        print("signup")
         serializer = SignupSerializer(data=request.POST)
-        print("is valid",serializer.is_valid())
-        print("errors",serializer.errors)
         if serializer.is_valid():
             serializer.save()
 
