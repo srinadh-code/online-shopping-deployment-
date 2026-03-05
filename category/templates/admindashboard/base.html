@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Admin Panel</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+display:flex;
+}
+
+.sidebar{
+width:220px;
+background:#2c3e50;
+color:white;
+height:100vh;
+padding:20px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin:10px 0;
+}
+
+.content{
+flex:1;
+padding:30px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+}
+
+.cards{
+display:flex;
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 0 5px rgba(0,0,0,0.1);
+width:200px;
+text-align:center;
+}
+
+.analytics{
+display:flex;
+gap:30px;
+margin-top:30px;
+}
+
+.chart-box{
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 0 5px rgba(0,0,0,0.1);
+width:400px;
+}
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>Admin Panel</h2>
+<h3>{{request.user.username}}</h3>
+
+<a href="{% url 'admin_dashboard' %}">Dashboard</a>
+<a href="{% url 'admin_products' %}">Products</a>
+<a href="{% url 'admin_orders' %}">Orders</a>
+<a href="{% url 'admin_customers' %}">Customers</a>
+<!-- <a href="{% url 'admin_products' %}">Add Product</a> -->
+
+</div>
+
+<div class="content">
+
+{% block content %}
+
+{% endblock %}
+
+</div>
+
+</body>
+</html>

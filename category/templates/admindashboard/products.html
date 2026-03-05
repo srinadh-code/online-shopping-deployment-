@@ -1,0 +1,218 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<style>
+    .product-thumb{
+width:60px;
+height:60px;
+object-fit:cover;
+border-radius:6px;
+}
+
+.add-product-box{
+margin-bottom:25px;
+}
+</style>
+<h2>Products</h2>
+
+<!-- SEARCH -->
+
+<form method="GET" style="margin-bottom:20px;">
+<input type="text" name="q" placeholder="Search product..." value="{{ query }}">
+<button type="submit">Search</button>
+</form>
+
+<!-- ADD PRODUCT -->
+
+<h3>Add Product</h3>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<input type="hidden" name="action" value="add">
+
+<input type="text" name="name" placeholder="Product Name">
+
+<input type="number" step="0.01" name="price" placeholder="Price">
+
+<input type="number" name="stock" placeholder="Stock">
+
+<input type="file" name="image">
+
+<select name="category">
+{% for c in categories %}
+<option value="{{ c.id }}">{{ c.name }}</option>
+{% endfor %}
+</select>
+
+<select name="subcategory" required>
+<option value="">Select Subcategory</option>
+
+{% for s in subcategories %}
+<option value="{{ s.id }}">{{ s.name }}</option>
+{% endfor %}
+
+</select>
+<button type="submit">Add Product</button>
+
+</form>
+
+<!-- PRODUCT TABLE -->
+
+<table border="1" cellpadding="10" cellspacing="0" width="100%">
+<thead>
+<tr>
+<th>ID</th>
+<th>Image</th>
+<th>Name</th>
+<th>Price</th>
+<th>Stock</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for product in products %}
+
+<tr>
+
+<td>{{ product.id }}</td>
+
+<td>
+{% if product.image %}
+<img src="{{ product.image.url }}" class="product-thumb">
+{% else %}
+No Image
+{% endif %}
+</td>
+
+<td>{{ product.name }}</td>
+
+<td>
+
+<span id="price-text-{{product.id}}">
+₹{{ product.price }}
+</span>
+
+<input type="number"
+name="price"
+value="{{product.price}}"
+id="price-input-{{product.id}}"
+style="display:none;width:80px;">
+
+</td>
+
+
+<td>
+
+<span id="stock-text-{{product.id}}">
+{{ product.stock }}
+</span>
+
+<input type="number"
+name="stock"
+value="{{product.stock}}"
+id="stock-input-{{product.id}}"
+style="display:none;width:80px;">
+
+</td>
+
+<td>
+{% if product.stock == 0 %}
+<span class="stock-out">Out of Stock</span>
+
+{% elif product.stock < 5 %}
+<span class="stock-low">Low Stock</span>
+
+{% else %}
+<span class="stock-ok">In Stock</span>
+
+{% endif %}
+</td>
+
+<td>
+
+<button type="button" onclick="editRow({{product.id}})">✏️</button>
+
+<form method="POST" style="display:inline;">
+{% csrf_token %}
+
+<input type="hidden" name="action" value="update">
+<input type="hidden" name="product_id" value="{{product.id}}">
+
+<input type="hidden" name="price" id="price-hidden-{{product.id}}">
+<input type="hidden" name="stock" id="stock-hidden-{{product.id}}">
+
+<button type="submit"
+onclick="saveRow({{product.id}})"
+id="save-btn-{{product.id}}"
+style="display:none;">
+Update
+</button>
+
+</form>
+
+<a href="{% url 'delete_product' product.id %}"
+onclick="return confirm('Delete this product?')">🗑</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+<!-- PAGINATION -->
+
+<div style="margin-top:20px;">
+
+{% if products.has_previous %} <a href="?page=1"><<</a> <a href="?page={{ products.previous_page_number }}"><</a>
+{% endif %}
+
+{% for i in products.paginator.page_range %}
+
+{% if products.number == i %} <strong>{{ i }}</strong>
+{% else %} <a href="?page={{ i }}">{{ i }}</a>
+{% endif %}
+
+{% endfor %}
+
+{% if products.has_next %} <a href="?page={{ products.next_page_number }}">></a> <a href="?page={{ products.paginator.num_pages }}">>></a>
+{% endif %}
+
+</div>
+
+
+
+
+<script>
+function editRow(id){
+
+document.getElementById("price-text-"+id).style.display="none";
+document.getElementById("stock-text-"+id).style.display="none";
+
+document.getElementById("price-input-"+id).style.display="inline";
+document.getElementById("stock-input-"+id).style.display="inline";
+
+document.getElementById("save-btn-"+id).style.display="inline";
+
+}
+
+function saveRow(id){
+
+let price = document.getElementById("price-input-"+id).value;
+let stock = document.getElementById("stock-input-"+id).value;
+
+document.getElementById("price-hidden-"+id).value = price;
+document.getElementById("stock-hidden-"+id).value = stock;
+
+}
+</script>
+
+
+{% endblock %}

@@ -247,6 +247,13 @@ Order #{{ order.id }}
 {{ item.product.name }} × {{ item.quantity }}
 </div>
 {% endfor %}
+<!-- <p style="color:green;">
+🚚 Delivery by {{ order.estimated_delivery|date:"F d, Y" }}
+</p> -->
+<div style="color:green; font-weight:bold;">
+🚚 Estimated Delivery:
+{{ order.estimated_delivery|date:"D, M d" }}
+</div>
 
 </div>
 
@@ -268,9 +275,23 @@ Order #{{ order.id }}
 ₹{{ order.total_amount }}
 </div>
 
-<a href="{% url 'return_request' order.id %}" class="btn btn-return">
-Return / Exchange
-</a>
+{% if order.status == "Delivered" %}
+
+    {% if not order.returns.all %}
+    
+        <a href="{% url 'return_request' order.id %}" class="btn btn-return">
+            Return / Exchange
+        </a>
+
+    {% else %}
+    
+        <span style="color:gray;font-size:13px;">
+            Request Submitted
+        </span>
+
+    {% endif %}
+
+{% endif %}
 
 {% if order.status != "Delivered" and order.status != "Cancelled" %}
 
@@ -307,10 +328,19 @@ Refund: {{ r.refund_status }}
 <div class="empty">
 
 <h3>No Orders Yet</h3>
+{% if order.status|lower == "delivered" %}
+    <br>
+    <a href="{% url 'download_invoice' order.id %}" 
+       class="btn" 
+       style="background:#007bff;color:white;margin-top:5px;">
+        Download Invoice
+    </a>
+{% endif %}
 
 </div>
 
 {% endfor %}
+
 
 <a href="{% url 'dashboard' %}" class="back">
 ← Back to Dashboard

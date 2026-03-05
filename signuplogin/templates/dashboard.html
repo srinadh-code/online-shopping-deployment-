@@ -212,6 +212,50 @@ z-index:10;
 .card{
 position:relative;
 }
+/* USER DROPDOWN */
+
+.user-menu{
+    position:relative;
+    display:inline-block;
+}
+
+.user-btn{
+    background:white;
+    border:none;
+    padding:6px 10px;
+    font-size:14px;
+    cursor:pointer;
+    border-radius:4px;
+}
+
+.dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:35px;
+    background:white;
+    min-width:150px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    border-radius:6px;
+    overflow:hidden;
+    z-index:1000;
+}
+
+.dropdown a{
+    display:block;
+    padding:10px;
+    text-decoration:none;
+    color:#333;
+}
+
+.dropdown a:hover{
+    background:#f1f3f6;
+}
+
+/* show dropdown when hovering username */
+.user-menu:hover .dropdown{
+    display:block;
+}
 </style>
 
 </head>
@@ -240,10 +284,19 @@ position:relative;
 <a href="{% url 'wishlist' %}" style="color:white; text-decoration:none;">
 ❤️ Wishlist ({{ wishlist_count }})
 </a>
+<div class="user-menu">
+    <button class="user-btn">
+        👤 {{ request.user.username }} ▼
+    </button>
 
-<div>
-Welcome {{ username }}
+    <div class="dropdown">
+        <a href="{% url 'profile' %}">Profile</a>
+        <a href="{% url 'my_orders' %}">My Orders</a>
+        <a href="{% url 'wishlist' %}">Wishlist</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
 </div>
+
 
 </div>
 </div>

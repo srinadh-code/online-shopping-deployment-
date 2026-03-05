@@ -69,7 +69,8 @@ class Order(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
+    estimated_delivery = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return f"Order {self.id} - {self.status}"
 
@@ -141,4 +142,18 @@ class ReturnRequest(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     refund_status = models.CharField(max_length=20, choices=REFUND_STATUS, default='Not Initiated')
 
-    created_at = models.DateTimeField(auto_now_add=True)        
+    created_at = models.DateTimeField(auto_now_add=True) 
+from django.contrib.auth.models import User
+from django.db import models    
+class Profile(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
+    phone=models.CharField(max_length=10,blank=True) 
+    address=models.TextField(max_length=50,blank=True)
+    city=models.TextField(max_length=10,blank=True) 
+    state=models.TextField(max_length=10,blank=True)
+    pincode=models.TextField(max_length=6,blank=True)  
+    profile_image=models.ImageField(upload_to="profile/",blank=True,null=True)
+
+
+    def __str__(self):
+        return self.user.username    

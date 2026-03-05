@@ -1,0 +1,50 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<h2>Orders</h2>
+
+<table>
+
+<tr>
+<th>Order ID</th>
+<th>Customer</th>
+<th>Status</th>
+</tr>
+
+{% for order in orders %}
+
+<tr>
+<td>
+<a href="{% url 'admin_order_detail' order.id %}">
+{{order.id}}
+</a>
+</td>
+<td>{{order.user}}</td>
+<td>{{order.status}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+
+<div style="margin-top:20px;">
+
+{% if orders.has_previous %} <a href="?page=1"><<</a> <a href="?page={{ orders.previous_page_number }}"><</a>
+{% endif %}
+
+{% for i in orders.paginator.page_range %}
+
+{% if orders.number == i %} <strong>{{ i }}</strong>
+{% else %} <a href="?page={{ i }}">{{ i }}</a>
+{% endif %}
+
+{% endfor %}
+
+{% if orders.has_next %} <a href="?page={{ orders.next_page_number }}">></a> <a href="?page={{ orders.paginator.num_pages }}">>></a>
+{% endif %}
+
+</div>
+
+{% endblock %}

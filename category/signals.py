@@ -59,3 +59,72 @@ def reduce_stock_on_first_delivery(sender, instance, **kwargs):
                         recipient_list=["ones12245@gmail.com"],
                         fail_silently=False,
                     )
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from .models import Order
+from .service import reduce_stock
+
+
+@receiver(pre_save, sender=Order)
+def handle_stock_on_delivery(sender, instance, **kwargs):
+    print("inside signal")
+    # Skip new order creation
+    if not instance.pk:
+        return
+
+    old_order = Order.objects.get(pk=instance.pk)
+
+    # Reduce stock ONLY when:
+    # 1. Status changes to Delivered
+    # 2. Stock was NOT already reduced
+    # print("OLD STATUS:", old_order.status)
+    # print("NEW STATUS:", instance.status)
+    # print("OLD stock_reduced:", old_order.stock_reduced)
+
+    if (
+        old_order.status != "Delivered"
+        and instance.status == "Delivered"
+        and not old_order.stock_reduced
+    ):
+
+        for item in instance.items.all():
+            reduce_stock(item.product.id, item.quantity)
+
+        # Mark as reduced
+        instance.stock_reduced = True
+
+# signals.py
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.db import transaction
+from .models import Order
+from django.core.exceptions import ValidationError
+
+@receiver(post_save, sender=Order)
+def reduce_stock_on_delivery(sender, instance, created, **kwargs):
+
+    # Do nothing when order is first created
+    if created:
+        return
+
+    # Reduce stock only once when status becomes Delivered
+    if instance.status == "Delivered" and not instance.stock_reduced:
+
+        with transaction.atomic():
+
+            for item in instance.items.select_related("product"):
+
+                product = item.product
+
+                if product.stock < item.quantity:
+                    instance.status = "Processing"
+                    instance.save(update_fields=["status"])
+                    return
+
+                product.stock -= item.quantity
+                product.save()
+
+        # Mark stock as reduced
+        instance.stock_reduced = True
+        instance.save(update_fields=["stock_reduced"])                    

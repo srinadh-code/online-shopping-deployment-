@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile</title>
+{% if messages %}
+<div class="message-box">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}    
+
+<style>
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f4f6f9;
+}
+
+.container{
+    width:600px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+textarea{
+    resize:none;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#007bff;
+    border:none;
+    color:white;
+    font-size:16px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+.profile-img{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.profile-img img{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+}
+.message-box{
+background:#ffebee;
+color:#c62828;
+padding:12px;
+margin:15px;
+border-radius:6px;
+font-weight:500;
+border-left:5px solid red;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>{{user.username}}</h2>
+
+<div class="profile-img">
+
+{% if profile.profile_image %}
+<img src="{{ profile.profile_image.url }}">
+{% else %}
+<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+{% endif %}
+
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="form-group">
+<label>Phone</label>
+<input type="text" name="phone" value="{{ profile.phone }}">
+</div>
+
+<div class="form-group">
+<label>Address</label>
+<textarea name="address">{{ profile.address }}</textarea>
+</div>
+
+<div class="form-group">
+<label>City</label>
+<input type="text" name="city" value="{{ profile.city }}">
+</div>
+
+<div class="form-group">
+<label>State</label>
+<input type="text" name="state" value="{{ profile.state }}">
+</div>
+
+<div class="form-group">
+<label>Pincode</label>
+<input type="text" name="pincode" value="{{ profile.pincode }}">
+</div>
+
+<div class="form-group">
+<label>Profile Image</label>
+<input type="file" name="profile_image">
+</div>
+
+<button type="submit">Save Profile</button>
+
+</form>
+<script>
+setTimeout(function(){
+    let msg = document.querySelector(".message-box");
+    if(msg){
+        msg.style.display = "none";
+    }
+},3000);
+</script>
+
+
+</div>
+
+</body>
+</html>

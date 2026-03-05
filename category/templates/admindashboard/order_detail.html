@@ -1,0 +1,48 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<h2>Order Details</h2>
+
+<p>Order ID: {{order.id}}</p>
+<p>Customer: {{order.user}}</p>
+<p>Status: {{order.status}}</p>
+
+<h3>Products</h3>
+
+<table>
+
+<tr>
+<th>Product</th>
+<th>Quantity</th>
+</tr>
+
+{% for item in items %}
+
+<tr>
+<td>{{item.product.name}}</td>
+<td>{{item.quantity}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<select name="status">
+
+<option value="Pending">Pending</option>
+<option value="Shipped">Shipped</option>
+<option value="Delivered">Delivered</option>
+<option value="Cancelled">Cancelled</option>
+
+</select>
+
+<button type="submit">Update Status</button>
+
+</form>
+
+{% endblock %}

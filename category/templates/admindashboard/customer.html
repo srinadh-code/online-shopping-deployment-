@@ -1,0 +1,30 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<h2>Customers</h2>
+
+<table>
+
+<tr>
+<th>ID</th>
+<th>Username</th>
+<th>Email</th>
+</tr>
+
+{% for customer in customers %}
+
+<tr>
+<td>{{customer.id}}</td>
+<td><a href="{% url 'customer_orders' customer.id %}">
+{{customer.username}}
+</a>
+</td>
+<td>{{customer.email}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

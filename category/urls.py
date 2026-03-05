@@ -30,6 +30,19 @@ urlpatterns = [
     path('return-request/<int:order_id>/', views.return_request, name='return_request'),
     path('my-returns/', views.my_returns, name='my_returns'),
     path("cancel-order/<int:order_id>/", views.cancel_order, name="cancel_order"),
+    path('invoice/<int:order_id>/', views.download_invoice, name='download_invoice'),
+    path("profile/", views.profile, name="profile"),
+    path("admin-login/", views.admin_login, name="admin_login"),
+    path("admin-dashboard/", views.admin_dashboard, name="admin_dashboard"),
+    path("admin-products/", views.admin_products, name="admin_products"),
+    path("admin-orders/", views.admin_orders, name="admin_orders"),
+    path("admin-customers/", views.admin_customers, name="admin_customers"),
+    path("admin-order/<int:order_id>/", views.admin_order_detail, name="admin_order_detail"),
+    path("admin-customer/<int:user_id>/", views.customer_orders, name="customer_orders"),
+
+    path("edit-product/<int:id>/", views.edit_product, name="edit_product"),
+
+    path("delete-product/<int:id>/", views.delete_product, name="delete_product"),
 
 ]
 

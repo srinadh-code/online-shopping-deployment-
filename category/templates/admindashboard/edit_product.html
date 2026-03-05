@@ -1,0 +1,55 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<h2>Edit Product</h2>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<input type="text" name="name" value="{{ product.name }}">
+
+<input type="number" step="0.01" name="price" value="{{ product.price }}">
+
+<input type="number" name="stock" value="{{ product.stock }}">
+
+
+<select name="category">
+
+{% for c in categories %}
+
+<option value="{{ c.id }}"
+{% if product.category.id == c.id %}selected{% endif %}>
+
+{{ c.name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+
+<select name="subcategory">
+
+{% for s in subcategories %}
+
+<option value="{{ s.id }}"
+{% if product.subcategory.id == s.id %}selected{% endif %}>
+
+{{ s.name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+
+<input type="file" name="image">
+
+<button type="submit">Update Product</button>
+
+</form>
+
+{% endblock %}

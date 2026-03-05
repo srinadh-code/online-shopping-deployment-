@@ -1,0 +1,97 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<h1>Dashboard</h1>
+
+<div class="cards">
+
+<div class="card">
+<h3>Total Orders</h3>
+<p>{{ total_orders }}</p>
+</div>
+
+<div class="card">
+<h3>Delivered Orders</h3>
+<p>{{ delivered_orders }}</p>
+</div>
+
+<div class="card">
+<h3>Total Products</h3>
+<p>{{ total_products }}</p>
+</div>
+
+<div class="card">
+<h3>Total Customers</h3>
+<p>{{ total_customers }}</p>
+</div>
+
+</div>
+
+
+<div class="analytics">
+
+<div class="chart-box">
+<h3>Orders Per Month</h3>
+<canvas id="ordersChart"></canvas>
+</div>
+
+<div class="card">
+    <h3>Top Selling Products</h3>
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Units Sold</th>
+        </tr>
+
+        {% for product in top_products %}
+        <tr>
+            <td>{{ product.product__name }}</td>
+            <td>{{ product.total_sold }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+
+<div class="chart-box">
+<h3>Order Status</h3>
+<canvas id="statusChart"></canvas>
+</div>
+
+</div>
+
+<script>
+
+const monthlyData = {{ monthly_orders|safe }}
+
+const months = monthlyData.map(item => item.month)
+const totals = monthlyData.map(item => item.total)
+
+new Chart(document.getElementById('ordersChart'), {
+type: 'bar',
+data: {
+labels: months,
+datasets: [{
+label: 'Orders per Month',
+data: totals,
+backgroundColor: 'rgba(54,162,235,0.6)'
+}]
+}
+})
+
+new Chart(document.getElementById('statusChart'), {
+type: 'pie',
+data: {
+labels: ['Pending','Delivered','Cancelled'],
+datasets: [{
+data: [{{pending}},{{delivered}},{{cancelled}}],
+backgroundColor: ['orange','green','red']
+}]
+}
+})
+
+</script>
+
+{% endblock %}

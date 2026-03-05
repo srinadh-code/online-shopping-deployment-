@@ -1,0 +1,25 @@
+{% extends "admindashboard/base.html" %}
+
+{% block content %}
+
+<h2>Orders of {{customer.username}}</h2>
+
+<table>
+
+<tr>
+<th>Order ID</th>
+<th>Status</th>
+</tr>
+
+{% for order in orders %}
+
+<tr>
+<td>{{order.id}}</td>
+<td>{{order.status}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}
