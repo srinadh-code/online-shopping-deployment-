@@ -1,214 +1,680 @@
+{% comment %} 
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Your Cart</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body{
-            margin:0;
-            font-family:Segoe UI, sans-serif;
-            background:#f5f7fa;
-        }
+<style>
 
-        .header{
-            background:#4a90e2;
-            color:white;
-            padding:18px 30px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        }
+body{
+    margin:0;
+    font-family:Segoe UI, sans-serif;
+    background:#f5f7fa;
+}
 
-        .container{
-            max-width:1100px;
-            margin:40px auto;
-            display:flex;
-            gap:30px;
-        }
+.header{
+    background:#4a90e2;
+    color:white;
+    padding:18px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
 
-        /* LEFT SIDE - CART ITEMS */
-        .cart-box{
-            flex:2;
-            background:white;
-            padding:30px;
-            border-radius:12px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.05);
-        }
+.container{
+    max-width:1100px;
+    margin:40px auto;
+    display:flex;
+    gap:30px;
+}
 
-        .cart-item{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            border-bottom:1px solid #eee;
-            padding:20px 0;
-        }
+.cart-box{
+    flex:2;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+}
 
-        .left{
-            display:flex;
-            align-items:center;
-            gap:20px;
-        }
+.cart-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #eee;
+    padding:20px 0;
+}
 
-        .left img{
-            width:90px;
-            height:90px;
-            object-fit:cover;
-            border-radius:10px;
-        }
+.left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
 
-        .details h4{
-            margin:0 0 5px 0;
-        }
+.left img{
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:10px;
+}
 
-        .price{
-            color:#4a90e2;
-            font-weight:bold;
-        }
+.price{
+    color:#4a90e2;
+    font-weight:bold;
+}
 
-        .quantity{
-            background:#f0f3f8;
-            padding:4px 10px;
-            border-radius:6px;
-            font-size:13px;
-            display:inline-block;
-            margin-top:5px;
-        }
+.old-price{
+    text-decoration:line-through;
+    color:gray;
+    font-size:14px;
+}
 
-        .remove-btn{
-            background:#ff4d4d;
-            color:white;
-            border:none;
-            padding:8px 14px;
-            border-radius:6px;
-            cursor:pointer;
-            transition:0.3s;
-        }
+.discount{
+    background:red;
+    color:white;
+    padding:3px 6px;
+    border-radius:4px;
+    font-size:12px;
+}
 
-        .remove-btn:hover{
-            background:#e60000;
-        }
+.quantity{
+    margin-top:8px;
+}
 
-        /* RIGHT SIDE - SUMMARY */
-        .summary-box{
-            flex:1;
-            background:white;
-            padding:30px;
-            border-radius:12px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.05);
-            height:fit-content;
-        }
+.quantity button{
+    padding:4px 10px;
+}
 
-        .summary-box h3{
-            margin-top:0;
-        }
+.remove-btn{
+    background:#ff4d4d;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:6px;
+    cursor:pointer;
+}
 
-        .summary-line{
-            display:flex;
-            justify-content:space-between;
-            margin:15px 0;
-        }
+.summary-box{
+    flex:1;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+}
 
-        .checkout-btn{
-            width:100%;
-            padding:14px;
-            background:#28a745;
-            color:white;
-            border:none;
-            border-radius:8px;
-            font-weight:bold;
-            cursor:pointer;
-            transition:0.3s;
-        }
+.summary-line{
+    display:flex;
+    justify-content:space-between;
+    margin:15px 0;
+}
 
-        .checkout-btn:hover{
-            background:#218838;
-        }
+.checkout-btn{
+    width:100%;
+    padding:14px;
+    background:#28a745;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+}
 
-        .continue{
-            display:inline-block;
-            margin-top:20px;
-            text-decoration:none;
-            color:#4a90e2;
-            font-weight:500;
-        }
+.continue{
+    display:inline-block;
+    margin-top:20px;
+    text-decoration:none;
+    color:#4a90e2;
+}
 
-        @media(max-width:900px){
-            .container{
-                flex-direction:column;
-            }
-        }
-    </style>
+@media(max-width:900px){
+.container{
+flex-direction:column;
+}
+}
+.summary-box label{
+display:block;
+margin:8px 0;
+font-size:14px;
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="header">
-    <div><strong>Your Cart</strong></div>
-    <div>Welcome {{ request.user.username }}</div>
+<div><strong>Your Cart</strong></div>
+<div>Welcome {{ request.user.username }}</div>
 </div>
 
 <div class="container">
 
-    <!-- CART ITEMS -->
+<div class="cart-box">
+
+{% for item in items %}
+
+<div class="cart-item">
+
+<div class="left">
+
+<img src="{{ item.product.image.url }}">
+
+<div>
+
+<h4>{{ item.product.name }}</h4>
+
+<p class="price">
+₹{{ item.price }}
+</p>
+<h4>{{ item.product.name }}</h4>
+
+<p>Size: {{ item.variant.attribute_value.value }}</p>
+
+<p class="price">
+₹{{ item.price }}
+</p>
+<div class="quantity">
+
+<a href="{% url 'decrease_quantity' item.id %}">
+<button>-</button>
+</a>
+
+<span>{{ item.quantity }}</span>
+
+<a href="{% url 'increase_quantity' item.id %}">
+<button>+</button>
+</a>
+
+</div>
+
+</div>
+</div>
+
+<form method="POST" action="{% url 'remove_from_cart' item.id %}">
+{% csrf_token %}
+<button class="remove-btn">Remove</button>
+</form>
+
+</div>
+
+{% empty %}
+
+<p>Your cart is empty.</p>
+
+{% endfor %}
+
+<a href="{% url 'dashboard' %}" class="continue">
+← Continue Shopping
+</a>
+
+</div>
+
+{% if items %}
+
+<div class="summary-box">
+
+<h3>Order Summary</h3>
+
+<div class="summary-line">
+<span>Total Items</span>
+<span>{{ items|length }}</span>
+</div>
+
+<div class="summary-line">
+<span>Subtotal</span>
+<span>₹{{ total|floatformat:2 }}</span>
+</div>
+
+{% if discount > 0 %}
+<div class="summary-line">
+<span>First Order Discount</span>
+<span>- ₹{{ discount|floatformat:2 }}</span>
+</div>
+{% endif %}
+
+<div class="summary-line">
+<strong>Grand Total</strong>
+<strong>₹{{ final_total|floatformat:2 }}</strong>
+</div>
+<form method="POST" action="{% url 'place_order' %}">
+{% csrf_token %}
+
+<h4>Select Payment Method</h4>
+
+<label>
+<input type="radio" name="payment_method" value="COD" checked>
+Cash On Delivery
+</label>
+
+<label>
+<input type="radio" name="payment_method" value="CARD">
+Credit / Debit Card (Demo)
+</label>
+
+<label>
+<input type="radio" name="payment_method" value="UPI">
+UPI Payment (Demo)
+</label>
+
+<br><br>
+
+<button type="submit" class="checkout-btn">
+Place Order
+</button>
+
+</form>
+
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+</html> {% endcomment %}
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500&family=Inter:wght@200;400;600&display=swap');
+
+        :root {
+            --accent: #d4bda8;
+            --accent-dark: #b89f88;
+            --bg-main: #fcfcfc;
+            --bg-card: #ffffff;
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 20px 50px rgba(212, 189, 168, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .header h2 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .user-info {
+            font-family: 'JetBrains+Mono', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* CART SECTION */
+        .cart-box {
+            flex: 2;
+        }
+
+        .luxury-heading {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 16px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .luxury-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .cart-item {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+        }
+
+        .cart-item:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-5px);
+        }
+
+        .left { display: flex; align-items: center; gap: 25px; }
+
+        .left img {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 15px;
+            background: #f9f9f9;
+        }
+
+        .item-details h4 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .item-details p {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-dark);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* QUANTITY CONTROLS */
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            background: #f8f8f8;
+            width: fit-content;
+            padding: 5px 15px;
+            border-radius: 50px;
+        }
+
+        .quantity button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.2s;
+        }
+
+        .quantity button:hover { color: var(--accent-dark); }
+
+        .quantity span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .remove-btn {
+            background: transparent;
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .remove-btn:hover {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        /* SUMMARY BOX */
+        .summary-box {
+            flex: 1;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .summary-box h3 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .summary-line strong {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            color: var(--accent-dark);
+        }
+
+        /* PAYMENT RADIOS */
+        .payment-methods { margin-top: 30px; }
+        .payment-methods h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-group label {
+            background: #fcfcfc;
+            border: 1px solid #f0f0f0;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .radio-group input[type="radio"]:checked + span {
+            font-weight: 600;
+        }
+
+        .radio-group label:hover {
+            border-color: var(--accent);
+        }
+
+        /* BUTTONS */
+        .checkout-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: 0.4s;
+        }
+
+        .checkout-btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .continue {
+            display: inline-block;
+            margin-top: 30px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .continue:hover { color: var(--accent); padding-left: 5px; }
+
+        @media(max-width: 1000px){
+            .container { flex-direction: column; }
+            .summary-box { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>Online Shopping</h2>
+    <div class="user-info">👤 {{ request.user.username }}</div>
+</div>
+
+<div class="container">
     <div class="cart-box">
+        <h2 class="luxury-heading">Your Cart</h2>
 
         {% for item in items %}
-            <div class="cart-item">
-
-                <div class="left">
-                    <img src="{{ item.product.image.url }}">
-                    <div class="details">
-                        <h4>{{ item.product.name }}</h4>
-                        <p class="price">₹{{ item.product.price }}</p>
-                        <div class="quantity">
-                            Qty: {{ item.quantity }}
-                        </div>
+        <div class="cart-item">
+            <div class="left">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                <div class="item-details">
+                    <h4>{{ item.product.name }}</h4>
+                    <p>Size: {{ item.variant.attribute_value.value }}</p>
+                    <span class="price">₹{{ item.price }}</span>
+                    
+                    <div class="quantity">
+                        <a href="{% url 'decrease_quantity' item.id %}" style="text-decoration:none; color:inherit;">
+                            <button>-</button>
+                        </a>
+                        <span>{{ item.quantity }}</span>
+                        <a href="{% url 'increase_quantity' item.id %}" style="text-decoration:none; color:inherit;">
+                            <button>+</button>
+                        </a>
                     </div>
                 </div>
-
-                <form method="POST" action="{% url 'remove_from_cart' item.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="remove-btn">
-                        Remove
-                    </button>
-                </form>
-
             </div>
+
+            <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button class="remove-btn">Remove</button>
+            </form>
+        </div>
         {% empty %}
-            <p>Your cart is empty.</p>
+        <p style="opacity: 0.5; font-style: italic;">Your cart is currently empty.</p>
         {% endfor %}
 
         <a href="{% url 'dashboard' %}" class="continue">
             ← Continue Shopping
         </a>
-
     </div>
 
-    <!-- ORDER SUMMARY -->
     {% if items %}
     <div class="summary-box">
         <h3>Order Summary</h3>
 
         <div class="summary-line">
             <span>Total Items</span>
-            <span>{{ items|length }}</span>
+            <span style="font-family: 'JetBrains Mono'">{{ items|length }}</span>
         </div>
 
         <div class="summary-line">
-            <strong>Grand Total</strong>
-            <strong>₹{{ total }}</strong>
+            <span>Subtotal</span>
+            <span style="font-family: 'JetBrains Mono'">₹{{ total|floatformat:2 }}</span>
         </div>
 
-        <form method="POST" action="{% url 'place_order' %}">
+        {% if discount > 0 %}
+        <div class="summary-line" style="color: #28a745;">
+            <span>First Order Discount</span>
+            <span>- ₹{{ discount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+
+        <div class="summary-line" style="margin-top: 20px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+            <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Grand Total</span>
+            <strong>₹{{ final_total|floatformat:2 }}</strong>
+        </div>
+
+        <form method="POST" action="{% url 'place_order' %}" class="payment-methods">
             {% csrf_token %}
+            <h4>Payment Method</h4>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="payment_method" value="COD" checked>
+                    <span>Cash On Delivery</span>
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="CARD">
+                    <span>Credit / Debit Card</span>
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="UPI">
+                    <span>UPI Payment</span>
+                </label>
+            </div>
+
             <button type="submit" class="checkout-btn">
-                Place Order
+                Complete Purchase
             </button>
         </form>
     </div>
     {% endif %}
-
 </div>
 
 </body>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html>
 <head>
     <title>My Profile</title>
@@ -155,6 +155,323 @@ setTimeout(function(){
 
 
 </div>
+
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Settings | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
+
+        :root {
+            --accent: #d4bda8;
+            --accent-dark: #b89f88;
+            --bg-main: #f8f9fa;
+            --sidebar-grad: linear-gradient(180deg, #1a1a1a 0%, #333333 100%);
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #888888;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR DECOR */
+        .sidebar-decor {
+            width: 350px;
+            background: var(--sidebar-grad);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-decor::after {
+            content: 'PROFILE';
+            position: absolute;
+            bottom: -20px;
+            right: -10px;
+            font-family: 'Syncopate';
+            font-size: 80px;
+            opacity: 0.05;
+            letter-spacing: 10px;
+        }
+
+        .sidebar-decor h1 {
+            font-family: 'Syncopate';
+            font-size: 22px;
+            letter-spacing: 8px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .sidebar-decor p {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .profile-card {
+            width: 100%;
+            max-width: 700px;
+            background: var(--card-bg);
+            border-radius: 40px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            padding: 60px;
+            position: relative;
+        }
+
+        /* MESSAGES */
+        .message-box {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(212, 189, 168, 0.4);
+        }
+
+        /* HEADER SECTION */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .img-container {
+            position: relative;
+        }
+
+        .img-container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            object-fit: cover;
+            background: #f0f0f0;
+            border: 5px solid #fff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .user-meta h2 {
+            font-family: 'Syncopate';
+            font-size: 20px;
+            letter-spacing: 3px;
+            margin: 0;
+        }
+
+        .user-meta span {
+            font-size: 12px;
+            color: var(--accent-dark);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .form-group label {
+            display: block;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(212, 189, 168, 0.15);
+        }
+
+        textarea { height: 100px; resize: none; }
+
+        .btn-row {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            flex: 2;
+            padding: 20px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Syncopate';
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: 0.4s;
+        }
+
+        button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-5px);
+        }
+
+        .back-btn {
+            flex: 1;
+            padding: 20px;
+            background: #f0f0f0;
+            color: var(--text-main);
+            text-align: center;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover { background: #e0e0e0; }
+
+        @media (max-width: 900px) {
+            .sidebar-decor { display: none; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar-decor">
+    <h1>SRIA<br>NEXT<br>GEN</h1>
+    <p>Account Settings</p>
+</div>
+
+<div class="main-content">
+    <div class="profile-card">
+        
+        {% if messages %}
+            <div class="message-box">
+                {% for message in messages %}{{ message }}{% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="profile-header">
+            <div class="img-container">
+                {% if profile.profile_image %}
+                    <img src="{{ profile.profile_image.url }}" alt="Profile">
+                {% else %}
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Default">
+                {% endif %}
+            </div>
+            <div class="user-meta">
+                <span>Welcome back</span>
+                <h2>{{ user.username }}</h2>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="form-grid">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone" value="{{ profile.phone }}" placeholder="+91 ...">
+            </div>
+
+            <div class="form-group">
+                <label>Update Photo</label>
+                <input type="file" name="profile_image" style="padding: 12px; font-size: 12px;">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Delivery Address</label>
+                <textarea name="address">{{ profile.address }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>City / District</label>
+                <input type="text" name="city" value="{{ profile.city }}">
+            </div>
+
+            <div class="form-group">
+                <label>State</label>
+                <input type="text" name="state" value="{{ profile.state }}">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Pincode</label>
+                <input type="text" name="pincode" value="{{ profile.pincode }}">
+            </div>
+
+            <div class="full-width btn-row">
+                <button type="submit">Save Changes</button>
+                <a href="{% url 'dashboard' %}" class="back-btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    setTimeout(function(){
+        let msg = document.querySelector(".message-box");
+        if(msg){ msg.style.display = "none"; }
+    }, 3000);
+</script>
 
 </body>
 </html>

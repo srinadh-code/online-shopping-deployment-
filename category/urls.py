@@ -39,10 +39,20 @@ urlpatterns = [
     path("admin-customers/", views.admin_customers, name="admin_customers"),
     path("admin-order/<int:order_id>/", views.admin_order_detail, name="admin_order_detail"),
     path("admin-customer/<int:user_id>/", views.customer_orders, name="customer_orders"),
-
     path("edit-product/<int:id>/", views.edit_product, name="edit_product"),
-
     path("delete-product/<int:id>/", views.delete_product, name="delete_product"),
+    path("cart/increase/<int:item_id>/",views.increase_quantity,name="increase_quantity"),
+    path("cart/decrease/<int:item_id>/",views.decrease_quantity,name="decrease_quantity"),
+    path("card-payment/", views.card_payment, name="card_payment"),
+    path("upi-payment/", views.upi_payment, name="upi_payment"),
+    path("payment-processing/", views.payment_processing, name="payment_processing"),
+    path("create-order/", views.create_order, name="create_order"),
+    path("order-success/", views.order_success, name="order_success"),
+    path('find-similar/<int:product_id>/', views.find_similar, name="find_similar"),
+    path("address/",views.address_page,name="address"),
+    path("address/edit/<int:id>/", views.edit_address, name="edit_address"),
+    path("address/delete/<int:id>/", views.delete_address, name="delete_address"),
 
+    path("deliver/<int:id>/",views.deliver_here,name="deliver_here"),
 ]
 

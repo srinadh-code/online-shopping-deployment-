@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login,logout,login,authenticate
 from .serializers import SignupSerializer
 import random
 from django.core.mail import send_mail
+
 from django.conf import settings
 class signupview(View):
 

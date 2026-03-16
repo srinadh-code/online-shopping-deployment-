@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html>
 <head>
     <title>Return / Exchange</title>
@@ -148,6 +148,226 @@
     });
 
     // Fake success animation (UI only)
+    document.getElementById("returnForm").addEventListener("submit", function() {
+        document.getElementById("successMsg").style.display = "block";
+    });
+</script>
+
+</body>
+</html> {% endcomment %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Return / Exchange | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            /* Tonal Palette: Muted Stone & Slate blue */
+            --bg-base: #e0ddd7;        /* Warm Stone */
+            --bg-card: #e9e6e0;        /* Slightly brighter stone for the card */
+            --accent: #5a6473;         /* Slate Blue */
+            --accent-dark: #3d4652;
+            --text-main: #2d2d2d;      /* Deep Charcoal */
+            --text-sub: #666666;
+            --border: rgba(45, 45, 45, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            /* Natural paper texture overlay for an organic feel */
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 45px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 20px 20px 60px #bebbb7, -20px -20px 60px #ffffff60;
+        }
+
+        h2 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 15px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 35px;
+            color: var(--accent-dark);
+        }
+
+        label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: block;
+            margin-top: 25px;
+            color: var(--accent);
+        }
+
+        select, textarea, input[type="file"] {
+            width: 100%;
+            padding: 14px 16px;
+            margin-top: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, textarea:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 0 4px rgba(90, 100, 115, 0.1);
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        /* CUSTOM BUTTON */
+        .btn {
+            margin-top: 35px;
+            width: 100%;
+            padding: 18px;
+            background: var(--accent-dark);
+            border: none;
+            color: #f1f1f1;
+            font-family: 'Syncopate', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(61, 70, 82, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            color: var(--accent-dark);
+            margin-top: 25px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px dashed var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h2>Initiate Action</h2>
+
+        <form method="POST" enctype="multipart/form-data" id="returnForm">
+            {% csrf_token %}
+
+            <label>Request Type</label>
+            <select name="type">
+                <option value="Return">Product Return</option>
+                <option value="Exchange">Size Exchange</option>
+            </select>
+
+            <label>Issue Description</label>
+            <textarea name="reason" placeholder="State the reason for this request..." required></textarea>
+
+            <label>Visual Evidence</label>
+            <input type="file" name="image" id="imageInput" accept="image/*">
+
+            <div class="preview" id="preview"></div>
+
+            <button type="submit" class="btn">Execute Submission</button>
+
+            <div class="success" id="successMsg">
+                LOG // REQUEST_SUBMITTED_SUCCESSFULLY
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    // Image Preview Logic
+    document.getElementById("imageInput").addEventListener("change", function(event) {
+        let preview = document.getElementById("preview");
+        preview.innerHTML = "";
+
+        let file = event.target.files[0];
+        if (file) {
+            let img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+            preview.appendChild(img);
+        }
+    });
+
+    // Success State Logic
     document.getElementById("returnForm").addEventListener("submit", function() {
         document.getElementById("successMsg").style.display = "block";
     });

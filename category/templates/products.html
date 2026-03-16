@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html>
 <head>
     <title>{{ subcategory.name }}</title>
@@ -254,4 +254,274 @@
 </body>
 
 </html>
-{% endcomment %}
+{% endcomment %} 
+
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ subcategory.name }} | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500&family=Inter:wght@200;400;600&display=swap');
+
+        :root {
+            --accent: #d4bda8;
+            --accent-dark: #b89f88;
+            --bg-main: #fcfcfc;
+            --bg-card: #ffffff;
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 20px 50px rgba(212, 189, 168, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .header h2 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 16px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .back-link:hover { color: var(--accent-dark); }
+
+        /* MAIN LAYOUT */
+        .main-content {
+            display: flex;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+            gap: 40px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            flex: 0 0 260px;
+            height: fit-content;
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar h4 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: var(--accent-dark);
+        }
+
+        .filter-group { margin-bottom: 35px; }
+
+        .price-option {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text-sub);
+            transition: 0.2s;
+        }
+
+        .price-option input {
+            margin-right: 12px;
+            accent-color: var(--accent-dark);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            background: #f9f9f9;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* PRODUCT GRID */
+        .grid-container { flex: 1; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 24px;
+            text-align: left;
+            box-shadow: var(--shadow-soft);
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid var(--glass-border);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        /* FIXED IMAGE BOX */
+        .img-wrapper {
+            width: 100%;
+            height: 250px; /* Uniform height for all cards */
+            background: #fcfcfc;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .card img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Keeps entire image visible without stretching */
+            transition: 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .card h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            text-transform: capitalize;
+        }
+
+        .price {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-dark);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .empty-msg {
+            grid-column: 1 / -1;
+            padding: 100px 0;
+            text-align: center;
+            opacity: 0.5;
+        }
+
+        @media(max-width: 900px){
+            .main-content { flex-direction: column; padding: 0 20px; }
+            .sidebar { position: static; width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h2>{{ subcategory.name }}</h2>
+    <a href="{% url 'dashboard' %}" class="back-link">← DASHBOARD</a>
+</div>
+
+<div class="main-content">
+    
+    <aside class="sidebar">
+        <form method="GET" id="filterForm">
+            <div class="filter-group">
+                <h4>Price Range</h4>
+                {% for min,max in price_ranges %}
+                    <label class="price-option">
+                        <input type="radio" name="price_range"
+                               value="{{ min }}-{{ max }}"
+                               {% if request.GET.price_range == min|stringformat:"s"|add:"-"|add:max|stringformat:"s" %}checked{% endif %}
+                               onchange="document.getElementById('filterForm').submit()">
+                        ₹{{ min }} — ₹{{ max }}
+                    </label>
+                {% endfor %}
+            </div>
+
+            <div class="filter-group">
+                <h4>Sort By</h4>
+                <select name="sort" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">Default Selection</option>
+                    <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>
+                        Price: Low to High
+                    </option>
+                    <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>
+                        Price: High to Low
+                    </option>
+                </select>
+            </div>
+        </form>
+    </aside>
+
+    <main class="grid-container">
+        <div class="grid">
+            {% for product in products %}
+            <a href="{% url 'product_detail' product.id %}" class="card">
+                <div class="img-wrapper">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                </div>
+                <h4>{{ product.name }}</h4>
+                <p class="price">₹{{ product.price }}</p>
+            </a>
+            {% empty %}
+            <div class="empty-msg">
+                <p>No products available in this category.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+</div>
+
+</body>
+</html>

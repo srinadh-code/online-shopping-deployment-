@@ -1,0 +1,185 @@
+{% comment %} <!DOCTYPE html>
+
+<html>
+<head>
+<title>UPI Payment</title>
+
+<style>
+
+body{
+font-family:Segoe UI;
+background:#f5f7fa;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+background:white;
+padding:40px;
+border-radius:10px;
+text-align:center;
+width:350px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+button{
+margin-top:20px;
+padding:12px;
+width:100%;
+background:#28a745;
+color:white;
+border:none;
+border-radius:6px;
+font-weight:bold;
+}
+
+img{
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>UPI Payment</h2>
+
+<h3>Amount: ₹{{ amount }}</h3>
+
+<p>Scan QR code and confirm payment</p>
+
+<img src="/static/upi_demo.png" width="180">
+
+<form method="POST">
+{% csrf_token %}
+<button type="submit">Payment Completed</button>
+</form>
+
+</div>
+
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra UPI Pay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes scan {
+            0%, 100% { transform: translateY(0); opacity: 0.2; }
+            50% { transform: translateY(180px); opacity: 1; }
+        }
+        .scanner-line {
+            height: 3px;
+            background: linear-gradient(to right, transparent, #22c55e, transparent);
+            box-shadow: 0 0 15px #22c55e;
+            animation: scan 2.5s infinite ease-in-out;
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 flex items-center justify-center min-h-screen p-4 font-sans">
+
+    <div class="max-w-sm w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden relative">
+        
+        <div class="bg-indigo-600 p-8 text-white text-center">
+            <div class="flex justify-center mb-3">
+                <div class="bg-white/20 p-3 rounded-full backdrop-blur-md">
+                    <i data-lucide="zap" class="w-6 h-6 text-yellow-300"></i>
+                </div>
+            </div>
+            <h2 class="text-xs uppercase tracking-[0.2em] font-bold opacity-80">Instant Transfer</h2>
+            <div class="flex items-center justify-center gap-1 mt-1">
+                <span class="text-xl font-bold opacity-70">₹</span>
+                <span class="text-4xl font-black">{{ amount|default:"1,299" }}</span>
+            </div>
+        </div>
+
+        <div class="p-8 -mt-6 bg-white rounded-t-[2.5rem]">
+            
+            <div class="flex justify-between items-center mb-6 text-sm bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="font-bold text-slate-600">Merchant: ACME Corp</span>
+                </div>
+                <span class="text-indigo-600 font-bold">#UPI-9842</span>
+            </div>
+
+            <div class="relative group">
+                <div class="absolute inset-0 bg-indigo-600/5 blur-xl group-hover:bg-indigo-600/10 transition-all"></div>
+                <div class="relative bg-white border-2 border-slate-100 rounded-3xl p-4 flex flex-col items-center shadow-sm">
+                    
+                    <div class="absolute w-[80%] top-4 z-10 scanner-line"></div>
+                    
+                    <img src="/static/upi_demo.png" class="w-48 h-48 object-contain opacity-90 group-hover:opacity-100 transition-opacity" alt="Scan me">
+                    
+                    <div class="mt-4 flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <i data-lucide="scan" class="w-3 h-3"></i>
+                        Point Camera to Scan
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-600 rounded-full text-xs font-bold mb-6">
+                    <i data-lucide="clock" class="w-3 h-3"></i>
+                    Expires in <span id="timer">05:00</span>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all transform active:scale-95 shadow-xl shadow-slate-200">
+                        Payment Completed
+                        <i data-lucide="arrow-right-circle" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-slate-50 flex justify-center items-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo.png" class="h-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Google_Pay_Logo.svg" class="h-4">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Countdown Timer Logic
+        let time = 300; // 5 minutes in seconds
+        const timerEl = document.getElementById('timer');
+
+        setInterval(() => {
+            if (time <= 0) return;
+            time--;
+            const mins = Math.floor(time / 60);
+            const secs = time % 60;
+            timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        // Submit Button Loading State
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const btn = this.querySelector('button');
+            btn.innerHTML = `<span class="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span> Verifying...`;
+            btn.classList.add('opacity-80', 'pointer-events-none');
+        });
+    </script>
+</body>
+</html>

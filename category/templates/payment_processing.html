@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Handshake | Processing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* --- Animated Mesh Background --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .mesh-gradient {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.6;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 50%;
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from { transform: translate(-10%, -10%) rotate(0deg); }
+            to { transform: translate(20%, 20%) rotate(360deg); }
+        }
+
+        /* --- UI Animations --- */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); opacity: 0; }
+            80%, 100% { opacity: 0; }
+        }
+        
+        .radar-ring {
+            position: absolute; width: 150px; height: 150px;
+            border: 2px solid #6366f1; border-radius: 50%;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .progress-bar-fill { transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1); }
+    </style>
+</head>
+<body class="flex items-center justify-center">
+
+    <div class="mesh-gradient">
+        <div class="blob" style="top: -10%; left: -10%; background: #4338ca;"></div>
+        <div class="blob" style="bottom: -10%; right: -10%; background: #7e22ce; animation-delay: -5s;"></div>
+        <div class="blob" style="top: 40%; left: 30%; background: #1e1b4b; animation-duration: 30s;"></div>
+    </div>
+
+    <div class="relative w-full max-w-sm px-4">
+        <div class="glass-container relative rounded-[2.5rem] p-10 text-center">
+            
+            <div class="relative flex justify-center items-center h-40">
+                <div class="radar-ring" style="animation-delay: 0s"></div>
+                <div class="radar-ring" style="animation-delay: 0.5s"></div>
+                <div class="z-10 bg-indigo-600 p-5 rounded-full shadow-[0_0_50px_rgba(99,102,241,0.4)] animate-pulse">
+                    <i data-lucide="shield-check" class="w-10 h-10 text-white"></i>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-2">
+                <h2 id="status-head" class="text-2xl font-black text-white tracking-tight">Initializing</h2>
+                <p id="status-sub" class="text-slate-400 text-sm h-5 font-medium">Please do not refresh...</p>
+            </div>
+
+            <div class="mt-10 space-y-6">
+                <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div id="progress-fill" class="progress-bar-fill w-0 h-full bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400"></div>
+                </div>
+
+                <div class="flex justify-between px-2">
+                    <div id="step-1" class="transition-all opacity-100 transform scale-110"><i data-lucide="credit-card" class="w-5 h-5 text-indigo-400"></i></div>
+                    <div id="step-2" class="transition-all opacity-20"><i data-lucide="lock" class="w-5 h-5 text-indigo-400"></i></div>
+                    <div id="step-3" class="transition-all opacity-20"><i data-lucide="check-circle-2" class="w-5 h-5 text-indigo-400"></i></div>
+                </div>
+            </div>
+
+            <p class="mt-10 text-[9px] uppercase font-black tracking-[0.3em] text-indigo-300/50 flex items-center justify-center gap-2">
+                <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
+                Secure Transaction Active
+            </p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const steps = [
+            { head: "Verifying Card", sub: "Connecting to secure gateway...", progress: 33, icon: 'step-1' },
+            { head: "Authorizing", sub: "Confirming limits with bank...", progress: 66, icon: 'step-2' },
+            { head: "Finalizing", sub: "Almost there, securing order...", progress: 100, icon: 'step-3' }
+        ];
+
+        let currentStep = 0;
+        const head = document.getElementById('status-head');
+        const sub = document.getElementById('status-sub');
+        const fill = document.getElementById('progress-fill');
+
+        const interval = setInterval(() => {
+            if (currentStep < steps.length) {
+                const data = steps[currentStep];
+                
+                head.innerText = data.head;
+                sub.innerText = data.sub;
+                fill.style.width = data.progress + "%";
+                
+                // Highlight current icon and dim others
+                document.querySelectorAll('[id^="step-"]').forEach(el => {
+                    el.classList.add('opacity-20');
+                    el.classList.remove('scale-110');
+                });
+                const currentIcon = document.getElementById(data.icon);
+                currentIcon.classList.replace('opacity-20', 'opacity-100');
+                currentIcon.classList.add('scale-110');
+                
+                currentStep++;
+            } else {
+                clearInterval(interval);
+                document.body.style.opacity = '0';
+                document.body.style.transition = 'opacity 0.8s ease-in-out';
+                setTimeout(() => {
+                    /*window.location.href = "/create-order/";*/
+                    window.location.href = "{% url 'create_order' %}";
+                }, 800);
+            }
+        }, 1500);
+    </script>
+</body>
+</html>

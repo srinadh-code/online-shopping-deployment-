@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Premium Pay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Subtle animated mesh background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(at 0% 0%, #e2e8f0 0px, transparent 50%),
+                radial-gradient(at 100% 0%, #cbd5e1 0px, transparent 50%),
+                radial-gradient(at 100% 100%, #e2e8f0 0px, transparent 50%),
+                radial-gradient(at 0% 100%, #cbd5e1 0px, transparent 50%);
+        }
+
+        .premium-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
+            box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.05);
+        }
+
+        input {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input:focus {
+            background: #ffffff !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .label-text {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mesh-bg"></div>
+
+    <div class="w-full max-w-md px-4 py-10">
+        <div class="relative z-20 px-6">
+            <div class="premium-card w-full aspect-[1.6/1] rounded-[28px] p-8 text-white flex flex-col justify-between transform -rotate-1 shadow-2xl">
+                <div class="flex justify-between items-start">
+                    <div class="w-14 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-lg shadow-inner"></div>
+                    <i data-lucide="contactless" class="w-8 h-8 opacity-40"></i>
+                </div>
+                
+                <div>
+                    <div class="text-2xl font-medium tracking-[4px] mb-6" id="v-num">#### #### #### ####</div>
+                    <div class="flex justify-between items-end">
+                        <div class="flex-1 mr-4">
+                            <p class="text-[10px] uppercase opacity-50 mb-1">Card Holder</p>
+                            <p class="font-bold tracking-widest truncate uppercase" id="v-name">YOUR NAME</p>
+                        </div>
+                        <div class="shrink-0 text-right">
+                            <p class="text-[10px] uppercase opacity-50 mb-1">Expires</p>
+                            <p class="font-bold" id="v-exp">MM/YY</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container -mt-20 pt-28 pb-10 px-10 rounded-[40px] relative">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Payment Details</h2>
+                <div class="mt-2 text-indigo-600 font-bold bg-indigo-50 inline-block px-4 py-1 rounded-full text-sm">
+                    Amount: ₹{{ amount|default:"1798.0" }}
+                </div>
+            </div>
+
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    <span class="label-text ml-1">Card Number</span>
+                    <input type="text" id="i-num" maxlength="19" placeholder="0000 0000 0000 0000" 
+                           class="w-full p-4 rounded-2xl outline-none text-slate-800 font-medium">
+                </div>
+
+                <div>
+                    <span class="label-text ml-1">Card Holder</span>
+                    <input type="text" id="i-name" placeholder="JOHN DOE" 
+                           class="w-full p-4 rounded-2xl outline-none text-slate-800 font-medium">
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-1/2">
+                        <span class="label-text ml-1">Expiry Date</span>
+                        <input type="text" id="i-exp" maxlength="5" placeholder="MM/YY" 
+                               class="w-full p-4 rounded-2xl outline-none text-slate-800 font-medium">
+                    </div>
+                    <div class="w-1/2">
+                        <span class="label-text ml-1">CVV</span>
+                        <input type="password" id="i-cvv" maxlength="3" placeholder="***" 
+                               class="w-full p-4 rounded-2xl outline-none text-slate-800 font-medium">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white py-5 rounded-2xl font-bold transition-all transform active:scale-95 shadow-lg shadow-slate-200 flex items-center justify-center gap-3 mt-4">
+                    <i data-lucide="lock" class="w-5 h-5 text-indigo-400"></i>
+                    Pay ₹{{ amount|default:"1798.0" }}
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-100 flex justify-center items-center gap-6 opacity-40 grayscale">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="h-5">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-4">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Formatting Logic
+        document.getElementById('i-num').addEventListener('input', e => {
+            let val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = val;
+            document.getElementById('v-num').innerText = val || "#### #### #### ####";
+        });
+
+        document.getElementById('i-name').addEventListener('input', e => {
+            document.getElementById('v-name').innerText = e.target.value || "YOUR NAME";
+        });
+
+        document.getElementById('i-exp').addEventListener('input', e => {
+            let val = e.target.value.replace(/\D/g, '');
+            if(val.length >= 2) val = val.slice(0,2) + '/' + val.slice(2,4);
+            e.target.value = val;
+            document.getElementById('v-exp').innerText = val || "MM/YY";
+        });
+
+        // Toggle back of card could be added here, but for "Ultra" 
+        // focus we kept the front visual solid.
+    </script>
+</body>
+</html>

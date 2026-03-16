@@ -1,0 +1,696 @@
+{% comment %} 
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Delivery Address</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f1f3f6;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.address-box{
+border:1px solid #ddd;
+padding:15px;
+margin-bottom:10px;
+border-radius:6px;
+}
+
+.deliver-btn{
+background:#2874f0;
+color:white;
+padding:8px 15px;
+text-decoration:none;
+border-radius:5px;
+}
+
+.deliver-btn:hover{
+background:#1f5ec8;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+background:#28a745;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1f8b38;
+}
+
+#map{
+height:350px;
+border-radius:8px;
+margin-top:10px;
+}
+
+.location-btn{
+background:#ff9f00;
+margin-bottom:10px;
+}
+
+.map-toggle{
+background:#2874f0;
+margin-bottom:10px;
+}
+
+.edit-btn{
+background:#ffc107;
+color:black;
+padding:6px 12px;
+border-radius:4px;
+text-decoration:none;
+margin-left:8px;
+}
+
+.delete-btn{
+background:#dc3545;
+color:white;
+padding:6px 12px;
+border-radius:4px;
+text-decoration:none;
+margin-left:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Select Delivery Address</h2>
+
+{% for a in addresses %}
+
+<div class="address-box">
+
+<h4>{{a.name}}</h4>
+
+<p>
+{{a.house}}, {{a.area}} <br>
+{{a.city}}, {{a.state}} - {{a.pincode}}
+</p>
+
+<a href="{% url 'deliver_here' a.id %}" class="deliver-btn">
+Deliver Here
+</a>
+
+<a href="{% url 'edit_address' a.id %}" class="edit-btn">
+Edit
+</a>
+
+<a href="{% url 'delete_address' a.id %}" class="delete-btn">
+Delete
+</a>
+
+</div>
+
+{% endfor %}
+
+<hr>
+
+<h3>Choose Location</h3>
+
+<button type="button" class="location-btn" onclick="getLocation()">
+Use My Live Location
+</button>
+
+<button class="map-toggle" onclick="toggleMap()">
+Select Location on Map
+</button>
+
+<div style="margin-bottom:10px;">
+<input type="text" id="searchInput" placeholder="Search location...">
+
+<button onclick="searchLocation()" style="background:#2874f0;">
+Search
+</button>
+</div>
+
+<!-- HIDDEN MAP -->
+<div id="mapContainer" style="display:none;">
+<div id="map"></div>
+</div>
+
+<hr>
+
+<h3>Add New Address</h3>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input type="hidden" name="latitude" id="lat">
+<input type="hidden" name="longitude" id="lng">
+
+<input type="text" name="name" placeholder="Full Name" required>
+
+<input type="text" name="phone" placeholder="Phone Number" required>
+
+<input type="text" name="house" placeholder="House No / Building" required>
+
+<input type="text" name="area" placeholder="Area / Street" required>
+
+<input type="text" name="city" placeholder="City" required>
+
+<input type="text" name="state" placeholder="State" required>
+
+<input type="text" name="pincode" placeholder="Pincode" required>
+
+<button type="submit">
+Save Address
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+var map = L.map('map').setView([17.3850,78.4867],13);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:19
+}).addTo(map);
+
+var marker;
+
+function toggleMap(){
+
+let mapDiv = document.getElementById("mapContainer");
+
+if(mapDiv.style.display === "none"){
+mapDiv.style.display = "block";
+}else{
+mapDiv.style.display = "none";
+}
+
+}
+
+map.on('click', function(e){
+
+var lat = e.latlng.lat;
+var lng = e.latlng.lng;
+
+if(marker){
+map.removeLayer(marker);
+}
+
+marker = L.marker([lat,lng]).addTo(map);
+
+document.getElementById("lat").value = lat;
+document.getElementById("lng").value = lng;
+
+getAddress(lat,lng);
+
+});
+
+function getLocation(){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+var lat = position.coords.latitude;
+var lng = position.coords.longitude;
+
+map.setView([lat,lng],15);
+
+if(marker){
+map.removeLayer(marker);
+}
+
+marker = L.marker([lat,lng]).addTo(map);
+
+document.getElementById("lat").value = lat;
+document.getElementById("lng").value = lng;
+
+getAddress(lat,lng);
+
+});
+
+}
+
+function searchLocation(){
+
+let place = document.getElementById("searchInput").value;
+
+fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${place}`)
+.then(res => res.json())
+.then(data => {
+
+if(data.length > 0){
+
+let lat = data[0].lat;
+let lon = data[0].lon;
+
+map.setView([lat, lon], 15);
+
+if(marker){
+map.removeLayer(marker);
+}
+
+marker = L.marker([lat, lon]).addTo(map);
+
+document.getElementById("lat").value = lat;
+document.getElementById("lng").value = lon;
+
+getAddress(lat, lon);
+
+}else{
+alert("Location not found");
+}
+
+});
+
+}
+
+function getAddress(lat, lon){
+
+fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+.then(res => res.json())
+.then(data => {
+
+document.querySelector("input[name='area']").value =
+data.address.road || data.address.suburb || "";
+
+document.querySelector("input[name='city']").value =
+data.address.city || data.address.town || data.address.village || "";
+
+document.querySelector("input[name='state']").value =
+data.address.state || "";
+
+document.querySelector("input[name='pincode']").value =
+data.address.postcode || "";
+
+});
+
+}
+
+</script>
+
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Address | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500&family=Inter:wght@200;400;600&display=swap');
+
+        :root {
+            --accent: #d4bda8;
+            --accent-dark: #b89f88;
+            --bg-main: #fcfcfc;
+            --bg-card: #ffffff;
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 20px 50px rgba(212, 189, 168, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .luxury-heading {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 18px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .luxury-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        /* ADDRESS CARDS */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .address-box {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            transition: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .address-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .address-box h4 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: var(--accent-dark);
+        }
+
+        .address-box p {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* ACTIONS */
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            display: inline-block;
+        }
+
+        .deliver-btn { background: var(--text-main); color: white; }
+        .deliver-btn:hover { background: var(--accent-dark); }
+
+        .edit-btn { background: #f5f5f5; color: var(--text-main); }
+        .delete-btn { background: transparent; color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.1); }
+        .delete-btn:hover { background: #ff4d4d; color: white; }
+
+        /* MAP SECTION */
+        .map-section {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 50px;
+            border: 1px solid var(--glass-border);
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            background: #f8f8f8;
+            padding: 5px;
+            border-radius: 50px;
+            flex: 1;
+        }
+
+        /* INPUTS */
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            background: #fcfcfc;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .search-container input {
+            background: transparent;
+            border: none;
+            margin-bottom: 0;
+        }
+
+        /* FORM */
+        .form-section {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--text-main);
+            color: white;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover { background: var(--accent-dark); }
+
+        @media(max-width: 768px){
+            .map-controls { flex-direction: column; }
+            .address-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2 class="luxury-heading">Delivery Address</h2>
+
+    <div class="address-grid">
+        {% for a in addresses %}
+        <div class="address-box">
+            <h4>{{a.name}}</h4>
+            <p>
+                {{a.house}}, {{a.area}}<br>
+                {{a.city}}, {{a.state}} - {{a.pincode}}
+            </p>
+            <div class="actions">
+                <a href="{% url 'deliver_here' a.id %}" class="btn deliver-btn">Deliver Here</a>
+                <a href="{% url 'edit_address' a.id %}" class="btn edit-btn">Edit</a>
+                <a href="{% url 'delete_address' a.id %}" class="btn delete-btn">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="map-section">
+        <h3 class="luxury-heading" style="font-size: 14px; margin-bottom: 25px;">Pinpoint Location</h3>
+        
+        <div class="map-controls">
+            <button type="button" class="btn edit-btn" onclick="getLocation()" style="background: var(--accent); color: white;">
+                📍 Use My Location
+            </button>
+            <button class="btn edit-btn" onclick="toggleMap()">
+                🗺️ Toggle Map View
+            </button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for your building, street or city...">
+            <button onclick="searchLocation()" class="btn deliver-btn">Search</button>
+        </div>
+
+        <div id="mapContainer" style="display:none;">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="luxury-heading" style="font-size: 14px; margin-bottom: 25px;">Add New Address</h3>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="latitude" id="lat">
+            <input type="hidden" name="longitude" id="lng">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <input type="text" name="name" placeholder="Full Name" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+            </div>
+
+            <input type="text" name="house" placeholder="House No / Building Name" required>
+            <input type="text" name="area" placeholder="Area / Street / Colony" required>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <input type="text" name="city" placeholder="City" required>
+                <input type="text" name="state" placeholder="State" required>
+                <input type="text" name="pincode" placeholder="Pincode" required>
+            </div>
+
+            <button type="submit" class="btn save-btn">Save Address & Proceed</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Map logic remains identical to your original functionality
+    var map = L.map('map').setView([17.3850,78.4867],13);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19
+    }).addTo(map);
+
+    var marker;
+
+    function toggleMap(){
+        let mapDiv = document.getElementById("mapContainer");
+        mapDiv.style.display = (mapDiv.style.display === "none") ? "block" : "none";
+        // Recalculate size if map was hidden
+        setTimeout(() => { map.invalidateSize(); }, 200);
+    }
+
+    map.on('click', function(e){
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+        if(marker){ map.removeLayer(marker); }
+        marker = L.marker([lat,lng]).addTo(map);
+        document.getElementById("lat").value = lat;
+        document.getElementById("lng").value = lng;
+        getAddress(lat,lng);
+    });
+
+    function getLocation(){
+        navigator.geolocation.getCurrentPosition(function(position){
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            map.setView([lat,lng],15);
+            if(marker){ map.removeLayer(marker); }
+            marker = L.marker([lat,lng]).addTo(map);
+            document.getElementById("lat").value = lat;
+            document.getElementById("lng").value = lng;
+            getAddress(lat,lng);
+            // Ensure map is visible if using geolocation
+            document.getElementById("mapContainer").style.display = "block";
+            map.invalidateSize();
+        });
+    }
+
+    function searchLocation(){
+        let place = document.getElementById("searchInput").value;
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${place}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.length > 0){
+                let lat = data[0].lat;
+                let lon = data[0].lon;
+                map.setView([lat, lon], 15);
+                if(marker){ map.removeLayer(marker); }
+                marker = L.marker([lat, lon]).addTo(map);
+                document.getElementById("lat").value = lat;
+                document.getElementById("lng").value = lon;
+                getAddress(lat, lon);
+                document.getElementById("mapContainer").style.display = "block";
+                map.invalidateSize();
+            } else {
+                alert("Location not found");
+            }
+        });
+    }
+
+    function getAddress(lat, lon){
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.address){
+                document.querySelector("input[name='area']").value = data.address.road || data.address.suburb || data.address.neighbourhood || "";
+                document.querySelector("input[name='city']").value = data.address.city || data.address.town || data.address.village || "";
+                document.querySelector("input[name='state']").value = data.address.state || "";
+                document.querySelector("input[name='pincode']").value = data.address.postcode || "";
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

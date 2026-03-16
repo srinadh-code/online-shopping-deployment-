@@ -2,219 +2,352 @@
 
 
 
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Dashboard | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500&family=Inter:wght@200;400;600&display=swap');
 
-<title>Dashboard</title>
+        :root {
+            --accent: #d4bda8;
+            --accent-dark: #b89f88;
+            --bg-main: #fcfcfc;
+            --bg-card: #ffffff;
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 20px 50px rgba(212, 189, 168, 0.15);
+        }
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-<style>
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:"Segoe UI", Arial, sans-serif;
-}
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-body{
-background:#f1f3f6;
-}
+        /* HEADER */
+        .header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.02);
+        }
 
-/* HEADER */
+        .header h2 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
 
-.header{
-background:linear-gradient(to right,#2874f0,#3f8cff);
-color:white;
-padding:15px 30px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:0 2px 8px rgba(0,0,0,0.2);
-}
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            padding: 4px;
+            border-radius: 50px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
 
-.search-bar{
-display:flex;
-align-items:center;
-}
+        .search-bar:focus-within {
+            background: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(212, 189, 168, 0.2);
+        }
 
-.search-bar input{
-padding:10px;
-width:350px;
-border:none;
-outline:none;
-border-radius:4px 0 0 4px;
-}
+        .search-bar input {
+            padding: 10px 20px;
+            width: 300px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+        }
 
-.search-btn{
-padding:10px 18px;
-border:none;
-background:#ff9f00;
-color:white;
-cursor:pointer;
-}
+        .search-btn {
+            padding: 10px 20px;
+            border: none;
+            background: var(--text-main);
+            color: white;
+            cursor: pointer;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
 
-.voice-btn{
-padding:10px 14px;
-border:none;
-background:#00c853;
-color:white;
-cursor:pointer;
-border-radius:0 4px 4px 0;
-font-size:16px;
-}
+        .search-btn:hover { background: var(--accent); }
 
-/* LAYOUT */
+        .voice-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 15px;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+        .voice-btn:hover { opacity: 1; transform: scale(1.1); }
 
-.wrapper{
-display:flex;
-}
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-/* SIDEBAR */
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: 0.3s;
+            position: relative;
+        }
 
-.sidebar{
-width:260px;
-background:white;
-padding:15px;
-box-shadow:2px 0 5px rgba(0,0,0,0.1);
-}
+        .nav-links a:hover { color: var(--accent); }
 
-.sidebar h3{
-margin-bottom:10px;
-}
+        /* WRAPPER & SIDEBAR */
+        .wrapper {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-.category-btn{
-padding:12px;
-cursor:pointer;
-background:#f5f7fa;
-margin-top:6px;
-border-radius:6px;
-font-weight:500;
-}
+        .sidebar {
+            width: 280px;
+            padding: 30px 20px;
+            height: calc(100vh - 100px);
+            position: sticky;
+            top: 100px;
+        }
 
-.category-btn:hover{
-background:#e3f2fd;
-}
+        .sidebar h3 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            opacity: 0.4;
+        }
 
+        .category-btn {
+            padding: 15px 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
+        .category-btn:hover { color: var(--accent); padding-left: 5px; }
 
-.subcategory a{
-display:block;
-padding:6px;
-text-decoration:none;
-color:#444;
-border-radius:4px;
-}
+        .subcategory {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fafafa;
+            border-radius: 8px;
+        }
 
-.subcategory a:hover{
-background:#f1f3f6;
-}
+        .subcategory a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: var(--text-sub);
+            font-size: 13px;
+            transition: 0.2s;
+        }
 
-/* MAIN */
+        .subcategory a:hover { color: var(--text-main); background: #f0f0f0; }
 
-.main{
-flex:1;
-padding:20px;
-}
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            padding: 20px 40px;
+        }
 
-/* SECTION */
+        .main-inner { max-width: 1200px; margin: 0 auto; }
 
-.section{
-background:white;
-padding:18px;
-margin-bottom:20px;
-border-radius:8px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
+        .section {
+            margin-bottom: 50px;
+        }
 
-.section h2{
-margin-bottom:15px;
-}
+        .section h2 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 16px;
+            letter-spacing: 5px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
 
-/* SLIDER */
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+        }
 
-.slider-wrapper{
-overflow:hidden;
-width:100%;
-}
+        /* SLIDER & GRID */
+        .slider-wrapper { overflow: hidden; width: 100%; border-radius: 20px; }
+        .slider-track { display: flex; transition: transform 1s cubic-bezier(0.85, 0, 0.15, 1); }
+        .slide-group { min-width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; padding: 10px; }
 
-.slider-track{
-display:flex;
-}
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+        .double-row { display: flex; gap: 40px; margin-top: 40px; }
+        .double-row .section { flex: 1; }
 
-.slide-group{
-min-width:100%;
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:15px;
-}
+        /* PRODUCT CARDS */
+        .card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            border: 1px solid #f5f5f5;
+            box-shadow: var(--shadow-soft);
+        }
 
-/* GRID */
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
 
-.grid-2{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
-}
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            transition: 0.4s;
+        }
 
-.bottom-row{
-display:flex;
-gap:20px;
-}
+        .card:hover img { transform: scale(1.05); }
 
-.bottom-row .section{
-flex:1;
-}
+        .card p { font-weight: 500; font-size: 14px; margin-bottom: 8px; color: var(--text-main); }
 
-/* CARD */
+        .price {
+            color: var(--accent-dark);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 15px;
+        }
 
-.card{
-background:white;
-padding:10px;
-border-radius:8px;
-text-align:center;
-transition:0.25s;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
+        .wishlist-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: 0.3s;
+            filter: grayscale(1);
+        }
+        .wishlist-icon:hover { transform: scale(1.2); filter: grayscale(0); }
+        .in-wishlist { filter: grayscale(0); }
 
-.card:hover{
-transform:translateY(-5px);
-box-shadow:0 6px 16px rgba(0,0,0,0.2);
-}
+        /* USER PROFILE CHIP */
+        .user-chip {
+            background: #f5f5f5;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--glass-border);
+        }
 
-.card img{
-width:100%;
-height:150px;
-object-fit:contain;
-}
+        @media(max-width: 1100px){
+            .wrapper { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; top: 0; }
+            .grid-2, .slide-group { grid-template-columns: repeat(2, 1fr); }
+            .double-row { flex-direction: column; }
+        }
 
-.price{
-color:green;
-font-weight:bold;
-}
-.subcategory {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-}
-.wishlist-icon{
-position:absolute;
-top:8px;
-right:10px;
-font-size:22px;
-cursor:pointer;
-z-index:10;
-}
-
-.card{
-position:relative;
-}
-/* USER DROPDOWN */
-
+        /* USER DROPDOWN */
 .user-menu{
+    position: relative;
+    display: inline-block;
+}
+
+.user-btn{
+    background:white;
+    border:none;
+    padding:8px 12px;
+    font-size:14px;
+    cursor:pointer;
+    border-radius:4px;
+}
+
+.dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:100%;   /* important fix */
+    background:white;
+    min-width:160px;
+    box-shadow:0 6px 15px rgba(0,0,0,0.15);
+    border-radius:6px;
+    overflow:hidden;
+    z-index:1000;
+}
+
+.dropdown a{
+    display:block;
+    padding:10px 15px;
+    text-decoration:none;
+    color:#333;
+}
+
+.dropdown a:hover{
+    background:#f1f3f6;
+}
+
+/* THIS MAKES BUTTON + DROPDOWN ONE HOVER AREA */
+.user-menu:hover .dropdown{
+    display:block;
+}
+
+{% comment %} .user-menu{
     position:relative;
     display:inline-block;
 }
@@ -255,36 +388,25 @@ position:relative;
 /* show dropdown when hovering username */
 .user-menu:hover .dropdown{
     display:block;
-}
-</style>
-
+} {% endcomment %}
+    </style>
 </head>
-
 <body>
 
-
 <!-- HEADER -->
-
 <div class="header">
+    <h2>online shopping</h2>
 
-<h2>Online Shopping</h2>
+    <form method="GET" action="{% url 'dashboard' %}" class="search-bar">
+        <input type="text" id="searchInput" name="q" placeholder="Search collection...">
+        <button type="submit" class="search-btn">Search</button>
+        <button type="button" onclick="startVoiceSearch()" class="voice-btn">🎤</button>
+    </form>
 
-<form method="GET" action="{% url 'dashboard' %}" class="search-bar">
-
-<input type="text" id="searchInput" name="q" placeholder="Search products">
-
-<button type="submit" class="search-btn">Search</button>
-
-<button type="button" onclick="startVoiceSearch()" class="voice-btn">🎤</button>
-
-</form>
-
-<div style="display:flex; gap:20px; align-items:center;">
-
-<a href="{% url 'wishlist' %}" style="color:white; text-decoration:none;">
-❤️ Wishlist ({{ wishlist_count }})
-</a>
-<div class="user-menu">
+    <div class="nav-links">
+        <a href="{% url 'wishlist' %}">Wishlist ({{ wishlist_count }})</a>
+        <a href="{% url 'cart' %}">Cart ({{ cart_count }})</a>
+        <div class="user-menu">
     <button class="user-btn">
         👤 {{ request.user.username }} ▼
     </button>
@@ -296,210 +418,222 @@ position:relative;
         <a href="{% url 'logout' %}">Logout</a>
     </div>
 </div>
-
-
+    </div>
 </div>
-</div>
-
-
-<!-- BODY -->
 
 <div class="wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h3>Categories</h3>
+        {% for category in categories %}
+            <div class="category-btn">
+                {{ category.name }}
+                <span>+</span>
+            </div>
+            <div class="subcategory">
+                {% for sub in category.subcategories.all %}
+                    <a href="{% url 'subcategory' sub.id %}">{{ sub.name }}</a>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 
+    <!-- MAIN -->
+    <div class="main">
+        <div class="main-inner">
 
-<!-- SIDEBAR -->
+            <!-- JUST ARRIVED -->
+            <div class="section">
+                <h2>New Arrivals</h2>
+                <div class="slider-wrapper">
+                    <div id="justArrivedTrack" class="slider-track"></div>
+                </div>
+            </div>
 
-<div class="sidebar">
+            <!-- RECENT + RECOMMENDED -->
+            <div class="double-row">
+                <div class="section">
+                    <h2>Recently Viewed</h2>
+                    <div class="grid-2">
+                        {% for product in recently_viewed|slice:":4" %}
+                        <div class="card">
+                            <div class="wishlist-icon {% if product.id in wishlist_product_ids %}in-wishlist{% endif %}"
+                                 onclick="toggleWishlist({{ product.id }}, this)">
+                                {% if product.id in wishlist_product_ids %}❤️{% else %}🤍{% endif %}
+                            </div>
+                            <a href="{% url 'product_detail' product.id %}">
+                                <img src="{{ product.image.url }}">
+                            </a>
+                            <p>{{ product.name }}</p>
+                            <p class="price">₹{{ product.price }}</p>
+                        </div>
+                        {% empty %}
+                        <p style="opacity: 0.5; font-size: 13px;">No history detected.</p>
+                        {% endfor %}
+                    </div>
+                </div>
 
-<h3>Categories</h3>
+                <div class="section">
+                    <h2>Recommended</h2>
+                    <div class="grid-2">
+                        {% for product in recommended|slice:":4" %}
+                        <div class="card">
+                            <div class="wishlist-icon {% if product.id in wishlist_product_ids %}in-wishlist{% endif %}"
+                                 onclick="toggleWishlist({{ product.id }}, this)">
+                                {% if product.id in wishlist_product_ids %}❤️{% else %}🤍{% endif %}
+                            </div>
+                            <a href="{% url 'product_detail' product.id %}">
+                                <img src="{{ product.image.url }}">
+                            </a>
+                            <p>{{ product.name }}</p>
+                            <p class="price">₹{{ product.price }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-{% for category in categories %}
+            <div class="double-row" style="margin-top: 0;">
+                <div class="section">
+                    <h2>Trending</h2>
+                    <div class="grid-2">
+                        {% for product in trending_products %}
+                        <div class="card">
+                            <a href="{% url 'product_detail' product.id %}">
+                                <img src="{{ product.image.url }}">
+                            </a>
+                            <p>{{ product.name }}</p>
+                            <p class="price">₹{{ product.price }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="section">
+    <h2>Most Purchased</h2>
 
-<div class="category-btn">
-{{ category.name }}
-</div>
+    <div class="grid-2">
 
-<div class="subcategory">
+        {% for product in most_purchased %}
 
-{% for sub in category.subcategories.all %}
+        <div class="card">
 
-<a href="{% url 'subcategory' sub.id %}">
-{{ sub.name }}
-</a>
+            <a href="{% url 'product_detail' product.id %}">
+                <img src="{{ product.image.url }}">
+            </a>
 
-{% endfor %}
+            <p>{{ product.name }}</p>
 
-</div>
+            <p class="price">
+                ₹{{ product.price }}
+            </p>
 
-{% endfor %}
+        </div>
 
-</div>
+        {% endfor %}
 
-
-<!-- MAIN -->
-
-<div class="main">
-
-
-<!-- JUST ARRIVED -->
-
-<div class="section">
-
-<h2>Just Arrived</h2>
-
-<div class="slider-wrapper">
-<div id="justArrivedTrack" class="slider-track"></div>
-</div>
-
-</div>
-
-
-<!-- RECENT + RECOMMENDED -->
-
-<div class="bottom-row">
-
-
-<!-- RECENTLY VIEWED -->
-
-<div class="section">
-
-<h2>Recently Viewed</h2>
-
-<div class="grid-2">
-
-{% for product in recently_viewed|slice:":4" %}
-
-
-<div class="card">
-
-<div class="wishlist-icon"
-onclick="toggleWishlist({{ product.id }}, this)">
-
-{% if product.id in wishlist_product_ids %}
-❤️
-{% else %}
-🤍
-{% endif %}
-
-</div>
-
-<a href="{% url 'product_detail' product.id %}">
-<img src="{{ product.image.url }}">
-</a>
-
-<p>{{ product.name }}</p>
-
-<p class="price">₹{{ product.price }}</p>
-
-</div>
-
-{% empty %}
-No recently viewed products
-{% endfor %}
-
-</div>
-
-</div>
-
-
-<!-- RECOMMENDED -->
-
-<div class="section">
-
-<h2>Recommended</h2>
-
-<div class="grid-2">
-
-{% for product in recommended|slice:":4" %}
-
-
-<div class="card">
-
-<div class="wishlist-icon"
-onclick="toggleWishlist({{ product.id }}, this)">
-
-{% if product.id in wishlist_product_ids %}
-❤️
-{% else %}
-🤍
-{% endif %}
+    </div>
 
 </div>
 
-<a href="{% url 'product_detail' product.id %}">
-<img src="{{ product.image.url }}">
-</a>
+        
 
-<p>{{ product.name }}</p>
 
-<p class="price">₹{{ product.price }}</p>
-
+<!-- HIDDEN DATA CONTAINER TO PREVENT JS SYNTAX ERRORS IN PREVIEW -->
+<div id="justArrivedData" style="display: none;">
+    {% for product in just_arrived %}
+    <div class="product-item" 
+         data-id="{{ product.id }}" 
+         data-name="{{ product.name|escapejs }}" 
+         data-price="{{ product.price }}" 
+         data-image="{{ product.image.url }}" 
+         data-wishlist="{% if product.id in wishlist_product_ids %}true{% else %}false{% endif %}">
+    </div>
+    {% endfor %}
 </div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-</div>
-
 
 <!-- JAVASCRIPT -->
-
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
-
     const categoryButtons = document.querySelectorAll(".category-btn");
-
     categoryButtons.forEach(button => {
-
         button.addEventListener("click", function () {
-
             const subcategory = this.nextElementSibling;
-
             const isOpen = subcategory.classList.contains("open");
 
-            // Close all subcategories
             document.querySelectorAll(".subcategory").forEach(sub => {
                 sub.classList.remove("open");
                 sub.style.maxHeight = null;
             });
 
-            // Open clicked one if it was closed
             if (!isOpen) {
                 subcategory.classList.add("open");
                 subcategory.style.maxHeight = subcategory.scrollHeight + "px";
             }
-
         });
-
     });
 
+    /* FETCH DATA FROM HIDDEN HTML INSTEAD OF DIRECT LOOP IN SCRIPT */
+    const dataNodes = document.querySelectorAll('#justArrivedData .product-item');
+    const justArrived = Array.from(dataNodes).map(node => ({
+        id: node.dataset.id,
+        name: node.dataset.name,
+        price: node.dataset.price,
+        image: node.dataset.image,
+        inWishlist: node.dataset.wishlist === 'true'
+    }));
+
+    let track = document.getElementById("justArrivedTrack");
+    if(track && justArrived.length > 0){
+        let current = 0;
+        let groups = [];
+        for(let i=0; i<justArrived.length; i+=4){
+            groups.push(justArrived.slice(i, i+4));
+        }
+
+        groups.forEach(group => {
+            let div = document.createElement("div");
+            div.className = "slide-group";
+            group.forEach(p => {
+                div.innerHTML += `
+                    <div class="card">
+                        <div class="wishlist-icon ${p.inWishlist ? 'in-wishlist' : ''}" onclick="toggleWishlist(${p.id}, this)">
+                            ${p.inWishlist ? "❤️" : "🤍"}
+                        </div>
+                        <a href="/product/${p.id}/"><img src="${p.image}"></a>
+                        <p>${p.name}</p>
+                        <p class="price">₹${p.price}</p>
+                    </div>`;
+            });
+            track.appendChild(div);
+        });
+
+        if (groups.length > 1) {
+            let clone = track.children[0].cloneNode(true);
+            track.appendChild(clone);
+            function slide(){
+                current++;
+                track.style.transition = "transform 1s cubic-bezier(0.85, 0, 0.15, 1)";
+                track.style.transform = `translateX(-${current*100}%)`;
+                if(current === groups.length){
+                    setTimeout(() => {
+                        track.style.transition = "none";
+                        track.style.transform = "translateX(0%)";
+                        current = 0;
+                    }, 1000);
+                }
+            }
+            setInterval(slide, 6000);
+        }
+    }
 });
 
-
-
-
 function startVoiceSearch(){
-
     if(!('webkitSpeechRecognition' in window)){
         alert("Voice search not supported in this browser");
         return;
     }
-
     const recognition = new webkitSpeechRecognition();
-
     recognition.lang = "en-IN";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
     recognition.start();
 
     recognition.onstart = function(){
@@ -507,150 +641,33 @@ function startVoiceSearch(){
     };
 
     recognition.onresult = function(event){
-
         let text = event.results[0][0].transcript;
-
-        console.log("Voice detected:", text);
-
-        //  CLEAN TEXT (IMPORTANT FIX)
         text = text.trim().replace(".", "").replace(",", "");
-
-        // Put into search box
         document.getElementById("searchInput").value = text;
-
-        // Submit form SAME as manual search
         document.querySelector(".search-bar").submit();
-
-    };
-
-    recognition.onerror = function(event){
-        alert("Voice error: " + event.error);
     };
 
     recognition.onend = function(){
         document.querySelector(".voice-btn").innerText = "🎤";
     };
-
-}
-
-
-
-/* JUST ARRIVED SLIDER */
-
-
-
-let justArrived = [
-
-{% for product in just_arrived %}
-{
-id: {{ product.id }},
-name: "{{ product.name|escapejs }}",
-price: "{{ product.price }}",
-image: "{{ product.image.url }}",
-inWishlist: {% if product.id in wishlist_product_ids %}true{% else %}false{% endif %}
-},
-{% endfor %}
-
-];
-
-let track=document.getElementById("justArrivedTrack");
-
-if(track && justArrived.length>0){
-
-let groups=[];
-let current=0;
-
-for(let i=0;i<justArrived.length;i+=4){
-groups.push(justArrived.slice(i,i+4));
-}
-
-groups.forEach(group=>{
-
-let div=document.createElement("div");
-
-div.className="slide-group";
-
-group.forEach(p=>{
-
-div.innerHTML+=`
-<div class="card">
-
-<div class="wishlist-icon"
-onclick="toggleWishlist(${p.id}, this)">
-${p.inWishlist ? "❤️" : "🤍"}
-</div>
-
-<a href="/product/${p.id}/">
-
-<img src="${p.image}">
-
-</a>
-
-<p>${p.name}</p>
-
-<p class="price">₹${p.price}</p>
-
-</div>
-
-`;
-
-});
-
-track.appendChild(div);
-
-});
-
-let clone=track.children[0].cloneNode(true);
-
-track.appendChild(clone);
-
-function slide(){
-
-current++;
-
-track.style.transition="transform 0.7s";
-
-track.style.transform=`translateX(-${current*100}%)`;
-
-}
-
-track.addEventListener("transitionend",()=>{
-
-if(current===groups.length){
-
-track.style.transition="none";
-
-track.style.transform="translateX(0%)";
-
-current=0;
-
-}
-
-});
-
-setInterval(slide,5000);
-
 }
 
 function toggleWishlist(productId, element){
-
-fetch(`/toggle-wishlist/${productId}/`)
-.then(response => response.json())
-.then(data => {
-
-if(data.status === "added"){
-element.innerHTML = "❤️";
-}
-else{
-element.innerHTML = "🤍";
-}
-
-})
-.catch(error => console.log(error));
-
+    fetch(`/toggle-wishlist/${productId}/`)
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "added"){
+            element.innerHTML = "❤️";
+            element.classList.add('in-wishlist');
+        } else {
+            element.innerHTML = "🤍";
+            element.classList.remove('in-wishlist');
+        }
+    })
+    .catch(error => console.log(error));
+    
 }
 </script>
-
 
 </body>
 </html>
