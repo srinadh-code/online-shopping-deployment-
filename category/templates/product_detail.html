@@ -717,11 +717,11 @@ object-fit:contain;
 <div class="price-row">
 <span class="curr-price">₹{{ product.price }}</span>
 
-{% if product.stock > 0 %}
+{% comment %} {% if product.stock > 0 %}
 <span class="stock-pill">In Stock ({{product.stock}})</span>
 {% else %}
 <span class="stock-pill" style="background:#fee2e2;color:#b91c1c;">Out of Stock</span>
-{% endif %}
+{% endif %} {% endcomment %}
 </div>
 
 

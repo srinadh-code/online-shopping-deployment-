@@ -326,16 +326,22 @@ def subcategory_view(request, subcategory_id):
         "title": subcategory.name,
         "price_ranges":price_ranges
     })
-# @login_required
-def product_detail(request, product_id):
     
+    
+from django.utils import timezone
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
+from django.db.models import Avg
+
+def product_detail(request, product_id):
 
     product = get_object_or_404(Product, id=product_id)
     print("OPENED PRODUCT ID:", product.id)
-    # Get variants for this product
+
+    # Variants
     variants = ProductVariant.objects.filter(product=product)
 
-    # Get recent list
+    # -------- SESSION RECENTLY VIEWED --------
     recent = request.session.get('recently_viewed', [])
 
     if product_id in recent:
@@ -343,38 +349,50 @@ def product_detail(request, product_id):
 
     recent.insert(0, product_id)
     request.session['recently_viewed'] = recent[:5]
+
+    # -------- DB RECENTLY VIEWED --------
     if request.user.is_authenticated:
         RecentlyViewed.objects.update_or_create(
             user=request.user,
-            product=product
+            product=product,
+            defaults={'viewed_at': timezone.now()}
         )
 
-    # wishlist check
-    wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+    # -------- DEFAULT VALUES --------
+    in_wishlist = False
+    can_review = False
+    user_review = None
 
-    in_wishlist = WishlistItem.objects.filter(
-        wishlist=wishlist,
-        product=product
-    ).exists()
+    # -------- ONLY IF LOGGED IN --------
+    if request.user.is_authenticated:
 
-    # CHECK: user purchased AND delivered
-    can_review = OrderItem.objects.filter(
-        order__user=request.user,
-        product=product,
-        order__status="Delivered"
-    ).exists()
+        # wishlist
+        wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
-    #  get existing user review (for update UI)
-    user_review = Review.objects.filter(
-        product=product,
-        user=request.user
-    ).first()
+        in_wishlist = WishlistItem.objects.filter(
+            wishlist=wishlist,
+            product=product
+        ).exists()
 
-    # review submit
+        # can review (only delivered)
+        can_review = OrderItem.objects.filter(
+            order__user=request.user,
+            product=product,
+            order__status="Delivered"
+        ).exists()
+
+        # existing review
+        user_review = Review.objects.filter(
+            product=product,
+            user=request.user
+        ).first()
+
+    # -------- REVIEW SUBMIT --------
     if request.method == "POST":
-        print("Saving review for product ID:", product.id)
 
-        #  block if not delivered
+        if not request.user.is_authenticated:
+            return redirect('login')  #  force login
+
         if not can_review:
             messages.error(request, "You can review only after delivery.")
             return redirect('product_detail', product_id=product.id)
@@ -394,8 +412,8 @@ def product_detail(request, product_id):
 
         return redirect('product_detail', product_id=product.id)
 
+    # -------- REVIEWS --------
     reviews = product.reviews.all().order_by("-created_at")
-
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
 
     return render(request, "product_detail.html", {
@@ -404,9 +422,90 @@ def product_detail(request, product_id):
         "in_wishlist": in_wishlist,
         "reviews": reviews,
         "avg_rating": avg_rating,
-        "can_review": can_review,        # ✅ REQUIRED FOR HTML
-        "user_review": user_review       # ✅ REQUIRED FOR UPDATE FEATURE
+        "can_review": can_review,
+        "user_review": user_review
     })
+# @login_required
+# def product_detail(request, product_id):
+    
+
+#     product = get_object_or_404(Product, id=product_id)
+#     print("OPENED PRODUCT ID:", product.id)
+#     # Get variants for this product
+#     variants = ProductVariant.objects.filter(product=product)
+
+#     # Get recent list
+#     recent = request.session.get('recently_viewed', [])
+
+#     if product_id in recent:
+#         recent.remove(product_id)
+
+#     recent.insert(0, product_id)
+#     request.session['recently_viewed'] = recent[:5]
+#     if request.user.is_authenticated:
+#         RecentlyViewed.objects.update_or_create(
+#             user=request.user,
+#             product=product
+#         )
+
+#     # wishlist check
+#     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+
+#     in_wishlist = WishlistItem.objects.filter(
+#         wishlist=wishlist,
+#         product=product
+#     ).exists()
+
+#     # CHECK: user purchased AND delivered
+#     can_review = OrderItem.objects.filter(
+#         order__user=request.user,
+#         product=product,
+#         order__status="Delivered"
+#     ).exists()
+
+#     #  get existing user review (for update UI)
+#     user_review = Review.objects.filter(
+#         product=product,
+#         user=request.user
+#     ).first()
+
+#     # review submit
+#     if request.method == "POST":
+#         print("Saving review for product ID:", product.id)
+
+#         #  block if not delivered
+#         if not can_review:
+#             messages.error(request, "You can review only after delivery.")
+#             return redirect('product_detail', product_id=product.id)
+
+#         rating = request.POST.get("rating")
+#         comment = request.POST.get("comment")
+
+#         if rating:
+#             Review.objects.update_or_create(
+#                 product=product,
+#                 user=request.user,
+#                 defaults={
+#                     "rating": int(rating),
+#                     "comment": comment
+#                 }
+#             )
+
+#         return redirect('product_detail', product_id=product.id)
+
+#     reviews = product.reviews.all().order_by("-created_at")
+
+#     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
+#     return render(request, "product_detail.html", {
+#         "product": product,
+#         "variants": variants,
+#         "in_wishlist": in_wishlist,
+#         "reviews": reviews,
+#         "avg_rating": avg_rating,
+#         "can_review": can_review,        
+#         "user_review": user_review      
+#     })
 # @login_required
 # def product_detail(request, product_id):
 
