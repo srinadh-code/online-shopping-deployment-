@@ -1,4 +1,4 @@
-
+{% comment %} 
 
 <!DOCTYPE html>
 <html>
@@ -91,6 +91,261 @@
 
     <a href="{% url 'login' %}" class="back">Back to Login</a>
 
+</div>
+
+</body>
+</html> {% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Security Code | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Outfit:wght@300;600&display=swap');
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .split-container {
+            display: flex;
+            width: 900px;
+            height: 580px; /* Slightly taller to accommodate two inputs nicely */
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* LEFT SIDE: SECURITY THEME */
+        .hero-section {
+            flex: 1.1;
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* CSS Shield Icon Mockup */
+        .shield-icon {
+            width: 80px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid white;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .shield-icon::after {
+            content: '✓';
+            font-size: 40px;
+            line-height: 80px;
+            color: white;
+        }
+
+        .hero-section h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .hero-section p {
+            font-size: 15px;
+            opacity: 0.85;
+            max-width: 260px;
+            line-height: 1.6;
+        }
+
+        /* RIGHT SIDE: FORM */
+        .form-section {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        .form-header {
+            margin-bottom: 35px;
+        }
+
+        .form-header h2 {
+            font-size: 26px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-header h2 span {
+            color: #0093E9;
+        }
+
+        .form-header p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* INPUT BOXES */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #f4f7ff;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            outline: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            background: #fff;
+            border-color: #0093E9;
+            box-shadow: 0 5px 15px rgba(0,147,233,0.1);
+        }
+
+        /* OTP Specific Style */
+        .otp-input {
+            letter-spacing: 8px;
+            font-weight: 700;
+            font-size: 18px !important;
+            text-align: center;
+            color: #0093E9 !important;
+        }
+
+        /* BUTTON */
+        .btn-verify {
+            width: 100%;
+            padding: 16px;
+            background: #0093E9;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-verify:hover {
+            background: #007bc2;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,147,233,0.25);
+        }
+
+        .error-msg {
+            background: #fff5f5;
+            color: #ff4757;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid #ffebeb;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+        }
+
+        .back-link a {
+            color: #888;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            color: #1a1a1a;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 850px) {
+            .split-container { width: 90%; height: auto; flex-direction: column; }
+            .hero-section { padding: 50px 20px; }
+            .shield-icon { transform: scale(0.7); margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="split-container">
+    <div class="hero-section">
+        <div class="shield-icon"></div>
+        <h1>Secure Reset</h1>
+        <p>Please enter the code we sent to your email and choose a new password.</p>
+    </div>
+
+    <div class="form-section">
+        <div class="form-header">
+            <h2>Verify <span>Identity</span></h2>
+            <p>Complete the verification to continue.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="input-group">
+                <label>Verification Code</label>
+                <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" required>
+            </div>
+
+            <div class="input-group">
+                <label>New Password</label>
+                <input type="password" name="new_password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-verify">Update Password</button>
+        </form>
+
+        {% if error %}
+            <div class="error-msg">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="{% url 'login' %}">← Return to Login</a>
+        </div>
+    </div>
 </div>
 
 </body>

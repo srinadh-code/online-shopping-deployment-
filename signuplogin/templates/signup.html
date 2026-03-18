@@ -1,4 +1,4 @@
-{% load static %}
+{% comment %} {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,14 +13,7 @@
             font-family: Arial, sans-serif;
         }
 
-        {% comment %} body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #4e1d75, #7b2cbf, #9d4edd);
-        } {% endcomment %}
-
+      
                 body {
     height: 100vh;
     display: flex;
@@ -164,4 +157,377 @@
 </div>
 
 </body>
+</html> {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Account | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0093E9;
+            --secondary: #80D0C7;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f0f9ff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* MAIN CONTAINER */
+        .split-container {
+            display: flex;
+            width: 1000px;
+            height: 600px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            animation: containerEntry 0.8s ease-out;
+        }
+
+        /* LEFT SIDE: HERO (With Animations) */
+        .hero-section {
+            flex: 1.1;
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            color: white;
+            position: relative;
+        }
+
+        .hero-section h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            /* Animation Settings */
+            opacity: 0;
+            transform: translateY(30px);
+            animation: revealContent 0.8s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            opacity: 0;
+            line-height: 1.6;
+            font-weight: 300;
+            transform: translateY(20px);
+            animation: revealContent 0.8s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .version-tag {
+            margin-top: auto;
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: revealContent 0.8s ease-out forwards;
+            animation-delay: 0.9s;
+        }
+
+        /* RIGHT SIDE: FORM */
+        {% comment %} .form-section {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        } {% endcomment %}
+         .form-section {
+flex: 1;
+padding: 60px;
+display: flex;
+flex-direction: column;
+justify-content: flex-start;
+background: white;
+}
+
+        .form-header h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 28px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 35px;
+        }
+
+        /* INPUTS */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background: #f9fafb;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 147, 233, 0.1);
+        }
+
+        /* ERROR MESSAGE */
+        .error-msg {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* BUTTON */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #0093E9;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #0076bd;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0, 147, 233, 0.2);
+        }
+
+        .btn-submit.loading {
+            color: transparent;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .btn-submit.loading::after {
+            content: "";
+            position: absolute;
+            width: 18px; height: 18px;
+            top: 50%; left: 50%;
+            margin: -9px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .footer-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ANIMATION KEYFRAMES */
+        @keyframes containerEntry {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes revealContent {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-section { display: none; }
+            .split-container { width: 420px; height: auto; margin: 20px; }
+        }
+        .logo{
+position:absolute;
+top:25px;
+left:40px;
+z-index:10;
+}
+.hero-logo img{
+height:120px;
+width:auto;
+}
+.logo img{
+height:70px;
+width:auto;
+}
+.logo-center{
+text-align:center;
+margin-bottom:20px;
+}
+
+.logo-center img{
+height:65px;
+width:auto;
+}
+    </style>
+    </head>
+<body>
+
+<div class="split-container">
+
+<div class="hero-section">
+
+    <!-- LOGO -->
+    <div class="hero-logo">
+        <img src="{% static 'images/image.png' %}" alt="SRIA NEXT GEN">
+    </div>
+
+<h2>Start Your Shopping Journey</h2>
+
+<p>Create your account to explore thousands of products and exclusive deals.</p>
+
+<p>Track orders, manage your wishlist, and enjoy a smooth shopping experience.</p>
+
+<p>Shop smarter. Shop faster.</p>
+
+    <p>Your journey into the future of online shopping starts here. Simple, secure, and fast.</p>
+    
+    <div class="version-tag">
+        SRIA NEXT GEN VERSION 2.0
+    </div>
+
+</div>
+
+    <div class="form-section">
+
+     
+
+        <div class="form-header">
+            <h2>Create Account</h2>
+            <p>Enter your details to get started</p>
+        </div>
+
+        <form method="POST" id="regForm">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="johndoe" required>
+                {% if errors.username %}<div class="error-msg">{{ errors.username.0 }}</div>{% endif %}
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="name@company.com" required>
+                {% if errors.email %}<div class="error-msg">{{ errors.email.0 }}</div>{% endif %}
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+                {% if errors.password %}<div class="error-msg">{{ errors.password.0 }}</div>{% endif %}
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">CREATE ACCOUNT</button>
+        </form>
+
+        <div class="footer-link">
+            Already a member? <a href="{% url 'login' %}">Sign In</a>
+        </div>
+
+        {% if message %}
+        <p style="color:#10b981;font-size:13px;text-align:center;margin-top:15px;font-weight:500;">
+            {{ message }}
+        </p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+    // Smooth loading state on button
+    const form = document.getElementById('regForm');
+    const btn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', () => {
+        btn.classList.add('loading');
+        btn.innerText = ""; 
+    });
+</script>
+
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

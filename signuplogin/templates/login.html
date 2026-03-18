@@ -1,4 +1,4 @@
-{% load static %}
+{% comment %} {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,13 +14,7 @@
         }
        
 
-        {% comment %} body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #4e1d75, #7b2cbf, #9d4edd);
-        } {% endcomment %}
+   
                  body {
     height: 100vh;
     display: flex;
@@ -179,5 +173,712 @@
 
 </div>
 
+</body>
+</html> {% endcomment %}
+{% comment %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SRIA NEXT GEN | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Outfit:wght@300;600&display=swap');
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* MAIN CONTAINER */
+        .split-container {
+            display: flex;
+            width: 900px;
+            height: 550px;
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            animation: slideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* LEFT SIDE: BRANDING PANEL */
+        .hero-section {
+            flex: 1.1;
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-section h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .hero-section p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 250px;
+            line-height: 1.6;
+        }
+
+        .hero-section .site-tag {
+            position: absolute;
+            bottom: 40px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.6;
+        }
+
+        /* RIGHT SIDE: LOGIN FORM */
+        .form-section {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-header span {
+            font-size: 14px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .form-header h2 {
+            font-size: 26px;
+            color: #1a1a1a;
+            margin-top: 5px;
+        }
+
+        .form-header h2 span {
+            color: #0093E9;
+            font-weight: 700;
+        }
+
+        /* INPUT STYLING */
+        .input-box {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-box label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 2px solid #f0f0f0;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .input-box input:focus {
+            border-bottom-color: #0093E9;
+        }
+
+        /* OPTIONS BLOCK */
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #888;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .forgot-link:hover { color: #0093E9; }
+
+        /* BUTTON */
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, #0093E9, #80D0C7);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,147,233,0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,147,233,0.35);
+        }
+
+        /* MESSAGES */
+        .msg {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+ @keyframes blinkError {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.error {
+    background: #fff5f5;
+    color: #eb0f22;
+    border: 1px solid #ffebeb;
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-weight: 500;
+
+    animation: blinkError 0.8s ease-in-out 3;
+}
+
+.success {
+    background: #f0fff4;
+    color: #2ed573;
+    border: 1px solid #e6ffed;
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-weight: 500;
+}
+        .footer-text {
+            text-align: center;
+            margin-top: 35px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .footer-text a {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 5px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 850px) {
+            .split-container { width: 90%; height: auto; flex-direction: column; }
+            .hero-section { padding: 60px 20px; }
+            .hero-section .site-tag { position: relative; bottom: 0; margin-top: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="split-container">
+    <div class="hero-section">
+        <h1>Welcome Back</h1>
+        <p>Access your ONLINE SHOPPING dashboard and insights.</p>
+        <div class="site-tag">Click. Order. Relax. We'll handle the rest.</div>
+    </div>
+
+    <div class="form-section">
+        <div class="form-header">
+            <span>Good Morning !</span>
+            <h2><span>Login</span> Your Account</h2>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="input-box">
+                <label>Username or Email</label>
+                <input type="text" name="username_or_email" placeholder="Enter your identity" required>
+            </div>
+
+            <div class="input-box">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <div class="options-row">
+                <label class="remember-me">
+                    <input type="checkbox"> Remember me
+                </label>
+                <a href="{% url 'forgot_password' %}" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">Sign In</button>
+        </form>
+
+        <div class="footer-text">
+            Don't have an account? <a href="{% url 'signup' %}">Create Account</a>
+        </div>
+
+        {% if error %}
+            <div class="msg error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        {% if message %}
+            <div class="msg success">✓ {{ message }}</div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html> {% endcomment %}
+
+
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0093E9;
+            --secondary: #80D0C7;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --error: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f0f9ff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* MAIN CONTAINER - STATIC (No Move) */
+        .split-container {
+            display: flex;
+            width: 1000px;
+            height: 600px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            /* Initial entry animation only */
+            animation: containerEntry 0.8s ease-out;
+        }
+
+        /* LEFT SIDE: HERO (Slow Reveal Content) */
+        .hero-section {
+            flex: 1.1;
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            color: white;
+            position: relative;
+        }
+
+        .hero-section h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: revealContent 0.8s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            opacity: 0;
+            line-height: 1.6;
+            font-weight: 300;
+            transform: translateY(20px);
+            animation: revealContent 0.8s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .site-tagline {
+            margin-top: auto;
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: revealContent 0.8s ease-out forwards;
+            animation-delay: 0.9s;
+            text-transform: uppercase;
+        }
+
+        /* RIGHT SIDE: FORM */
+        .form-section {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        .form-header h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 28px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 35px;
+        }
+
+        /* INPUTS */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background: #f9fafb;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 147, 233, 0.1);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .checkbox-label input {
+            accent-color: var(--primary);
+            width: 16px; height: 16px;
+        }
+
+        .forgot-pass {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* BUTTON */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #0093E9;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #0076bd;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0, 147, 233, 0.2);
+        }
+
+        .alert {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+        }
+        {% comment %} .alert-error { background: #fef2f2; color: var(--error); border: 1px solid #fee2e2; }
+        .alert-success { background: #f0fdf4; color: var(--success); border: 1px solid #dcfce7; } {% endcomment %}
+.alert-error{
+background:#fee2e2;
+color:#b91c1c;
+padding:10px;
+border-radius:8px;
+margin-top:15px;
+font-weight:600;
+animation: blinkError 1s linear 3;
+}
+
+@keyframes blinkError{
+0%{opacity:1;}
+50%{opacity:0.2;}
+100%{opacity:1;}
+}
+.alert-success{
+background:#dcfce7;
+color:#166534;
+padding:10px;
+border-radius:8px;
+margin-top:15px;
+font-weight:600;
+}
+        .footer-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .footer-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* KEYFRAMES */
+        @keyframes containerEntry {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes revealContent {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-section { display: none; }
+            .split-container { width: 420px; height: auto; margin: 20px; }
+        }
+.hero-logo{
+position:absolute;
+top:40px;
+left:40px;
+}
+
+.hero-logo img{
+height:160px;
+width:auto;
+}
+.hero-section{
+position:relative;
+padding-top:180px;
+}
+.alert-success{
+background:#dcfce7;
+color:green;
+padding:12px;
+border-radius:10px;
+margin-bottom:20px;
+font-weight:600;
+text-align:center;
+}
+.success-msg{
+background:#dcfce7;
+color:#15803d;
+padding:10px 15px;
+border-radius:8px;
+font-weight:600;
+margin-bottom:15px;
+border:1px solid #bbf7d0;
+}
+.success-msg{
+animation: fadeSlide 0.5s ease;
+}
+
+@keyframes fadeSlide{
+from{opacity:0; transform:translateY(-10px);}
+to{opacity:1; transform:translateY(0);}
+}
+.top-alert{
+color:#16a34a;
+font-weight:600;
+font-size:14px;
+margin-bottom:15px;
+opacity:0;
+transform:translateY(-10px);
+animation: slideDown 0.6s ease forwards;
+transition: opacity 0.5s ease;
+}
+
+@keyframes slideDown{
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+    </style>
+</head>
+<body>
+
+
+<div class="split-container">
+    <div class="hero-section">
+
+        <!-- LOGO -->
+        <div class="hero-logo">
+            <img src="{% static 'images/image.png' %}" alt="SRIA NEXT GEN">
+        </div>
+
+        <h2>Welcome Back To ONLINE SHOPPING</h2>
+
+        <p>Log in to access your curated collection, track orders, and discover new arrivals.</p>
+        <p>View your orders, check your wishlist, and discover new arrivals.</p>
+        
+        <p>Your next favorite product is just a click away</p>
+
+        <div class="site-tagline">
+            Innovation in every click.
+        </div>
+    </div>
+
+    <div class="form-section">
+        {% if messages %}
+    {% for message in messages %}
+        <div class="top-alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+        <div class="form-header">
+            <h2>Login In</h2>
+            <p>Welcome back! Please enter your details.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username_or_email" placeholder="e.g. john@email.com" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember"> Keep me logged in
+                </label>
+                <a href="{% url 'forgot_password' %}" class="forgot-pass">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">SECURE LOGIN</button>
+        </form>
+
+        <div class="footer-link">
+            Don't have an account? <a href="{% url 'signup' %}">SIGN Up</a>
+        </div>
+
+        {% if error %}
+            <div class="alert alert-error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        {% if message %}
+            <div class="alert alert-success">✓ {{ message }}</div>
+        {% endif %}
+    </div>
+</div>
+<script>
+setTimeout(function(){
+    const msg = document.querySelector('.top-alert');
+    if(msg){
+        msg.style.transition = "opacity 0.5s ease";
+        msg.style.opacity = "0";
+
+        setTimeout(function(){
+            msg.remove();
+        }, 500);
+    }
+}, 5000);
+</script>
 </body>
 </html>

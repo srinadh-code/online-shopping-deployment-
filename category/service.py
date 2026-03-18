@@ -5,12 +5,9 @@ from .models import Product
 def reduce_stock(product_id, quantity):
 
     with transaction.atomic():
-
         product = Product.objects.select_for_update().get(pk=product_id)
-
         if product.stock < quantity:
             return False
-
         old_stock = product.stock
         product.stock -= quantity
 
@@ -25,7 +22,6 @@ def reduce_stock(product_id, quantity):
                 settings.DEFAULT_FROM_EMAIL,
                 ["admin@example.com"],
             )
-
             product.low_stock_alert_sent = True
 
         product.save()

@@ -7,8 +7,10 @@ from django.contrib.auth import authenticate, login,logout,login,authenticate
 from .serializers import SignupSerializer
 import random
 from django.core.mail import send_mail
-
+from django.contrib import messages
 from django.conf import settings
+
+
 class signupview(View):
 
     def get(self, request):
@@ -20,17 +22,12 @@ class signupview(View):
         serializer = SignupSerializer(data=request.POST)
         if serializer.is_valid():
             serializer.save()
-
-            return render(request, "signup.html", {
-                "message": "Account created successfully!"
-            })
+            messages.success(request, " Account created successfully! Please login.")
+            return redirect("login")
         return render(request, "signup.html", {
             "errors": serializer.errors
         })
         
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-
 class loginview(View):
     def get(self, request):
         return render(request, "login.html")
@@ -58,9 +55,7 @@ class logoutview(View):
     def get(self, request):
         logout(request)
         return redirect("login")
-import random
-from django.core.mail import send_mail
-from django.conf import settings
+
 
 class ForgotPasswordView(View):
     def get(self, request):

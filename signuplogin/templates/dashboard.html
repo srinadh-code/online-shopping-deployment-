@@ -346,49 +346,37 @@
 .user-menu:hover .dropdown{
     display:block;
 }
-
-{% comment %} .user-menu{
-    position:relative;
-    display:inline-block;
+.slider-wrapper {
+    position: relative;
+    overflow: hidden;
 }
 
-.user-btn{
-    background:white;
-    border:none;
-    padding:6px 10px;
-    font-size:14px;
-    cursor:pointer;
-    border-radius:4px;
+.slider-track {
+    display: flex;
+    transition: transform 0.5s ease;
 }
 
-.dropdown{
-    display:none;
-    position:absolute;
-    right:0;
-    top:35px;
-    background:white;
-    min-width:150px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.2);
-    border-radius:6px;
-    overflow:hidden;
-    z-index:1000;
+/* BUTTONS */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 8px 12px;
+    z-index: 10;
 }
 
-.dropdown a{
-    display:block;
-    padding:10px;
-    text-decoration:none;
-    color:#333;
+.slider-btn.left {
+    left: 10px;
 }
 
-.dropdown a:hover{
-    background:#f1f3f6;
+.slider-btn.right {
+    right: 10px;
 }
 
-/* show dropdown when hovering username */
-.user-menu:hover .dropdown{
-    display:block;
-} {% endcomment %}
     </style>
 </head>
 <body>
@@ -403,10 +391,24 @@
         <button type="button" onclick="startVoiceSearch()" class="voice-btn">🎤</button>
     </form>
 
-    <div class="nav-links">
+    {% comment %} <div class="nav-links">
         <a href="{% url 'wishlist' %}">Wishlist ({{ wishlist_count }})</a>
         <a href="{% url 'cart' %}">Cart ({{ cart_count }})</a>
         <div class="user-menu">
+    <button class="user-btn">
+        👤 {{ request.user.username }} ▼
+    </button> {% endcomment %}
+<div class="nav-links">
+    <a href="{% url 'wishlist' %}">
+        Wishlist (<span id="wishlist-count">{{ wishlist_count }}</span>)
+    </a>
+
+    <a href="{% url 'cart' %}">
+        Cart (<span id="cart-count">{{ cart_count }}</span>)
+    </a>
+</div>
+
+<div class="user-menu">
     <button class="user-btn">
         👤 {{ request.user.username }} ▼
     </button>
@@ -418,7 +420,7 @@
         <a href="{% url 'logout' %}">Logout</a>
     </div>
 </div>
-    </div>
+
 </div>
 
 <div class="wrapper">
@@ -446,9 +448,25 @@
             <div class="section">
                 <h2>New Arrivals</h2>
                 <div class="slider-wrapper">
+
+        <!-- PREV BUTTON -->
+        <button id="prevBtn" class="slider-btn left">❮</button>
+
+        <!-- TRACK -->
+        <div id="justArrivedTrack" class="slider-track"></div>
+
+        <!-- NEXT BUTTON -->
+        <button id="nextBtn" class="slider-btn right">❯</button>
+
+    </div>
+</div>
+
+
+
+                {% comment %} <div class="slider-wrapper">
                     <div id="justArrivedTrack" class="slider-track"></div>
                 </div>
-            </div>
+            </div> {% endcomment %}
 
             <!-- RECENT + RECOMMENDED -->
             <div class="double-row">
@@ -457,15 +475,17 @@
                     <div class="grid-2">
                         {% for product in recently_viewed|slice:":4" %}
                         <div class="card">
+                            <a href="{% url 'product_detail' product.id %}">
                             <div class="wishlist-icon {% if product.id in wishlist_product_ids %}in-wishlist{% endif %}"
                                  onclick="toggleWishlist({{ product.id }}, this)">
                                 {% if product.id in wishlist_product_ids %}❤️{% else %}🤍{% endif %}
                             </div>
-                            <a href="{% url 'product_detail' product.id %}">
+                            {% comment %} <a href="{% url 'product_detail' product.id %}"> {% endcomment %}
                                 <img src="{{ product.image.url }}">
-                            </a>
+                            
                             <p>{{ product.name }}</p>
                             <p class="price">₹{{ product.price }}</p>
+                            </a>
                         </div>
                         {% empty %}
                         <p style="opacity: 0.5; font-size: 13px;">No history detected.</p>
@@ -478,15 +498,15 @@
                     <div class="grid-2">
                         {% for product in recommended|slice:":4" %}
                         <div class="card">
+                            <a href="{% url 'product_detail' product.id %}">
                             <div class="wishlist-icon {% if product.id in wishlist_product_ids %}in-wishlist{% endif %}"
                                  onclick="toggleWishlist({{ product.id }}, this)">
                                 {% if product.id in wishlist_product_ids %}❤️{% else %}🤍{% endif %}
                             </div>
-                            <a href="{% url 'product_detail' product.id %}">
                                 <img src="{{ product.image.url }}">
-                            </a>
                             <p>{{ product.name }}</p>
                             <p class="price">₹{{ product.price }}</p>
+                            </a>
                         </div>
                         {% endfor %}
                     </div>
@@ -501,9 +521,10 @@
                         <div class="card">
                             <a href="{% url 'product_detail' product.id %}">
                                 <img src="{{ product.image.url }}">
-                            </a>
+                            
                             <p>{{ product.name }}</p>
                             <p class="price">₹{{ product.price }}</p>
+                            </a>
                         </div>
                         {% endfor %}
                     </div>
@@ -519,13 +540,14 @@
 
             <a href="{% url 'product_detail' product.id %}">
                 <img src="{{ product.image.url }}">
-            </a>
+            
 
             <p>{{ product.name }}</p>
 
             <p class="price">
                 ₹{{ product.price }}
             </p>
+            </a>
 
         </div>
 
@@ -573,7 +595,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /* FETCH DATA FROM HIDDEN HTML INSTEAD OF DIRECT LOOP IN SCRIPT */
-    const dataNodes = document.querySelectorAll('#justArrivedData .product-item');
+const dataNodes = document.querySelectorAll('#justArrivedData .product-item');
     const justArrived = Array.from(dataNodes).map(node => ({
         id: node.dataset.id,
         name: node.dataset.name,
@@ -610,19 +632,61 @@ document.addEventListener("DOMContentLoaded", function () {
         if (groups.length > 1) {
             let clone = track.children[0].cloneNode(true);
             track.appendChild(clone);
-            function slide(){
-                current++;
-                track.style.transition = "transform 1s cubic-bezier(0.85, 0, 0.15, 1)";
-                track.style.transform = `translateX(-${current*100}%)`;
-                if(current === groups.length){
-                    setTimeout(() => {
-                        track.style.transition = "none";
-                        track.style.transform = "translateX(0%)";
-                        current = 0;
-                    }, 1000);
-                }
-            }
-            setInterval(slide, 6000);
+            
+            // setInterval(slide, 6000);
+        
+
+        function updateSlide() {
+    track.style.transition = "transform 0.5s ease";
+    track.style.transform = `translateX(-${current * 100}%)`;
+}
+
+function nextSlide() {
+    current++;
+    updateSlide();
+
+    if (current === groups.length) {
+        setTimeout(() => {
+            track.style.transition = "none";
+            track.style.transform = "translateX(0%)";
+            current = 0;
+        }, 500);
+    }
+}
+
+function prevSlide() {
+    if (current === 0) {
+        track.style.transition = "none";
+        current = groups.length;
+        track.style.transform = `translateX(-${current * 100}%)`;
+
+        setTimeout(() => {
+            current--;
+            updateSlide();
+        }, 50);
+    } else {
+        current--;
+        updateSlide();
+    }
+}
+
+let auto = setInterval(nextSlide, 6000);
+
+function resetAuto() {
+    clearInterval(auto);
+    auto = setInterval(nextSlide, 6000);
+}
+
+document.getElementById("nextBtn").addEventListener("click", () => {
+    nextSlide();
+    resetAuto();
+});
+
+document.getElementById("prevBtn").addEventListener("click", () => {
+    prevSlide();
+    resetAuto();
+});
+
         }
     }
 });
@@ -652,7 +716,7 @@ function startVoiceSearch(){
     };
 }
 
-function toggleWishlist(productId, element){
+{% comment %} function toggleWishlist(productId, element){
     fetch(`/toggle-wishlist/${productId}/`)
     .then(response => response.json())
     .then(data => {
@@ -666,7 +730,43 @@ function toggleWishlist(productId, element){
     })
     .catch(error => console.log(error));
     
+} {% endcomment %}
+ function toggleWishlist(productId, element){
+    fetch(`/toggle-wishlist/${productId}/`)
+    .then(response => response.json())
+    .then(data => {
+
+        let wishlistCount = document.getElementById("wishlist-count")
+        let count = parseInt(wishlistCount.innerText)
+
+        if(data.status === "added"){
+            element.innerHTML = "❤️"
+            element.classList.add("in-wishlist")
+            count++
+        } else {
+            element.innerHTML = "🤍"
+            element.classList.remove("in-wishlist")
+            count--
+        }
+
+        wishlistCount.innerText = count
+    })
 }
+
+
+window.addEventListener("pageshow", function () {
+    if (performance.navigation.type === 2) {
+        location.reload();
+    }
+});
+
+document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+        location.reload();
+    }
+});
+
+
 </script>
 
 </body>

@@ -9,17 +9,21 @@ from django.db.models.functions import ExtractMonth
 from django.core.paginator import Paginator
 from .models import Cart, CartItem, ProductVariant
 from .utils import apply_first_order_discount
-from .utils import predict_delivery
+
 from .models import Profile
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from datetime import timedelta
 from .models import ReturnRequest
-
-
-
+from .utils import apply_first_order_discount
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table#invoice 
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet#invoice 
+from .models import Address
+from .forms import AddressForm
+from django.http import JsonResponse
+from .models import Product
+from django.contrib.auth import authenticate, login
+from django.db import transaction
+from .models import Profile
 from .models import (
     Category,
     SubCategory,
@@ -35,11 +39,11 @@ from .models import (
 
 @login_required
 def dashboardview(request):
-    # USER INFO
+    # user informantion 
     username = request.user.username
-    # CATEGORIES WITH SUBCATEGORIES
+    # categories withs sub category and to avoid n+1
     categories = Category.objects.prefetch_related("subcategories").all()
-    # WISHLIST
+    # whishlist
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
     wishlist_product_ids = list(
@@ -47,8 +51,7 @@ def dashboardview(request):
     )
     wishlist_count = wishlist.items.count()
     
-    
-    # SEARCH functionility
+    # search functionality
     query = request.GET.get('q', '').strip()
     if query:
         # product exact match → OPEN PRODUCT DETAIL
@@ -76,7 +79,7 @@ def dashboardview(request):
                 'category',
                 category_id=category.id
             )
-        # 4️ PARTIAL PRODUCT SEARCH → SHOW RESULTS PAGE
+        #  PARTIAL Product  search → SHOW RESULTS PAGE
         products = Product.objects.filter(
             name__icontains=query
         )
@@ -102,7 +105,7 @@ def dashboardview(request):
     recommended = Product.objects.exclude(
         id__in=recent_ids
     ).order_by('?')[:4]
-    # TRENDING PRODUCTS (Most Added To Cart)
+    # TRENDING PRODUCTS (mostly added to cart)
     trending_products = Product.objects.annotate(
     cart_count=Count('cartitem')
     ).order_by('-cart_count')[:4]
@@ -112,13 +115,13 @@ def dashboardview(request):
     ).order_by("-total_orders")[:4]
 
 
-    #  JUST ARRIVED
+    #  just arrived last added 8 produts
     just_arrived = Product.objects.order_by('-id')[:8]
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
     
     cart_count = cart.items.count()
-    # FINAL RENDER 
+    #rendering
 
     context = {
         "username": username,
@@ -134,8 +137,6 @@ def dashboardview(request):
        
     }
     return render(request, "dashboard.html", context)
-
-
 
 @login_required
 def category_view(request, category_id):
@@ -168,7 +169,6 @@ def subcategory_view(request, subcategory_id):
         ]
     else:
         price_ranges = []
-
 
     price_range = request.GET.get("price_range")
 
@@ -279,10 +279,6 @@ def add_to_cart(request, product_id):
     return redirect("cart")
 
 
-
-from django.db.models import Count
-from .utils import apply_first_order_discount
-
 @login_required
 def cart_view(request):
 
@@ -339,7 +335,6 @@ def remove_from_cart(request, item_id):
     return redirect('cart')
 
 
-
 @login_required
 def place_order(request):
 
@@ -351,7 +346,7 @@ def place_order(request):
 
     payment_method = request.POST.get("payment_method", "COD")
 
-    # store payment choice in session
+    
     request.session["payment_method"] = payment_method
 
     profile = Profile.objects.filter(user=request.user).first()
@@ -360,26 +355,102 @@ def place_order(request):
         messages.warning(request, "Please fill your profile details before placing the order.")
         return redirect('profile')
 
+
     total = sum(item.price * item.quantity for item in items)
 
-    final_total, discount, discount_applied = apply_first_order_discount(
-        request.user, total
-    )
+    final_total, discount, is_first = apply_first_order_discount(
+    request.user, total
+)
 
     request.session["final_total"] = float(final_total)
     request.session["discount"] = float(discount)
+    request.session["is_first_order"] = is_first    
 
-    # go to address page first
+    
     return redirect("address")
 
+# @login_required
+# def place_order(request):
+
+#     cart = Cart.objects.get_or_create(user=request.user)[0]
+#     items = cart.items.all()
+
+#     if not items:
+#         return redirect('cart')
+
+#     payment_method = request.POST.get("payment_method", "COD")
+
+#     # store payment choice in session
+#     request.session["payment_method"] = payment_method
+
+#     profile = Profile.objects.filter(user=request.user).first()
+
+#     if not profile or not profile.address or not profile.phone:
+#         messages.warning(request, "Please fill your profile details before placing the order.")
+#         return redirect('profile')
+
+#     total = sum(item.price * item.quantity for item in items)
+
+#     final_total, discount, discount_applied = apply_first_order_discount(
+#         request.user, total
+#     )
+
+#     request.session["final_total"] = float(final_total)
+#     request.session["discount"] = float(discount)
+
+#     # go to address page first
+#     return redirect("address")
+
+# @login_required
+# def create_order(request):
+
+#     cart = Cart.objects.get(user=request.user)
+#     items = cart.items.all()
+
+#     # if not items:
+#     #     return redirect("cart")
+#     if not items:
+#         order = Order.objects.filter(user=request.user).last()
+#         if order:
+#             return redirect("order_success")
+#         return redirect("cart")
+
+#     payment_method = request.session.get("payment_method", "COD")
+#     final_total = request.session.get("final_total", 0)
+#     discount = request.session.get("discount", 0)
+
+#     order = Order.objects.create(
+#         user=request.user,
+#         total_amount=final_total,
+#         discount_amount=discount,
+#         payment_method=payment_method,
+#         payment_status="Pending" if payment_method == "COD" else "Paid"
+#     )
+
+#     order.estimated_delivery = predict_delivery()
+#     order.save()
+
+#     for item in items:
+#         OrderItem.objects.create(
+#             order=order,
+#             product=item.product,
+#             variant=item.variant,
+#             quantity=item.quantity,
+#             price=item.price
+#         )
+
+#     cart.items.all().delete()
+
+#     return redirect("order_success")
+
+
+@transaction.atomic
 @login_required
 def create_order(request):
 
     cart = Cart.objects.get(user=request.user)
-    items = cart.items.all()
+    items = cart.items.select_related("variant", "product")
 
-    # if not items:
-    #     return redirect("cart")
     if not items:
         order = Order.objects.filter(user=request.user).last()
         if order:
@@ -387,8 +458,11 @@ def create_order(request):
         return redirect("cart")
 
     payment_method = request.session.get("payment_method", "COD")
-    final_total = request.session.get("final_total", 0)
-    discount = request.session.get("discount", 0)
+    final_total = request.session.get("final_total")
+    discount = request.session.get("discount")
+    if final_total is None:
+        total = sum(item.price * item.quantity for item in items)
+        final_total, discount, _ = apply_first_order_discount(request.user, total)
 
     order = Order.objects.create(
         user=request.user,
@@ -398,21 +472,42 @@ def create_order(request):
         payment_status="Pending" if payment_method == "COD" else "Paid"
     )
 
-    order.estimated_delivery = predict_delivery()
+    
     order.save()
 
     for item in items:
+
+        # LOCK VARIANT (NOT PRODUCT)
+        variant = item.variant.__class__.objects.select_for_update().get(id=item.variant.id)
+
+        # CORRECT VALIDATION
+        if item.quantity > variant.stock:
+            messages.error(
+                request,
+                f"{variant.attribute_value.value} only has {variant.stock} items available"
+            )
+            raise Exception("Stock issue")
+
+        # CREATE ORDER ITEM
         OrderItem.objects.create(
             order=order,
             product=item.product,
-            variant=item.variant,
+            variant=variant,
             quantity=item.quantity,
             price=item.price
         )
 
+        #  CORRECT STOCK UPDATE
+        variant.stock -= item.quantity
+        variant.save()
+
+    # CLEAR CART
     cart.items.all().delete()
 
     return redirect("order_success")
+
+
+
 @login_required
 
 def card_payment(request):
@@ -432,10 +527,6 @@ def upi_payment(request):
         return redirect("payment_processing")
 
     return render(request,"upi_payment.html",{"amount":amount})
-# @login_required
-# def payment_processing(request):
-
-#     return render(request,"payment_processing.html")
 
 @login_required
 def payment_processing(request):
@@ -447,8 +538,12 @@ def payment_processing(request):
         return redirect("cart")
 
     payment_method = request.session.get("payment_method", "COD")
-    final_total = request.session.get("final_total", 0)
-    discount = request.session.get("discount", 0)
+    final_total = request.session.get("final_total")
+    discount = request.session.get("discount")
+
+    if final_total is None:
+        total = sum(item.price * item.quantity for item in items)
+        final_total, discount, _ = apply_first_order_discount(request.user, total)
 
     order = Order.objects.create(
         user=request.user,
@@ -458,7 +553,7 @@ def payment_processing(request):
         payment_status="Paid"
     )
 
-    order.estimated_delivery = predict_delivery()
+    
     order.save()
 
     for item in items:
@@ -473,6 +568,42 @@ def payment_processing(request):
     cart.items.all().delete()
 
     return render(request,"payment_processing.html")
+# @login_required
+# def payment_processing(request):
+
+#     cart = Cart.objects.get(user=request.user)
+#     items = cart.items.all()
+
+#     if not items:
+#         return redirect("cart")
+
+#     payment_method = request.session.get("payment_method", "COD")
+#     final_total = request.session.get("final_total", 0)
+#     discount = request.session.get("discount", 0)
+
+#     order = Order.objects.create(
+#         user=request.user,
+#         total_amount=final_total,
+#         discount_amount=discount,
+#         payment_method=payment_method,
+#         payment_status="Paid"
+#     )
+
+#     order.estimated_delivery = predict_delivery()
+#     order.save()
+
+#     for item in items:
+#         OrderItem.objects.create(
+#             order=order,
+#             product=item.product,
+#             variant=item.variant,
+#             quantity=item.quantity,
+#             price=item.price
+#         )
+
+#     cart.items.all().delete()
+
+#     return render(request,"payment_processing.html")
 
 
 
@@ -482,11 +613,55 @@ def order_success(request):
     order = Order.objects.filter(user=request.user).last()
     return render(request,"order_success.html",{"order":order})
 
+# @login_required
+# def my_orders(request):
+
+#     orders = Order.objects.filter(user=request.user).order_by('-created_at')
+
+#     now = timezone.now()
+
+#     for order in orders:
+
+#         if not order.created_at:
+#             continue
+
+#         diff = now - order.created_at
+
+#         # Order just placed
+#         if diff < timedelta(minutes=1):
+
+#             if order.status != "Placed":
+#                 order.status = "Placed"
+#                 order.save()
+
+#         # Order shipped
+#         elif diff < timedelta(minutes=2):
+
+#             if order.status != "Shipped":
+#                 order.status = "Shipped"
+#                 order.save()
+
+#         # Delivered when predicted delivery time reached
+#         elif order.estimated_delivery and now >= order.estimated_delivery:
+
+#             if order.status != "Delivered":
+#                 order.status = "Delivered"
+
+#                 if not order.delivered_at:
+#                     order.delivered_at = now
+
+#                 order.save()
+
+#     return render(request, "my_orders.html", {"orders": orders})
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
 @login_required
 def my_orders(request):
 
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
-
     now = timezone.now()
 
     for order in orders:
@@ -496,33 +671,25 @@ def my_orders(request):
 
         diff = now - order.created_at
 
-        # Order just placed
-        if diff < timedelta(minutes=1):
+        
+        if diff < timedelta(seconds=30):
+            order.display_status = "Placed"
 
-            if order.status != "Placed":
-                order.status = "Placed"
-                order.save()
+        
+        elif diff < timedelta(minutes=1):
+            order.display_status = "Shipped"
 
-        # Order shipped
-        elif diff < timedelta(minutes=2):
+        
+        else:
+            order.display_status = "Delivered"
 
-            if order.status != "Shipped":
-                order.status = "Shipped"
-                order.save()
-
-        # Delivered when predicted delivery time reached
-        elif order.estimated_delivery and now >= order.estimated_delivery:
-
+            
             if order.status != "Delivered":
                 order.status = "Delivered"
-
-                if not order.delivered_at:
-                    order.delivered_at = now
-
+                order.delivered_at = now
                 order.save()
 
     return render(request, "my_orders.html", {"orders": orders})
-
 @login_required
 def cancel_order(request, order_id):
 
@@ -593,28 +760,31 @@ def order_success(request):
     return render(request, "order_success.html", {
         "is_first_order": is_first_order
     })
-
-
+from django.shortcuts import get_object_or_404, redirect
 
 @login_required
 def return_request(request, order_id):
+
     order = get_object_or_404(Order, id=order_id, user=request.user)
 
-    #  Only allow if delivered
+    
     if order.status != "Delivered":
         return redirect("my_orders")
-    
+
+
     if not order.delivered_at:
         return redirect("my_orders")
+
 
     if order.delivered_at < timezone.now() - timedelta(days=7):
         return redirect("my_orders")
 
-    #  Prevent duplicate return
+
     if ReturnRequest.objects.filter(order=order).exists():
         return redirect("my_orders")
 
     if request.method == "POST":
+
         request_type = request.POST.get("type")
         reason = request.POST.get("reason")
         image = request.FILES.get("image")
@@ -630,6 +800,40 @@ def return_request(request, order_id):
         return redirect("my_orders")
 
     return render(request, "return_form.html", {"order": order})
+# @login_required
+# def return_request(request, order_id):
+#     order = get_object_or_404(Order, id=order_id, user=request.user)
+
+#     #  Only allow if delivered
+#     if order.status != "Delivered":
+#         return redirect("my_orders")
+    
+#     if not order.delivered_at:
+#         return redirect("my_orders")
+
+#     if order.delivered_at < timezone.now() - timedelta(days=7):
+#         return redirect("my_orders")
+
+#     #  Prevent duplicate return
+#     if ReturnRequest.objects.filter(order=order).exists():
+#         return redirect("my_orders")
+
+#     if request.method == "POST":
+#         request_type = request.POST.get("type")
+#         reason = request.POST.get("reason")
+#         image = request.FILES.get("image")
+
+#         ReturnRequest.objects.create(
+#             order=order,
+#             user=request.user,
+#             request_type=request_type,
+#             reason=reason,
+#             image=image
+#         )
+
+#         return redirect("my_orders")
+
+#     return render(request, "return_form.html", {"order": order})
 def save_model(self, request, obj, form, change):
 
     if obj.status == "Approved":
@@ -678,10 +882,6 @@ def decrease_quantity(request, item_id):
 
 
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from django.http import HttpResponse
 
 @login_required
 def download_invoice(request, order_id):
@@ -732,9 +932,7 @@ def download_invoice(request, order_id):
     doc.build(elements)
 
     return response
-from .models import Profile
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+
 
 @login_required
 def profile(request):
@@ -1006,9 +1204,6 @@ def customer_orders(request, user_id):
     
 
 
-from django.http import JsonResponse
-from .models import Product
-
 def find_similar(request, product_id):
 
     product = Product.objects.get(id=product_id)
@@ -1034,44 +1229,58 @@ def find_similar(request, product_id):
 
 
 
+
+# def address_page(request):
+
+#     form = AddressForm()
+
+#     if request.method == "POST":
+#         form = AddressForm(request.POST)
+
+#         if form.is_valid():
+#             address = form.save()
+
+#             # store selected address in session
+#             request.session["selected_address"] = address.id
+
+#             return redirect("place_order")
+
+#     addresses = Address.objects.all()
+
+#     return render(request,"address.html",{
+#         "form":form,
+#         "addresses":addresses
+#     })
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import AddressForm
 from .models import Address
 
-
 def address_page(request):
-
-    form = AddressForm()
 
     if request.method == "POST":
         form = AddressForm(request.POST)
 
         if form.is_valid():
-            address = form.save()
+            address = form.save(commit=False)
 
-            # store selected address in session
+            address.user = request.user   # 🔥 important
+
+            address.save()
+
             request.session["selected_address"] = address.id
 
             return redirect("place_order")
 
-    addresses = Address.objects.all()
+    else:
+        form = AddressForm()
+
+    addresses = Address.objects.filter(user=request.user)
 
     return render(request,"address.html",{
         "form":form,
         "addresses":addresses
     })
 
-
-# def deliver_here(request, id):
-
-#     request.session["selected_address"] = id
-
-#     return redirect("order_placed")
-# def deliver_here(request, id):
-
-#     request.session["selected_address"] = id
-
-#     return redirect("place_order")
 @login_required
 def deliver_here(request, id):
 
@@ -1102,9 +1311,7 @@ def order_placed(request):
     return render(request,"order_placed.html",{
         "address":address
     })
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Address
-from .forms import AddressForm
+
 
 def edit_address(request, id):
     address = get_object_or_404(Address, id=id)

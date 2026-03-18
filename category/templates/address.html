@@ -328,7 +328,7 @@ data.address.postcode || "";
 </html> {% endcomment %}
 
 
-
+{% comment %} 
 
 {% load static %}
 <!DOCTYPE html>
@@ -690,6 +690,396 @@ data.address.postcode || "";
             }
         });
     }
+</script>
+
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery | SRIA NEXT GEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        :root {
+            --accent: #d4bda8;
+            --accent-dark: #b89f88;
+            --bg-main: #fcfcfc;
+            --text-main: #1a1a1a;
+            --glass: rgba(255, 255, 255, 0.8);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 20px 50px rgba(212, 189, 168, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--bg-main); 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-family: 'Syncopate';
+            font-size: 16px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+        }
+
+        /* SIDEBAR (Map Controls) */
+        .sidebar {
+            background: #fff;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: var(--shadow-soft);
+            height: fit-content;
+            border: 1px solid rgba(0,0,0,0.03);
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar h4 {
+            font-family: 'Syncopate';
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--accent-dark);
+            margin-bottom: 20px;
+        }
+
+        .search-group { margin-bottom: 20px; }
+
+        input, select {
+            width: 100%;
+            padding: 14px 18px;
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .control-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-black { background: #1a1a1a; color: white; }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-black:hover { background: var(--accent-dark); }
+
+        /* ADDRESS GRID */
+        .content-main { display: flex; flex-direction: column; gap: 30px; }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .address-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: 0.4s;
+            position: relative;
+        }
+
+        .address-box:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .address-box h4 {
+            font-family: 'Syncopate';
+            font-size: 12px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .address-box p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .actions { display: flex; gap: 10px; align-items: center; }
+
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 50px;
+            text-transform: uppercase;
+        }
+
+        .btn-deliver { background: #1a1a1a; color: white; }
+        .btn-edit { background: #f0f0f0; color: #1a1a1a; }
+        .btn-delete { color: #ff4d4d; border: none; background: transparent; cursor: pointer; font-size: 10px; font-weight: 700; }
+
+        /* MAP BOX */
+        #mapContainer {
+            margin-top: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+        #map { height: 350px; width: 100%; }
+
+        /* FORM SECTION */
+        .form-section {
+            background: #fff;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .form-section h3 {
+            font-family: 'Syncopate';
+            font-size: 14px;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 18px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Syncopate';
+            font-size: 12px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .save-btn:hover { background: var(--accent-dark); transform: translateY(-3px); }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; padding: 20px; }
+            .sidebar { position: static; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h2>Delivery Center</h2>
+    <div style="font-size: 11px; opacity: 0.7; letter-spacing: 1px;">SRIA NEXT GEN</div>
+</div>
+
+<div class="container">
+
+    <aside class="sidebar">
+        <h4>Find Location</h4>
+        <div class="search-group">
+            <input type="text" id="searchInput" placeholder="Search locality...">
+            <button class="control-btn btn-black" onclick="searchLocation()">Search Area</button>
+            <button class="control-btn btn-accent" onclick="getLocation()">Use Current GPS</button>
+            <button class="control-btn btn-edit" onclick="toggleMap()">View/Hide Map</button>
+        </div>
+
+        <div id="mapContainer" style="display:none;">
+            <div id="map"></div>
+        </div>
+    </aside>
+
+    <main class="content-main">
+        
+        <div class="top-nav">
+            <a href="{% url 'dashboard' %}" style="text-decoration:none; color: var(--accent-dark); font-size: 11px; font-weight: 700; letter-spacing: 1px;">← BACK TO DASHBOARD</a>
+        </div>
+
+        <div class="address-grid">
+            {% for a in addresses %}
+            <div class="address-box">
+                <h4>{{a.name}}</h4>
+                <p>{{a.house}}, {{a.area}}<br>{{a.city}}, {{a.state}} - {{a.pincode}}</p>
+                
+                <div class="actions">
+                    <a href="{% url 'deliver_here' a.id %}" class="btn-sm btn-deliver">Deliver Here</a>
+                    <a href="{% url 'edit_address' a.id %}" class="btn-sm btn-edit">Edit</a>
+                    <form method="POST" action="{% url 'delete_address' a.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button class="btn-delete">DELETE</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-section">
+            <h3>Add New Address</h3>
+            <form method="POST" id="addressForm">
+                {% csrf_token %}
+                <input type="hidden" name="latitude" id="lat">
+                <input type="hidden" name="longitude" id="lng">
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <input type="text" name="name" placeholder="Full Name" required>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <select name="country_code" style="flex: 0 0 90px;">
+                            <option value="+91">+91</option>
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                        </select>
+                        <input type="tel" name="phone" placeholder="Phone Number" required>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input type="text" name="house" placeholder="House / Flat No." required>
+                    <input type="text" name="area" placeholder="Area / Landmark" required>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <input type="text" name="city" placeholder="City" required>
+                    <input type="text" name="state" placeholder="State" required>
+                    <input type="text" name="pincode" placeholder="Pincode" required>
+                </div>
+
+                <button class="save-btn">Secure Save Address</button>
+            </form>
+        </div>
+    </main>
+
+</div>
+
+<script>
+    // LEAFLET MAP LOGIC (Functional - No changes to your logic)
+    var map = L.map('map').setView([17.38, 78.48], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    var marker;
+
+    function toggleMap() {
+        let m = document.getElementById("mapContainer");
+        m.style.display = m.style.display === "none" ? "block" : "none";
+        setTimeout(() => map.invalidateSize(), 200);
+    }
+
+    map.on('click', function(e) {
+        let lat = e.latlng.lat;
+        let lon = e.latlng.lng;
+        if(marker) map.removeLayer(marker);
+        marker = L.marker([lat, lon]).addTo(map);
+        document.getElementById("lat").value = lat;
+        document.getElementById("lng").value = lon;
+        getAddress(lat, lon);
+    });
+
+    function getLocation() {
+        navigator.geolocation.getCurrentPosition(p => {
+            let lat = p.coords.latitude;
+            let lon = p.coords.longitude;
+            map.setView([lat, lon], 15);
+            if(marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map);
+            getAddress(lat, lon);
+        });
+    }
+
+    function searchLocation() {
+        let place = document.getElementById("searchInput").value;
+        if(!place) { alert("Enter location"); return; }
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${place}`)
+        .then(r => r.json())
+        .then(d => {
+            if(d.length) {
+                let lat = d[0].lat;
+                let lon = d[0].lon;
+                map.setView([lat, lon], 15);
+                if(marker) map.removeLayer(marker);
+                marker = L.marker([lat, lon]).addTo(map);
+                getAddress(lat, lon);
+            }
+        });
+    }
+
+    function getAddress(lat, lon) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        .then(r => r.json())
+        .then(d => {
+            if(d.address) {
+                document.querySelector("input[name='area']").value = d.address.road || d.address.suburb || "";
+                document.querySelector("input[name='city']").value = d.address.city || d.address.town || "";
+                document.querySelector("input[name='state']").value = d.address.state || "";
+                document.querySelector("input[name='pincode']").value = d.address.postcode || "";
+            }
+        });
+    }
+
+    // REGEX VALIDATION (Functional - No changes to your logic)
+    document.getElementById("addressForm").addEventListener("submit", function(e) {
+        let name = document.querySelector("input[name='name']").value.trim();
+        let phone = document.querySelector("input[name='phone']").value.trim();
+        let pin = document.querySelector("input[name='pincode']").value.trim();
+
+        if(!/^[A-Za-z ]+$/.test(name)) {
+            alert("Name only letters allowed"); e.preventDefault(); return;
+        }
+        if(!/^[6-9][0-9]{9}$/.test(phone)) {
+            alert("Phone must start 6-9 and be 10 digits"); e.preventDefault(); return;
+        }
+        if(!/^[0-9]{6}$/.test(pin)) {
+            alert("Pincode must be 6 digits"); e.preventDefault(); return;
+        }
+    });
 </script>
 
 </body>

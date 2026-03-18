@@ -1,9 +1,5 @@
-
-
 from rest_framework import serializers
-# from .models import Signup
 from django.contrib.auth.models import User
-
 
 class SignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -25,8 +21,6 @@ class SignupSerializer(serializers.ModelSerializer):
         if not any(char in value for char in special_chars):
             raise serializers.ValidationError("Password must contain at least one special character")
         return value
-
-
 
     def validate_email(self, value):
 

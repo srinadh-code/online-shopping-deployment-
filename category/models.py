@@ -1,10 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.models import User
+from django.db import models 
+from django.db.models import Sum   
 
-class ProductAttribute(models.Model):
+class ProductAttribute(models.Model):   # means which time it is like size,length or somthing
     name = models.CharField(max_length=50)
-
     def __str__(self):
         return self.name
     
@@ -28,10 +32,17 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='products/')
-    stock=models.IntegerField(default=10)
+    stock=models.IntegerField(default=0)
     low_stock_threshold = models.IntegerField(default=0)
     def __str__(self):
         return self.name
+    def total_stock(self):
+        return self.variants.aggregate(total=Sum('stock'))['total'] or 0
+
+    #  AUTO SYNC (keeps old code working)
+    def update_stock(self):
+        self.stock = self.total_stock()
+        self.save(update_fields=['stock'])
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -40,21 +51,27 @@ class Cart(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Cart"
 
-
-class AttributeValue(models.Model):
+class AttributeValue(models.Model):    # like M,L,XL,XXL
     attribute = models.ForeignKey(ProductAttribute, on_delete=models.CASCADE, related_name="values")
     value = models.CharField(max_length=50)
-
     def __str__(self):
         return f"{self.attribute.name} - {self.value}"
     
-class ProductVariant(models.Model):
+class ProductVariant(models.Model):  #adding M,L,XL   size to products
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants")
     attribute_value = models.ForeignKey(AttributeValue, on_delete=models.CASCADE)
     stock = models.IntegerField(default=10)
 
     def __str__(self):
         return f"{self.product.name} - {self.attribute_value.value}"
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.product.update_stock()
+
+    def delete(self, *args, **kwargs):
+        product = self.product
+        super().delete(*args, **kwargs)
+        product.update_stock()
 
     
 class CartItem(models.Model):
@@ -165,8 +182,7 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.product} - {self.rating}"
-from django.utils import timezone
-from datetime import timedelta
+
 
 class ReturnRequest(models.Model):
     STATUS_CHOICES = (
@@ -198,8 +214,7 @@ class ReturnRequest(models.Model):
     refund_status = models.CharField(max_length=20, choices=REFUND_STATUS, default='Not Initiated')
 
     created_at = models.DateTimeField(auto_now_add=True) 
-from django.contrib.auth.models import User
-from django.db import models    
+
 class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     phone=models.CharField(max_length=10,blank=True) 
@@ -214,24 +229,43 @@ class Profile(models.Model):
         return self.user.username    
     
 
+# class Address(models.Model):
+#     name = models.CharField(max_length=100)
+#     phone = models.CharField(max_length=15)
 
+#     house = models.CharField(max_length=200)
+#     area = models.CharField(max_length=200)
+
+#     city = models.CharField(max_length=100)
+#     state = models.CharField(max_length=100)
+#     pincode = models.CharField(max_length=10)
+
+#     latitude = models.FloatField(null=True, blank=True)
+#     longitude = models.FloatField(null=True, blank=True)
+
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.name
 from django.db import models
+from django.contrib.auth.models import User
 
 class Address(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=10)   
+    country_code = models.CharField(max_length=5, default="+91")
 
     house = models.CharField(max_length=200)
     area = models.CharField(max_length=200)
 
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
-    pincode = models.CharField(max_length=10)
+    pincode = models.CharField(max_length=6)
 
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
