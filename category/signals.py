@@ -112,3 +112,19 @@ def sync_recently_viewed(sender, request, user, **kwargs):
             )
         except Product.DoesNotExist:
             continue
+        
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import Order
+
+@receiver(post_save, sender=Order)
+def add_coins_on_delivery(sender, instance, **kwargs):
+
+    if instance.status == "Delivered" and not instance.coins_added:
+
+        profile = instance.user.profile
+        profile.coins += 10   # 🎁 add 10 coins
+        profile.save()
+
+        instance.coins_added = True
+        instance.save()

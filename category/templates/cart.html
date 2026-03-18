@@ -650,8 +650,42 @@ Place Order
             <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Grand Total</span>
             <strong>₹{{ final_total|floatformat:2 }}</strong>
         </div>
-
         <form method="POST" action="{% url 'place_order' %}" class="payment-methods">
+    {% csrf_token %}
+
+    <!-- 💰 COINS OPTION (ADD THIS BLOCK) -->
+    {% if request.user.is_authenticated %}
+    <div class="summary-line" style="margin-top:15px;">
+        <label style="cursor:pointer;">
+            <input type="checkbox" name="use_coins">
+            Use Coins (Available: {{ request.user.profile.coins }})
+        </label>
+    </div>
+    {% endif %}
+
+    <h4>Payment Method</h4>
+
+    <div class="radio-group">
+        <label>
+            <input type="radio" name="payment_method" value="COD" checked>
+            <span>Cash On Delivery</span>
+        </label>
+        <label>
+            <input type="radio" name="payment_method" value="CARD">
+            <span>Credit / Debit Card</span>
+        </label>
+        <label>
+            <input type="radio" name="payment_method" value="UPI">
+            <span>UPI Payment</span>
+        </label>
+    </div>
+
+    <button type="submit" class="checkout-btn">
+        Complete Purchase
+    </button>
+</form>
+
+        {% comment %} <form method="POST" action="{% url 'place_order' %}" class="payment-methods">
             {% csrf_token %}
             <h4>Payment Method</h4>
             <div class="radio-group">
@@ -672,7 +706,7 @@ Place Order
             <button type="submit" class="checkout-btn">
                 Complete Purchase
             </button>
-        </form>
+        </form> {% endcomment %}
     </div>
     {% endif %}
 </div>

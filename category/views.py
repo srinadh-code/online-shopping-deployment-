@@ -13,7 +13,7 @@ from  .models import RecentlyViewed
 from .models import Profile
 from django.contrib import messages
 from .models import ReturnRequest
-from .utils import apply_first_order_discount
+
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table#invoice 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet#invoice 
@@ -24,6 +24,10 @@ from .models import Product
 from django.contrib.auth import authenticate, login
 from django.db import transaction
 from .models import Profile
+from django.utils import timezone
+
+from django.contrib import messages
+from django.db.models import Avg
 from .models import (
     Category,
     SubCategory,
@@ -328,10 +332,7 @@ def subcategory_view(request, subcategory_id):
     })
     
     
-from django.utils import timezone
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib import messages
-from django.db.models import Avg
+
 
 def product_detail(request, product_id):
 
@@ -506,61 +507,6 @@ def product_detail(request, product_id):
 #         "can_review": can_review,        
 #         "user_review": user_review      
 #     })
-# @login_required
-# def product_detail(request, product_id):
-
-#     product = get_object_or_404(Product, id=product_id)
-
-#     # Get variants for this product
-#     variants = ProductVariant.objects.filter(product=product)
-
-#     # Get recent list
-#     recent = request.session.get('recently_viewed', [])
-
-#     if product_id in recent:
-#         recent.remove(product_id)
-
-#     recent.insert(0, product_id)
-
-#     request.session['recently_viewed'] = recent[:5]
-
-#     # wishlist check
-#     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
-
-#     in_wishlist = WishlistItem.objects.filter(
-#         wishlist=wishlist,
-#         product=product
-#     ).exists()
-
-#     # review submit
-#     if request.method == "POST":
-
-#         rating = request.POST.get("rating")
-#         comment = request.POST.get("comment")
-
-#         if rating:
-#             Review.objects.update_or_create(
-#                 product=product,
-#                 user=request.user,
-#                 defaults={
-#                     "rating": int(rating),
-#                     "comment": comment
-#                 }
-#             )
-
-#         return redirect('product_detail', product_id=product.id)
-
-#     reviews = product.reviews.all().order_by("-created_at")
-
-#     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-
-#     return render(request, "product_detail.html", {
-#         "product": product,
-#         "variants": variants,  # ADD THIS
-#         "in_wishlist": in_wishlist,
-#         "reviews": reviews,
-#         "avg_rating": avg_rating,
-#     })
 
 @login_required
 def add_to_cart(request, product_id):
@@ -669,11 +615,22 @@ def place_order(request):
     total = sum(item.price * item.quantity for item in items)
 
     final_total, discount, is_first = apply_first_order_discount(
-    request.user, total
-)
+    request.user, total)
+    coins_used = 0
+
+    if request.POST.get("use_coins"):
+
+        profile = request.user.profile
+
+        coins_used = min(profile.coins, final_total)
+        final_total = final_total - coins_used
+
+        profile.coins -= coins_used
+        profile.save()
 
     request.session["final_total"] = float(final_total)
     request.session["discount"] = float(discount)
+    request.session["coins_used"] = coins_used
     request.session["is_first_order"] = is_first    
 
     
@@ -686,6 +643,7 @@ def create_order(request):
 
     cart = Cart.objects.get(user=request.user)
     items = cart.items.select_related("variant", "product")
+    coins_used = request.session.get("coins_used", 0)
 
     if not items:
         order = Order.objects.filter(user=request.user).last()
@@ -704,6 +662,7 @@ def create_order(request):
         user=request.user,
         total_amount=final_total,
         discount_amount=discount,
+        coins_used=coins_used,
         payment_method=payment_method,
         payment_status="Pending" if payment_method == "COD" else "Paid"
     )
@@ -737,8 +696,17 @@ def create_order(request):
         variant.stock -= item.quantity
         variant.save()
 
+    # # CLEAR CART
+    # cart.items.all().delete()
     # CLEAR CART
     cart.items.all().delete()
+
+#  CLEAR SESSION (ADD HERE)
+    request.session.pop("coins_used", None)
+    request.session.pop("final_total", None)
+    request.session.pop("discount", None)
+
+
 
     return redirect("order_success")
 

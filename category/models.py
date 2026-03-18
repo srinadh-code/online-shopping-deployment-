@@ -34,6 +34,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/')
     stock=models.IntegerField(default=0)
     low_stock_threshold = models.IntegerField(default=0)
+    coins = models.IntegerField(default=0) 
     def __str__(self):
         return self.name
     def total_stock(self):
@@ -117,7 +118,7 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
+    
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -142,6 +143,8 @@ class Order(models.Model):
 
     delivered_at = models.DateTimeField(null=True, blank=True)
     stock_reduced = models.BooleanField(default=False)
+    coins_used = models.IntegerField(default=0) 
+    coins_added = models.BooleanField(default=False)
     def __str__(self):
         return f"Order {self.id} - {self.status}"
 
