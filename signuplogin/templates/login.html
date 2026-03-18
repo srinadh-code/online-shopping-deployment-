@@ -869,16 +869,30 @@ transform:translateY(0);
 </div>
 <script>
 setTimeout(function(){
-    const msg = document.querySelector('.top-alert');
-    if(msg){
+    const errorMsg = document.querySelector('.alert-error');
+    if(errorMsg){
+        errorMsg.style.transition = "opacity 0.5s ease";
+        errorMsg.style.opacity = "0";
+
+        setTimeout(function(){
+            errorMsg.remove();
+        }, 500);
+    }
+}, 4000); // 3 seconds
+
+
+
+setTimeout(function(){
+    document.querySelectorAll('.top-alert').forEach(msg => {
         msg.style.transition = "opacity 0.5s ease";
         msg.style.opacity = "0";
 
         setTimeout(function(){
             msg.remove();
         }, 500);
-    }
-}, 5000);
+    });
+}, 5000); // 5 sec
 </script>
+
 </body>
 </html>

@@ -1,17 +1,29 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-
+import re
 class SignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = User
         fields = ["username", "email", "password"]
 
+    # def validate_username(self, value):
+    #     if len(value) < 3:
+    #         raise serializers.ValidationError("Username too short!")
+    #     if User.objects.filter(username=value).exists():
+    #         raise serializers.ValidationError("Username already exists")
+    #     return value
     def validate_username(self, value):
         if len(value) < 3:
             raise serializers.ValidationError("Username too short!")
+
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Username already exists")
+
+    # Must start with a letter
+        if not re.match(r'^[A-Za-z]', value):
+            raise serializers.ValidationError("Username must start with a letter")
+
         return value
 
     def validate_password(self, value):

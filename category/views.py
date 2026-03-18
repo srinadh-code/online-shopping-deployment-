@@ -9,7 +9,7 @@ from django.db.models.functions import ExtractMonth
 from django.core.paginator import Paginator
 from .models import Cart, CartItem, ProductVariant
 from .utils import apply_first_order_discount
-
+from  .models import RecentlyViewed
 from .models import Profile
 from django.contrib import messages
 from .models import ReturnRequest
@@ -37,52 +37,145 @@ from .models import (
     Review
 )
 
-@login_required
-def dashboardview(request):
-    # user informantion 
-    username = request.user.username
-    # categories withs sub category and to avoid n+1
-    categories = Category.objects.prefetch_related("subcategories").all()
-    # whishlist
-    wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+# @login_required
+# def dashboardview(request):
+#     # user informantion 
+#     username = request.user.username
+#     # categories withs sub category and to avoid n+1
+#     categories = Category.objects.prefetch_related("subcategories").all()
+#     # whishlist
+#     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
-    wishlist_product_ids = list(
-        wishlist.items.values_list("product_id", flat=True)
-    )
-    wishlist_count = wishlist.items.count()
+#     wishlist_product_ids = list(
+#         wishlist.items.values_list("product_id", flat=True)
+#     )
+#     wishlist_count = wishlist.items.count()
     
-    # search functionality
+#     # search functionality
+#     query = request.GET.get('q', '').strip()
+#     if query:
+#         # product exact match → OPEN PRODUCT DETAIL
+#         product = Product.objects.filter(
+#             name__iexact=query
+#         ).first()
+#         if product:
+#             return redirect('product_detail', product_id=product.id)
+#         #  subcategory → SHOW PRODUCTS
+#         subcategory = SubCategory.objects.filter(
+#             name__icontains=query
+#         ).first()
+#         if subcategory:
+#             return redirect(
+#                 'subcategory',
+#                 subcategory_id=subcategory.id
+#             )
+#         #  CATEGORY MATCH → SHOW SUBCATEGORIES
+#         category = Category.objects.filter(
+#             name__icontains=query
+#         ).first()
+
+#         if category:
+#             return redirect(
+#                 'category',
+#                 category_id=category.id
+#             )
+#         #  PARTIAL Product  search → SHOW RESULTS PAGE
+#         products = Product.objects.filter(
+#             name__icontains=query
+#         )
+#         if products.exists():
+#             return render(request, "products.html", {
+#                 "products": products,
+#                 "title": f"Search Results for '{query}'",
+#                 "username": username,
+#                 "wishlist_count": wishlist_count
+#             })
+
+
+#     # RECENTLY VIEWED 
+#     recent_ids = request.session.get('recently_viewed', [])
+#     recently_viewed_queryset = Product.objects.filter(
+#         id__in=recent_ids
+#     )
+#     recently_viewed = sorted(
+#         recently_viewed_queryset,
+#         key=lambda x: recent_ids.index(x.id)
+#     )
+#     # RECOMMENDED 
+#     recommended = Product.objects.exclude(
+#         id__in=recent_ids
+#     ).order_by('?')[:4]
+#     # TRENDING PRODUCTS (mostly added to cart)
+#     trending_products = Product.objects.annotate(
+#     cart_count=Count('cartitem')
+#     ).order_by('-cart_count')[:4]
+
+#     most_purchased = Product.objects.annotate(
+#     total_orders=Count("orderitem")
+#     ).order_by("-total_orders")[:4]
+
+
+#     #  just arrived last added 8 produts
+#     just_arrived = Product.objects.order_by('-id')[:8]
+#     cart, _ = Cart.objects.get_or_create(user=request.user)
+
+    
+#     cart_count = cart.items.count()
+#     #rendering
+
+#     context = {
+#         "username": username,
+#         "categories": categories,
+#         "recently_viewed": recently_viewed,
+#         "recommended": recommended,
+#         "just_arrived": just_arrived,
+#         "wishlist_product_ids": wishlist_product_ids,
+#         "wishlist_count": wishlist_count,
+#         "cart_count": cart_count ,
+#         "trending_products": trending_products,
+#         "most_purchased": most_purchased,
+       
+#     }
+#     return render(request, "dashboard.html", context)
+def dashboardview(request):
+
+    #  user info safe
+    if request.user.is_authenticated:
+        username = request.user.username
+    else:
+        username = "Guest"
+
+    # categories
+    categories = Category.objects.prefetch_related("subcategories").all()
+
+    #  wishlist safe
+    if request.user.is_authenticated:
+        wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+
+        wishlist_product_ids = list(
+            wishlist.items.values_list("product_id", flat=True)
+        )
+        wishlist_count = wishlist.items.count()
+    else:
+        wishlist_product_ids = []
+        wishlist_count = 0
+
+    # 🔍 search functionality (UNCHANGED)
     query = request.GET.get('q', '').strip()
     if query:
-        # product exact match → OPEN PRODUCT DETAIL
-        product = Product.objects.filter(
-            name__iexact=query
-        ).first()
+        product = Product.objects.filter(name__iexact=query).first()
         if product:
             return redirect('product_detail', product_id=product.id)
-        #  subcategory → SHOW PRODUCTS
-        subcategory = SubCategory.objects.filter(
-            name__icontains=query
-        ).first()
-        if subcategory:
-            return redirect(
-                'subcategory',
-                subcategory_id=subcategory.id
-            )
-        #  CATEGORY MATCH → SHOW SUBCATEGORIES
-        category = Category.objects.filter(
-            name__icontains=query
-        ).first()
 
+        subcategory = SubCategory.objects.filter(name__icontains=query).first()
+        if subcategory:
+            return redirect('subcategory', subcategory_id=subcategory.id)
+
+        category = Category.objects.filter(name__icontains=query).first()
         if category:
-            return redirect(
-                'category',
-                category_id=category.id
-            )
-        #  PARTIAL Product  search → SHOW RESULTS PAGE
-        products = Product.objects.filter(
-            name__icontains=query
-        )
+            return redirect('category', category_id=category.id)
+
+        products = Product.objects.filter(name__icontains=query)
         if products.exists():
             return render(request, "products.html", {
                 "products": products,
@@ -91,38 +184,75 @@ def dashboardview(request):
                 "wishlist_count": wishlist_count
             })
 
+    #  recently viewed
+    # recent_ids = request.session.get('recently_viewed', [])
+    # recently_viewed_queryset = Product.objects.filter(id__in=recent_ids)
 
-    # RECENTLY VIEWED 
-    recent_ids = request.session.get('recently_viewed', [])
-    recently_viewed_queryset = Product.objects.filter(
-        id__in=recent_ids
-    )
-    recently_viewed = sorted(
-        recently_viewed_queryset,
-        key=lambda x: recent_ids.index(x.id)
-    )
-    # RECOMMENDED 
+    # recently_viewed = sorted(
+    #     recently_viewed_queryset,
+    #     key=lambda x: recent_ids.index(x.id)
+    # )
+    # recent_db = RecentlyViewed.objects.filter(
+    #     user=request.user
+    # ).select_related('product')[:5]
+
+    # recently_viewed = [item.product for item in recent_db]
+
+    # # -------- FALLBACK (if DB empty) --------
+    # if not recently_viewed:
+    #     session_ids = request.session.get('recently_viewed', [])
+    #     qs = Product.objects.filter(id__in=session_ids)
+
+    #     recently_viewed = sorted(
+    #         qs,
+    #         key=lambda x: session_ids.index(x.id)
+    #     )
+    recently_viewed = []
+
+    if request.user.is_authenticated:
+        recent_db = RecentlyViewed.objects.filter(
+            user=request.user
+        ).select_related('product')[:5]
+
+        recently_viewed = [item.product for item in recent_db]
+
+    if not recently_viewed:
+        session_ids = request.session.get('recently_viewed', [])
+        qs = Product.objects.filter(id__in=session_ids)
+
+        recently_viewed = sorted(
+            qs,
+            key=lambda x: session_ids.index(x.id)
+        )
+
+        #recommeded
+    recent_ids = [p.id for p in recently_viewed]
+
+    #  recommended
     recommended = Product.objects.exclude(
         id__in=recent_ids
     ).order_by('?')[:4]
-    # TRENDING PRODUCTS (mostly added to cart)
+
+    #  trending
     trending_products = Product.objects.annotate(
-    cart_count=Count('cartitem')
+        cart_count=Count('cartitem')
     ).order_by('-cart_count')[:4]
 
     most_purchased = Product.objects.annotate(
-    total_orders=Count("orderitem")
+        total_orders=Count("orderitem")
     ).order_by("-total_orders")[:4]
 
-
-    #  just arrived last added 8 produts
+    #  just arrived
     just_arrived = Product.objects.order_by('-id')[:8]
-    cart, _ = Cart.objects.get_or_create(user=request.user)
 
-    
-    cart_count = cart.items.count()
-    #rendering
+    #  cart safe
+    if request.user.is_authenticated:
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart_count = cart.items.count()
+    else:
+        cart_count = 0
 
+    # render
     context = {
         "username": username,
         "categories": categories,
@@ -131,11 +261,11 @@ def dashboardview(request):
         "just_arrived": just_arrived,
         "wishlist_product_ids": wishlist_product_ids,
         "wishlist_count": wishlist_count,
-        "cart_count": cart_count ,
+        "cart_count": cart_count,
         "trending_products": trending_products,
         "most_purchased": most_purchased,
-       
     }
+
     return render(request, "dashboard.html", context)
 
 @login_required
@@ -196,11 +326,12 @@ def subcategory_view(request, subcategory_id):
         "title": subcategory.name,
         "price_ranges":price_ranges
     })
-@login_required
+# @login_required
 def product_detail(request, product_id):
+    
 
     product = get_object_or_404(Product, id=product_id)
-
+    print("OPENED PRODUCT ID:", product.id)
     # Get variants for this product
     variants = ProductVariant.objects.filter(product=product)
 
@@ -211,8 +342,12 @@ def product_detail(request, product_id):
         recent.remove(product_id)
 
     recent.insert(0, product_id)
-
     request.session['recently_viewed'] = recent[:5]
+    if request.user.is_authenticated:
+        RecentlyViewed.objects.update_or_create(
+            user=request.user,
+            product=product
+        )
 
     # wishlist check
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
@@ -222,8 +357,27 @@ def product_detail(request, product_id):
         product=product
     ).exists()
 
+    # CHECK: user purchased AND delivered
+    can_review = OrderItem.objects.filter(
+        order__user=request.user,
+        product=product,
+        order__status="Delivered"
+    ).exists()
+
+    #  get existing user review (for update UI)
+    user_review = Review.objects.filter(
+        product=product,
+        user=request.user
+    ).first()
+
     # review submit
     if request.method == "POST":
+        print("Saving review for product ID:", product.id)
+
+        #  block if not delivered
+        if not can_review:
+            messages.error(request, "You can review only after delivery.")
+            return redirect('product_detail', product_id=product.id)
 
         rating = request.POST.get("rating")
         comment = request.POST.get("comment")
@@ -246,11 +400,68 @@ def product_detail(request, product_id):
 
     return render(request, "product_detail.html", {
         "product": product,
-        "variants": variants,  # ADD THIS
+        "variants": variants,
         "in_wishlist": in_wishlist,
         "reviews": reviews,
         "avg_rating": avg_rating,
+        "can_review": can_review,        # ✅ REQUIRED FOR HTML
+        "user_review": user_review       # ✅ REQUIRED FOR UPDATE FEATURE
     })
+# @login_required
+# def product_detail(request, product_id):
+
+#     product = get_object_or_404(Product, id=product_id)
+
+#     # Get variants for this product
+#     variants = ProductVariant.objects.filter(product=product)
+
+#     # Get recent list
+#     recent = request.session.get('recently_viewed', [])
+
+#     if product_id in recent:
+#         recent.remove(product_id)
+
+#     recent.insert(0, product_id)
+
+#     request.session['recently_viewed'] = recent[:5]
+
+#     # wishlist check
+#     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+
+#     in_wishlist = WishlistItem.objects.filter(
+#         wishlist=wishlist,
+#         product=product
+#     ).exists()
+
+#     # review submit
+#     if request.method == "POST":
+
+#         rating = request.POST.get("rating")
+#         comment = request.POST.get("comment")
+
+#         if rating:
+#             Review.objects.update_or_create(
+#                 product=product,
+#                 user=request.user,
+#                 defaults={
+#                     "rating": int(rating),
+#                     "comment": comment
+#                 }
+#             )
+
+#         return redirect('product_detail', product_id=product.id)
+
+#     reviews = product.reviews.all().order_by("-created_at")
+
+#     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
+#     return render(request, "product_detail.html", {
+#         "product": product,
+#         "variants": variants,  # ADD THIS
+#         "in_wishlist": in_wishlist,
+#         "reviews": reviews,
+#         "avg_rating": avg_rating,
+#     })
 
 @login_required
 def add_to_cart(request, product_id):
@@ -368,80 +579,6 @@ def place_order(request):
 
     
     return redirect("address")
-
-# @login_required
-# def place_order(request):
-
-#     cart = Cart.objects.get_or_create(user=request.user)[0]
-#     items = cart.items.all()
-
-#     if not items:
-#         return redirect('cart')
-
-#     payment_method = request.POST.get("payment_method", "COD")
-
-#     # store payment choice in session
-#     request.session["payment_method"] = payment_method
-
-#     profile = Profile.objects.filter(user=request.user).first()
-
-#     if not profile or not profile.address or not profile.phone:
-#         messages.warning(request, "Please fill your profile details before placing the order.")
-#         return redirect('profile')
-
-#     total = sum(item.price * item.quantity for item in items)
-
-#     final_total, discount, discount_applied = apply_first_order_discount(
-#         request.user, total
-#     )
-
-#     request.session["final_total"] = float(final_total)
-#     request.session["discount"] = float(discount)
-
-#     # go to address page first
-#     return redirect("address")
-
-# @login_required
-# def create_order(request):
-
-#     cart = Cart.objects.get(user=request.user)
-#     items = cart.items.all()
-
-#     # if not items:
-#     #     return redirect("cart")
-#     if not items:
-#         order = Order.objects.filter(user=request.user).last()
-#         if order:
-#             return redirect("order_success")
-#         return redirect("cart")
-
-#     payment_method = request.session.get("payment_method", "COD")
-#     final_total = request.session.get("final_total", 0)
-#     discount = request.session.get("discount", 0)
-
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=final_total,
-#         discount_amount=discount,
-#         payment_method=payment_method,
-#         payment_status="Pending" if payment_method == "COD" else "Paid"
-#     )
-
-#     order.estimated_delivery = predict_delivery()
-#     order.save()
-
-#     for item in items:
-#         OrderItem.objects.create(
-#             order=order,
-#             product=item.product,
-#             variant=item.variant,
-#             quantity=item.quantity,
-#             price=item.price
-#         )
-
-#     cart.items.all().delete()
-
-#     return redirect("order_success")
 
 
 @transaction.atomic
@@ -800,40 +937,8 @@ def return_request(request, order_id):
         return redirect("my_orders")
 
     return render(request, "return_form.html", {"order": order})
-# @login_required
-# def return_request(request, order_id):
-#     order = get_object_or_404(Order, id=order_id, user=request.user)
 
-#     #  Only allow if delivered
-#     if order.status != "Delivered":
-#         return redirect("my_orders")
-    
-#     if not order.delivered_at:
-#         return redirect("my_orders")
 
-#     if order.delivered_at < timezone.now() - timedelta(days=7):
-#         return redirect("my_orders")
-
-#     #  Prevent duplicate return
-#     if ReturnRequest.objects.filter(order=order).exists():
-#         return redirect("my_orders")
-
-#     if request.method == "POST":
-#         request_type = request.POST.get("type")
-#         reason = request.POST.get("reason")
-#         image = request.FILES.get("image")
-
-#         ReturnRequest.objects.create(
-#             order=order,
-#             user=request.user,
-#             request_type=request_type,
-#             reason=reason,
-#             image=image
-#         )
-
-#         return redirect("my_orders")
-
-#     return render(request, "return_form.html", {"order": order})
 def save_model(self, request, obj, form, change):
 
     if obj.status == "Approved":

@@ -1,476 +1,375 @@
-{% comment %} <!DOCTYPE html>
-<html>
-<head>
-    <title>My Profile</title>
-{% if messages %}
-<div class="message-box">
-    {% for message in messages %}
-        <p>{{ message }}</p>
-    {% endfor %}
-</div>
-{% endif %}    
-
-<style>
-
-body{
-    font-family: Arial, Helvetica, sans-serif;
-    background:#f4f6f9;
-}
-
-.container{
-    width:600px;
-    margin:40px auto;
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-h2{
-    text-align:center;
-    margin-bottom:25px;
-}
-
-.form-group{
-    margin-bottom:15px;
-}
-
-label{
-    display:block;
-    font-weight:bold;
-    margin-bottom:5px;
-}
-
-input, textarea{
-    width:100%;
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:5px;
-}
-
-textarea{
-    resize:none;
-}
-
-button{
-    width:100%;
-    padding:12px;
-    background:#007bff;
-    border:none;
-    color:white;
-    font-size:16px;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#0056b3;
-}
-
-.profile-img{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.profile-img img{
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    object-fit:cover;
-}
-.message-box{
-background:#ffebee;
-color:#c62828;
-padding:12px;
-margin:15px;
-border-radius:6px;
-font-weight:500;
-border-left:5px solid red;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>{{user.username}}</h2>
-
-<div class="profile-img">
-
-{% if profile.profile_image %}
-<img src="{{ profile.profile_image.url }}">
-{% else %}
-<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
-{% endif %}
-
-</div>
-
-<form method="POST" enctype="multipart/form-data">
-{% csrf_token %}
-
-<div class="form-group">
-<label>Phone</label>
-<input type="text" name="phone" value="{{ profile.phone }}">
-</div>
-
-<div class="form-group">
-<label>Address</label>
-<textarea name="address">{{ profile.address }}</textarea>
-</div>
-
-<div class="form-group">
-<label>City</label>
-<input type="text" name="city" value="{{ profile.city }}">
-</div>
-
-<div class="form-group">
-<label>State</label>
-<input type="text" name="state" value="{{ profile.state }}">
-</div>
-
-<div class="form-group">
-<label>Pincode</label>
-<input type="text" name="pincode" value="{{ profile.pincode }}">
-</div>
-
-<div class="form-group">
-<label>Profile Image</label>
-<input type="file" name="profile_image">
-</div>
-
-<button type="submit">Save Profile</button>
-
-</form>
-<script>
-setTimeout(function(){
-    let msg = document.querySelector(".message-box");
-    if(msg){
-        msg.style.display = "none";
-    }
-},3000);
-</script>
-
-
-</div>
-
-</body>
-</html> {% endcomment %}
-
-
-
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Profile Settings | SRIA NEXT GEN</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Profile Settings | SRIA NEXT GEN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
+<style>
+body{
+    margin:0;
+    font-family:Inter;
+    background:#f8f9fa;
+    display:flex;
+}
 
-        :root {
-            --accent: #d4bda8;
-            --accent-dark: #b89f88;
-            --bg-main: #f8f9fa;
-            --sidebar-grad: linear-gradient(180deg, #1a1a1a 0%, #333333 100%);
-            --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #888888;
-        }
+.sidebar-decor{
+    width:350px;
+    background:linear-gradient(#1a1a1a,#333);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            display: flex;
-            min-height: 100vh;
-        }
+.main-content{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
 
-        /* SIDEBAR DECOR */
-        .sidebar-decor {
-            width: 350px;
-            background: var(--sidebar-grad);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            padding: 40px;
-            position: relative;
-            overflow: hidden;
-        }
+.profile-card{
+    background:#fff;
+    padding:50px;
+    border-radius:30px;
+    width:700px;
+    position:relative;
+}
 
-        .sidebar-decor::after {
-            content: 'PROFILE';
-            position: absolute;
-            bottom: -20px;
-            right: -10px;
-            font-family: 'Syncopate';
-            font-size: 80px;
-            opacity: 0.05;
-            letter-spacing: 10px;
-        }
+/* IMAGE */
+.img-container{
+    position:relative;
+    width:100px;
+    height:100px;
+}
 
-        .sidebar-decor h1 {
-            font-family: 'Syncopate';
-            font-size: 22px;
-            letter-spacing: 8px;
-            text-align: center;
-            line-height: 1.6;
-        }
+.img-container img{
+    width:100px;
+    height:100px;
+    border-radius:20px;
+    object-fit:cover;
+}
 
-        .sidebar-decor p {
-            font-size: 12px;
-            opacity: 0.6;
-            margin-top: 20px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+.camera-btn{
+    position:absolute;
+    bottom:0;
+    right:0;
+    background:black;
+    color:white;
+    border-radius:50%;
+    padding:8px;
+    cursor:pointer;
+}
 
-        /* MAIN CONTENT AREA */
-        .main-content {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
+/* POPUP MENU */
+.popup-menu{
+    position:absolute;
+    top:110%;
+    left:0;
+    width:180px;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+    display:none;
+    z-index:1000;
+    overflow:hidden;
+}
 
-        .profile-card {
-            width: 100%;
-            max-width: 700px;
-            background: var(--card-bg);
-            border-radius: 40px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            padding: 60px;
-            position: relative;
-        }
+.popup-menu div{
+    padding:12px;
+    font-size:14px;
+    cursor:pointer;
+}
 
-        /* MESSAGES */
-        .message-box {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent);
-            color: white;
-            padding: 10px 30px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 10px 20px rgba(212, 189, 168, 0.4);
-        }
+.popup-menu div:hover{
+    background:#f5f5f5;
+}
 
-        /* HEADER SECTION */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-bottom: 50px;
-        }
+/* FORM */
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
 
-        .img-container {
-            position: relative;
-        }
+.full-width{
+    grid-column:span 2;
+}
 
-        .img-container img {
-            width: 100px;
-            height: 100px;
-            border-radius: 30px;
-            object-fit: cover;
-            background: #f0f0f0;
-            border: 5px solid #fff;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
+input,textarea,select{
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #eee;
+    width:100%;
+}
 
-        .user-meta h2 {
-            font-family: 'Syncopate';
-            font-size: 20px;
-            letter-spacing: 3px;
-            margin: 0;
-        }
+button{
+    padding:15px;
+    background:black;
+    color:white;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+}
 
-        .user-meta span {
-            font-size: 12px;
-            color: var(--accent-dark);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* FORM */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        .full-width { grid-column: span 2; }
-
-        .form-group label {
-            display: block;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            color: var(--text-muted);
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 16px 20px;
-            background: #f8f9fa;
-            border: 1px solid #eee;
-            border-radius: 15px;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            background: #fff;
-            border-color: var(--accent);
-            box-shadow: 0 10px 25px rgba(212, 189, 168, 0.15);
-        }
-
-        textarea { height: 100px; resize: none; }
-
-        .btn-row {
-            margin-top: 40px;
-            display: flex;
-            gap: 15px;
-        }
-
-        button {
-            flex: 2;
-            padding: 20px;
-            background: var(--text-main);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-family: 'Syncopate';
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            cursor: pointer;
-            transition: 0.4s;
-        }
-
-        button:hover {
-            background: var(--accent-dark);
-            transform: translateY(-5px);
-        }
-
-        .back-btn {
-            flex: 1;
-            padding: 20px;
-            background: #f0f0f0;
-            color: var(--text-main);
-            text-align: center;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-        }
-
-        .back-btn:hover { background: #e0e0e0; }
-
-        @media (max-width: 900px) {
-            .sidebar-decor { display: none; }
-            .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
-        }
-    </style>
+.message-box{
+    background:#d4bda8;
+    color:white;
+    padding:10px;
+    border-radius:20px;
+    margin-bottom:20px;
+    text-align:center;
+}
+</style>
 </head>
 
 <body>
 
 <div class="sidebar-decor">
-    <h1>SRIA<br>NEXT<br>GEN</h1>
-    <p>Account Settings</p>
+<h2>SRIA NEXT GEN</h2>
 </div>
 
 <div class="main-content">
-    <div class="profile-card">
-        
-        {% if messages %}
-            <div class="message-box">
-                {% for message in messages %}{{ message }}{% endfor %}
-            </div>
-        {% endif %}
 
-        <div class="profile-header">
-            <div class="img-container">
-                {% if profile.profile_image %}
-                    <img src="{{ profile.profile_image.url }}" alt="Profile">
-                {% else %}
-                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Default">
-                {% endif %}
-            </div>
-            <div class="user-meta">
-                <span>Welcome back</span>
-                <h2>{{ user.username }}</h2>
-            </div>
-        </div>
+<div class="profile-card">
 
-        <form method="POST" enctype="multipart/form-data" class="form-grid">
-            {% csrf_token %}
+{% if messages %}
+<div class="message-box">
+{% for message in messages %}{{ message }}{% endfor %}
+</div>
+{% endif %}
 
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" name="phone" value="{{ profile.phone }}" placeholder="+91 ...">
-            </div>
+<form method="POST" enctype="multipart/form-data" id="profileForm">
+{% csrf_token %}
 
-            <div class="form-group">
-                <label>Update Photo</label>
-                <input type="file" name="profile_image" style="padding: 12px; font-size: 12px;">
-            </div>
+<div style="display:flex;gap:20px;align-items:center;margin-bottom:30px" class="full-width">
 
-            <div class="form-group full-width">
-                <label>Delivery Address</label>
-                <textarea name="address">{{ profile.address }}</textarea>
-            </div>
+<div class="img-container">
 
-            <div class="form-group">
-                <label>City / District</label>
-                <input type="text" name="city" value="{{ profile.city }}">
-            </div>
+{% if profile.profile_image %}
+<img src="{{ profile.profile_image.url }}" id="profilePreview">
+{% else %}
+<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="profilePreview">
+{% endif %}
 
-            <div class="form-group">
-                <label>State</label>
-                <input type="text" name="state" value="{{ profile.state }}">
-            </div>
+<button type="button" class="camera-btn" onclick="openOptions(event)">📷</button>
 
-            <div class="form-group full-width">
-                <label>Pincode</label>
-                <input type="text" name="pincode" value="{{ profile.pincode }}">
-            </div>
+<div id="uploadOptions" class="popup-menu">
+    <div onclick="openCamera()">📷 Take photo</div>
+    <div onclick="openGallery()">🖼️ Upload photo</div>
+    <div onclick="closeOptions()">❌ Cancel</div>
+</div>
 
-            <div class="full-width btn-row">
-                <button type="submit">Save Changes</button>
-                <a href="{% url 'dashboard' %}" class="back-btn">Cancel</a>
-            </div>
-        </form>
-    </div>
+<input type="file" id="imageUpload" name="profile_image" hidden>
+
+</div>
+
+<div>
+<p>Welcome back</p>
+<h2>{{ user.username }}</h2>
+</div>
+
+</div>
+
+<div>
+<label>Phone</label>
+<div style="display:flex; gap:8px;">
+<select name="country_code">
+<option value="+91">+91</option>
+<option value="+1">+1</option>
+<option value="+44">+44</option>
+</select>
+
+<input type="tel"
+name="phone"
+value="{{ profile.phone|slice:'3:' }}"
+maxlength="10"
+placeholder="Enter 10 digit number"
+required>
+</div>
+</div>
+
+<div>
+<label>City</label>
+<input type="text" name="city" value="{{ profile.city }}" required>
+</div>
+
+<div class="full-width">
+<label>Address</label>
+<textarea name="address" required>{{ profile.address }}</textarea>
+</div>
+
+<div>
+<label>State</label>
+<input type="text" name="state" value="{{ profile.state }}" required>
+</div>
+
+<div>
+<label>Pincode</label>
+<input type="text" name="pincode" value="{{ profile.pincode }}" maxlength="6" required>
+</div>
+
+<div class="full-width">
+<button type="submit">Save Changes</button>
+</div>
+
+</form>
+
+</div>
 </div>
 
 <script>
-    setTimeout(function(){
-        let msg = document.querySelector(".message-box");
-        if(msg){ msg.style.display = "none"; }
-    }, 3000);
+let stream = null;
+
+// PREVIEW IMAGE
+document.getElementById("imageUpload").addEventListener("change", function(e){
+    let file = e.target.files[0];
+    if(file){
+        document.getElementById("profilePreview").src = URL.createObjectURL(file);
+    }
+});
+
+// FORM VALIDATION
+document.getElementById("profileForm").addEventListener("submit", function(e){
+    let phone = document.querySelector("input[name='phone']").value.trim();
+    let pin = document.querySelector("input[name='pincode']").value.trim();
+
+    if(!/^[6-9][0-9]{9}$/.test(phone)){
+        alert("Phone must start with 6-9 and be 10 digits");
+        e.preventDefault();
+        return;
+    }
+
+    if(!/^[0-9]{6}$/.test(pin)){
+        alert("Pincode must be 6 digits");
+        e.preventDefault();
+        return;
+    }
+});
+
+// POPUP CONTROL
+function openOptions(e){
+    e.stopPropagation();
+    document.getElementById("uploadOptions").style.display = "block";
+}
+
+function closeOptions(){
+    document.getElementById("uploadOptions").style.display = "none";
+}
+
+document.addEventListener("click", function(e){
+    let menu = document.getElementById("uploadOptions");
+    let container = document.querySelector(".img-container");
+
+    if(!container.contains(e.target)){
+        menu.style.display = "none";
+    }
+});
+
+// GALLERY
+function openGallery(){
+    document.getElementById("imageUpload").click();
+    closeOptions();
+}
+
+// CAMERA
+function openCamera(){
+    closeOptions();
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(s => {
+
+        stream = s;
+
+        let container = document.createElement("div");
+        container.style.position = "fixed";
+        container.style.top = "0";
+        container.style.left = "0";
+        container.style.right = "0";
+        container.style.bottom = "0";
+        container.style.background = "black";
+        container.style.zIndex = "9999";
+
+        let video = document.createElement("video");
+        video.autoplay = true;
+        video.srcObject = stream;
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "cover";
+
+        let captureBtn = document.createElement("button");
+        captureBtn.innerText = "📸";
+        captureBtn.style.position = "absolute";
+        captureBtn.style.bottom = "30px";
+        captureBtn.style.left = "50%";
+        captureBtn.style.transform = "translateX(-50%)";
+        captureBtn.style.width = "70px";
+        captureBtn.style.height = "70px";
+        captureBtn.style.borderRadius = "50%";
+        captureBtn.style.border = "none";
+        captureBtn.style.fontSize = "28px";
+        captureBtn.style.background = "white";
+
+        let closeBtn = document.createElement("button");
+        closeBtn.innerText = "✖";
+        closeBtn.style.position = "absolute";
+        closeBtn.style.top = "20px";
+        closeBtn.style.right = "20px";
+        closeBtn.style.background = "black";
+        closeBtn.style.color = "white";
+        closeBtn.style.border = "none";
+        closeBtn.style.padding = "8px 12px";
+
+        container.appendChild(video);
+        container.appendChild(captureBtn);
+        container.appendChild(closeBtn);
+        document.body.appendChild(container);
+
+        closeBtn.onclick = function(){
+            stream.getTracks().forEach(track => track.stop());
+            container.remove();
+        };
+
+        captureBtn.onclick = function(){
+            let canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0);
+
+            let imageData = canvas.toDataURL("image/png");
+
+            document.getElementById("profilePreview").src = imageData;
+
+            stream.getTracks().forEach(track => track.stop());
+
+            function dataURLtoFile(dataurl, filename){
+                let arr = dataurl.split(',');
+                let mime = arr[0].match(/:(.*?);/)[1];
+                let bstr = atob(arr[1]);
+                let n = bstr.length;
+                let u8arr = new Uint8Array(n);
+                while(n--){ u8arr[n] = bstr.charCodeAt(n); }
+                return new File([u8arr], filename, {type:mime});
+            }
+
+            let file = dataURLtoFile(imageData, "profile.png");
+
+            let dt = new DataTransfer();
+            dt.items.add(file);
+
+            document.getElementById("imageUpload").files = dt.files;
+
+            container.remove();
+        };
+
+    })
+    .catch(()=> alert("Camera not allowed"));
+}
 </script>
 
 </body>

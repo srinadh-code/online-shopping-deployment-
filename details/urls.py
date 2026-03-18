@@ -18,8 +18,10 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
+from category.views import dashboardview
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', dashboardview, name="dashboard"),
     path("",include("signuplogin.urls")),
     path("",include ("category.urls"))
 ]

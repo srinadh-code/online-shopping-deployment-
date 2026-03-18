@@ -27,7 +27,9 @@ class signupview(View):
         return render(request, "signup.html", {
             "errors": serializer.errors
         })
-        
+from django.core.mail import send_mail
+from django.conf import settings
+
 class loginview(View):
     def get(self, request):
         return render(request, "login.html")
@@ -35,22 +37,76 @@ class loginview(View):
     def post(self, request):
         username_or_email = request.POST.get("username_or_email")
         password = request.POST.get("password")
-        # Try username
+
         user = authenticate(request, username=username_or_email, password=password)
-        # If not, try email
+
         if user is None:
             try:
                 user_obj = User.objects.get(email=username_or_email)
                 user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
                 user = None
+
         if user is not None:
             login(request, user)
+
+            #  SEND EMAIL AFTER LOGIN
+            subject = "Welcome Back to SRIA NEXT GEN 🛍️"
+            message = f"""
+Hi {user.username},
+
+Welcome back to SRIA NEXT GEN ONLINE SHOPPPING!
+
+✨ "Shopping is not just buying, it's an experience."
+
+We're excited to have you again.
+
+🎁 Special Offer Just for You:
+Get 30% OFF on your first order!
+
+Start shopping now and grab your favorites.
+
+Happy Shopping 🛒
+- SRIA Team
+"""
+
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=True,  # avoid crash if email fails
+            )
+
             return redirect("dashboard")
+
         else:
             return render(request, "login.html", {
                 "error": "Invalid username/email or password"
             })
+# class loginview(View):
+#     def get(self, request):
+#         return render(request, "login.html")
+
+#     def post(self, request):
+#         username_or_email = request.POST.get("username_or_email")
+#         password = request.POST.get("password")
+#         # Try username
+#         user = authenticate(request, username=username_or_email, password=password)
+#         # If not, try email
+#         if user is None:
+#             try:
+#                 user_obj = User.objects.get(email=username_or_email)
+#                 user = authenticate(request, username=user_obj.username, password=password)
+#             except User.DoesNotExist:
+#                 user = None
+#         if user is not None:
+#             login(request, user)
+#             return redirect("dashboard")
+#         else:
+#             return render(request, "login.html", {
+#                 "error": "Invalid username/email or password"
+#             })
 class logoutview(View):
     def get(self, request):
         logout(request)

@@ -93,3 +93,22 @@ def reduce_stock_on_delivery(sender, instance, created, **kwargs):
         # Mark stock as reduced
         instance.stock_reduced = True
         instance.save(update_fields=["stock_reduced"])                    
+        
+        
+from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
+from .models import RecentlyViewed, Product
+
+@receiver(user_logged_in)
+def sync_recently_viewed(sender, request, user, **kwargs):
+    session_ids = request.session.get('recently_viewed', [])
+
+    for pid in session_ids:
+        try:
+            product = Product.objects.get(id=pid)
+            RecentlyViewed.objects.update_or_create(
+                user=user,
+                product=product
+            )
+        except Product.DoesNotExist:
+            continue
