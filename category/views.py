@@ -13,7 +13,6 @@ from  .models import RecentlyViewed
 from .models import Profile
 from django.contrib import messages
 from .models import ReturnRequest
-
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table#invoice 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet#invoice 
@@ -23,13 +22,6 @@ from django.http import JsonResponse
 from .models import Product
 from django.contrib.auth import authenticate, login
 from django.db import transaction
-from .models import Profile
-from django.utils import timezone
-
-from django.contrib import messages
-from django.db.models import Avg
-from .forms import AddressForm
-from .models import Address
 from .models import (
     Category,
     SubCategory,
@@ -46,7 +38,7 @@ from .models import (
 
 def dashboardview(request):
 
-    #  user info safe
+    #  user info 
     if request.user.is_authenticated:
         username = request.user.username
     else:
@@ -55,7 +47,7 @@ def dashboardview(request):
     # categories
     categories = Category.objects.prefetch_related("subcategories").all()
 
-    #  wishlist safe
+    #  wishlist
     if request.user.is_authenticated:
         wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
@@ -67,7 +59,7 @@ def dashboardview(request):
         wishlist_product_ids = []
         wishlist_count = 0
 
-    # 🔍 search functionality (UNCHANGED)
+    #  search functionality (UNCHANGED)
     query = request.GET.get('q', '').strip()
     if query:
         product = Product.objects.filter(name__iexact=query).first()
@@ -211,9 +203,6 @@ def subcategory_view(request, subcategory_id):
         "title": subcategory.name,
         "price_ranges":price_ranges
     })
-    
-    
-
 
 def product_detail(request, product_id):
 
@@ -223,7 +212,7 @@ def product_detail(request, product_id):
     # Variants
     variants = ProductVariant.objects.filter(product=product)
 
-    # -------- SESSION RECENTLY VIEWED --------
+    #  recently viewed sessions 
     recent = request.session.get('recently_viewed', [])
 
     if product_id in recent:
@@ -232,7 +221,7 @@ def product_detail(request, product_id):
     recent.insert(0, product_id)
     request.session['recently_viewed'] = recent[:5]
 
-    # -------- DB RECENTLY VIEWED --------
+    # db recently viewd
     if request.user.is_authenticated:
         RecentlyViewed.objects.update_or_create(
             user=request.user,
@@ -240,12 +229,12 @@ def product_detail(request, product_id):
             defaults={'viewed_at': timezone.now()}
         )
 
-    # -------- DEFAULT VALUES --------
+    # default
     in_wishlist = False
     can_review = False
     user_review = None
 
-    # -------- ONLY IF LOGGED IN --------
+    # logged in
     if request.user.is_authenticated:
 
         # wishlist
@@ -256,7 +245,7 @@ def product_detail(request, product_id):
             product=product
         ).exists()
 
-        # can review (only delivered)
+        # can review (only delivered) after delivery
         can_review = OrderItem.objects.filter(
             order__user=request.user,
             product=product,
@@ -269,7 +258,7 @@ def product_detail(request, product_id):
             user=request.user
         ).first()
 
-    # -------- REVIEW SUBMIT --------
+    #submit review
     if request.method == "POST":
 
         if not request.user.is_authenticated:
@@ -294,7 +283,7 @@ def product_detail(request, product_id):
 
         return redirect('product_detail', product_id=product.id)
 
-    # -------- REVIEWS --------
+    # reviews
     reviews = product.reviews.all().order_by("-created_at")
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
 
@@ -334,7 +323,6 @@ def add_to_cart(request, product_id):
         item.save()
 
     return redirect("cart")
-
 
 @login_required
 def cart_view(request):
@@ -497,26 +485,17 @@ def create_order(request):
         variant.stock -= item.quantity
         variant.save()
 
-    # # CLEAR CART
-    # cart.items.all().delete()
-    # CLEAR CART
+
     cart.items.all().delete()
 
-#  CLEAR SESSION (ADD HERE)
+#  CLEAR SESSION 
     request.session.pop("coins_used", None)
     request.session.pop("final_total", None)
     request.session.pop("discount", None)
-
-
-
     return redirect("order_success")
 
-
-
 @login_required
-
 def card_payment(request):
-
     amount = request.session.get("final_total", 0)
 
     if request.method == "POST":
@@ -525,20 +504,15 @@ def card_payment(request):
     return render(request,"card_payment.html",{"amount":amount})
 @login_required
 def upi_payment(request):
-
     amount = request.session.get("final_total", 0)
-
     if request.method == "POST":
         return redirect("payment_processing")
-
     return render(request,"upi_payment.html",{"amount":amount})
 
 @login_required
 def payment_processing(request):
-
     cart = Cart.objects.get(user=request.user)
     items = cart.items.all()
-
     if not items:
         return redirect("cart")
 
@@ -583,10 +557,6 @@ def order_success(request):
 
 
 
-from django.utils import timezone
-from datetime import timedelta
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
 
 @login_required
 def my_orders(request):
@@ -852,9 +822,6 @@ def profile(request):
         return redirect("profile")
 
     return render(request, "profile.html", {"profile": profile})
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-
 
 def admin_login(request):
 
@@ -936,8 +903,6 @@ def admin_products(request):
     if request.method == "POST":
 
         action = request.POST.get("action")
-
-        # ADD PRODUCT
         if action == "add":
 
             name = request.POST.get("name")
@@ -973,8 +938,6 @@ def admin_products(request):
             product.save()
 
         return redirect("admin_products")
-
-
     # SEARCH
     query = request.GET.get("q")
     products = Product.objects.all()
@@ -983,8 +946,6 @@ def admin_products(request):
 
     if query:
         products = products.filter(name__icontains=query)
-
-
     # PAGINATION
     paginator = Paginator(products,9)
 
@@ -1001,12 +962,8 @@ def admin_products(request):
     })
 
 
-
-
 def edit_product(request, id):
-
     product = get_object_or_404(Product, id=id)
-
     categories = Category.objects.all()
     subcategories = SubCategory.objects.all()
 
@@ -1051,8 +1008,6 @@ def admin_orders(request):
 
     page_number = request.GET.get("page")
     orders = paginator.get_page(page_number)
-
-
     return render(request,"admindashboard/orders.html",{
         "orders":orders,
     
@@ -1099,13 +1054,9 @@ def customer_orders(request, user_id):
     })
     
     
-    
-
 
 def find_similar(request, product_id):
-
     product = Product.objects.get(id=product_id)
-
     similar = Product.objects.filter(
         category=product.category
     ).exclude(id=product.id)[:4]
@@ -1124,26 +1075,20 @@ def find_similar(request, product_id):
 
 
 def address_page(request):
-
     if request.method == "POST":
         form = AddressForm(request.POST)
 
         if form.is_valid():
             address = form.save(commit=False)
 
-            address.user = request.user   # 🔥 important
-
+            address.user = request.user   
             address.save()
-
             request.session["selected_address"] = address.id
-
             return redirect("place_order")
 
     else:
         form = AddressForm()
-
     addresses = Address.objects.filter(user=request.user)
-
     return render(request,"address.html",{
         "form":form,
         "addresses":addresses
@@ -1151,9 +1096,7 @@ def address_page(request):
 
 @login_required
 def deliver_here(request, id):
-
     request.session["selected_address"] = id
-
     payment_method = request.session.get("payment_method")
     print("PAYMENT METHOD:", payment_method)
     if payment_method == "CARD":
@@ -1168,11 +1111,8 @@ def deliver_here(request, id):
     return redirect("cart")
 
 def order_placed(request):
-
     address_id = request.session.get("selected_address")
-
     address = None
-
     if address_id:
         address = Address.objects.get(id=address_id)
 
@@ -1190,7 +1130,6 @@ def edit_address(request, id):
         if form.is_valid():
             form.save()
             return redirect("address")
-
     return render(request, "edit_address.html", {"form": form})
 
 

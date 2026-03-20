@@ -16,8 +16,6 @@ class signupview(View):
     def get(self, request):
         return render(request, "signup.html")
    
-   
-        
     def post(self, request):
         serializer = SignupSerializer(data=request.POST)
         if serializer.is_valid():
@@ -75,7 +73,7 @@ Happy Shopping 🛒
                 message,
                 settings.DEFAULT_FROM_EMAIL,
                 [user.email],
-                fail_silently=False,  # avoid crash if email fails
+                fail_silently=True,  # avoid crash if email fails
             )
             print(user.email)
             
