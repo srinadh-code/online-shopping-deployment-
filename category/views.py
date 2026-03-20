@@ -549,15 +549,29 @@ def payment_processing(request):
     return render(request,"payment_processing.html")
 
 
+# @login_required
+# def order_success(request):
+#     order = Order.objects.filter(user=request.user).last()
+#     return render(request,"order_success.html",{"order":order})
+
+
+
+
 @login_required
 def order_success(request):
-    order = Order.objects.filter(user=request.user).last()
-    return render(request,"order_success.html",{"order":order})
+    user = request.user
+    order = Order.objects.filter(user=user).last()
 
+    if not order:
+        return redirect("cart")
 
+    order_count = user.order_set.count()
+    is_first_order = order_count == 1
 
-
-
+    return render(request, "order_success.html", {
+        "order": order,
+        "is_first_order": is_first_order
+    })
 @login_required
 def my_orders(request):
 
@@ -651,15 +665,15 @@ def remove_from_wishlist(request, item_id):
 def reset_orders(request):
     Order.objects.filter(user=request.user).delete()
     return HttpResponse("Orders Reset Done ")
-def order_success(request):
-    user = request.user
-    # Count how many orders user has
-    order_count = user.order_set.count()   
-    # First order check
-    is_first_order = order_count == 1
-    return render(request, "order_success.html", {
-        "is_first_order": is_first_order
-    })
+# def order_success(request):
+#     user = request.user
+#     # Count how many orders user has
+#     order_count = user.order_set.count()   
+#     # First order check
+#     is_first_order = order_count == 1
+#     return render(request, "order_success.html", {
+#         "is_first_order": is_first_order
+#     })
 from django.shortcuts import get_object_or_404, redirect
 
 @login_required

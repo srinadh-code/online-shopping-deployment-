@@ -627,89 +627,92 @@ Place Order
 
     {% if items %}
     <div class="summary-box">
-        <h3>Order Summary</h3>
+    <h3>Order Summary</h3>
 
-        <div class="summary-line">
-            <span>Total Items</span>
-            <span style="font-family: 'JetBrains Mono'">{{ items|length }}</span>
-        </div>
+    <div class="summary-line">
+        <span>Total Items</span>
+        <span style="font-family: 'JetBrains Mono'">{{ items|length }}</span>
+    </div>
 
-        <div class="summary-line">
-            <span>Subtotal</span>
-            <span style="font-family: 'JetBrains Mono'">₹{{ total|floatformat:2 }}</span>
-        </div>
+    <div class="summary-line">
+        <span>Subtotal</span>
+        <span style="font-family: 'JetBrains Mono'">₹{{ total|floatformat:2 }}</span>
+    </div>
 
-        {% if discount > 0 %}
-        <div class="summary-line" style="color: #28a745;">
-            <span>First Order Discount</span>
-            <span>- ₹{{ discount|floatformat:2 }}</span>
-        </div>
-        {% endif %}
-
-        <div class="summary-line" style="margin-top: 20px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
-            <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Grand Total</span>
-            <strong>₹{{ final_total|floatformat:2 }}</strong>
-        </div>
-        <form method="POST" action="{% url 'place_order' %}" class="payment-methods">
-    {% csrf_token %}
-
-    <!-- 💰 COINS OPTION (ADD THIS BLOCK) -->
-    {% if request.user.is_authenticated %}
-    <div class="summary-line" style="margin-top:15px;">
-        <label style="cursor:pointer;">
-            <input type="checkbox" name="use_coins">
-            Use Coins (Available: {{ request.user.profile.coins }})
-        </label>
+    {% if discount > 0 %}
+    <div class="summary-line" style="color: #28a745;">
+        <span>First Order Discount</span>
+        <span>- ₹{{ discount|floatformat:2 }}</span>
     </div>
     {% endif %}
 
-    <h4>Payment Method</h4>
-
-    <div class="radio-group">
-        <label>
-            <input type="radio" name="payment_method" value="COD" checked>
-            <span>Cash On Delivery</span>
-        </label>
-        <label>
-            <input type="radio" name="payment_method" value="CARD">
-            <span>Credit / Debit Card</span>
-        </label>
-        <label>
-            <input type="radio" name="payment_method" value="UPI">
-            <span>UPI Payment</span>
-        </label>
+    <!-- ✅ GRAND TOTAL -->
+    <div class="summary-line">
+        <span>Grand Total</span>
+        <strong id="grand-total">₹{{ final_total|floatformat:2 }}</strong>
     </div>
 
-    <button type="submit" class="checkout-btn">
-        Complete Purchase
-    </button>
-</form>
+    <!-- ✅ FORM START -->
+    <form method="POST" action="{% url 'place_order' %}" class="payment-methods">
+        {% csrf_token %}
 
-        {% comment %} <form method="POST" action="{% url 'place_order' %}" class="payment-methods">
-            {% csrf_token %}
-            <h4>Payment Method</h4>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="payment_method" value="COD" checked>
-                    <span>Cash On Delivery</span>
-                </label>
-                <label>
-                    <input type="radio" name="payment_method" value="CARD">
-                    <span>Credit / Debit Card</span>
-                </label>
-                <label>
-                    <input type="radio" name="payment_method" value="UPI">
-                    <span>UPI Payment</span>
-                </label>
-            </div>
+        <!-- ✅ IMPORTANT (hidden original total INSIDE form) -->
+        <input type="hidden" id="original-total" value="{{ final_total }}">
 
-            <button type="submit" class="checkout-btn">
-                Complete Purchase
-            </button>
-        </form> {% endcomment %}
-    </div>
+        <!-- ✅ COINS (INSIDE FORM) -->
+        <div class="summary-line" style="margin-top:15px;">
+            <label style="cursor:pointer;">
+                <input type="checkbox" id="use-coins" name="use_coins">
+                Use Coins (Available: 
+                <span id="coins">{{ request.user.profile.coins }}</span>)
+            </label>
+        </div>
+
+        <h4>Payment Method</h4>
+
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="payment_method" value="COD" checked>
+                <span>Cash On Delivery</span>
+            </label>
+            <label>
+                <input type="radio" name="payment_method" value="CARD">
+                <span>Credit / Debit Card</span>
+            </label>
+            <label>
+                <input type="radio" name="payment_method" value="UPI">
+                <span>UPI Payment</span>
+            </label>
+        </div>
+
+        <button type="submit" class="checkout-btn">
+            Complete Purchase
+        </button>
+    </form>
+</div>
     {% endif %}
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
+    const checkbox = document.getElementById("use-coins");
+    const totalElement = document.getElementById("grand-total");
+    const originalTotal = parseFloat(document.getElementById("original-total").value);
+    const coins = parseInt(document.getElementById("coins").innerText);
+
+    checkbox.addEventListener("change", function () {
+
+        let newTotal = originalTotal;
+
+        if (this.checked) {
+            newTotal = originalTotal - coins;
+            if (newTotal < 0) newTotal = 0;
+        }
+
+        totalElement.innerText = "₹" + newTotal.toFixed(2);
+    });
+
+});
+</script>
 </body>
 </html>
