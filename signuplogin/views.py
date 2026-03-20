@@ -49,33 +49,33 @@ class loginview(View):
             login(request, user)
 
             #  SEND EMAIL AFTER LOGIN
-            subject = "Welcome Back to SRIA NEXT GEN 🛍️"
-            message = f"""
-Hi {user.username},
+#             subject = "Welcome Back to SRIA NEXT GEN 🛍️"
+#             message = f"""
+# Hi {user.username},
 
-Welcome back to SRIA NEXT GEN ONLINE SHOPPPING!
+# Welcome back to SRIA NEXT GEN ONLINE SHOPPPING!
 
-✨ "Shopping is not just buying, it's an experience."
+# ✨ "Shopping is not just buying, it's an experience."
 
-We're excited to have you again.
+# We're excited to have you again.
 
-🎁 Special Offer Just for You:
-Get 30% OFF on your first order!
+# 🎁 Special Offer Just for You:
+# Get 30% OFF on your first order!
 
-Start shopping now and grab your favorites.
+# Start shopping now and grab your favorites.
 
-Happy Shopping 🛒
-- SRIA Team
-"""
+# Happy Shopping 🛒
+# - SRIA Team
+# """
 
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=True,  # avoid crash if email fails
-            )
-            print(user.email)
+#             send_mail(
+#                 subject,
+#                 message,
+#                 settings.DEFAULT_FROM_EMAIL,
+#                 [user.email],
+#                 fail_silently=True,  # avoid crash if email fails
+#             )
+#             print(user.email)
             
 
             return redirect("dashboard")
