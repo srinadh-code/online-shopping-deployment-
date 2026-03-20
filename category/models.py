@@ -226,7 +226,7 @@ class Profile(models.Model):
     state=models.TextField(max_length=10,blank=True)
     pincode=models.TextField(max_length=6,blank=True)  
     profile_image=models.ImageField(upload_to="profile/",blank=True,null=True)
-
+    coins = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username    

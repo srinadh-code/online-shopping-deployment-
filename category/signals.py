@@ -122,8 +122,10 @@ def add_coins_on_delivery(sender, instance, **kwargs):
 
     if instance.status == "Delivered" and not instance.coins_added:
 
+        print(" SIGNAL TRIGGERED")  # DEBUG
+
         profile = instance.user.profile
-        profile.coins += 10   # 🎁 add 10 coins
+        profile.coins += 10
         profile.save()
 
         instance.coins_added = True

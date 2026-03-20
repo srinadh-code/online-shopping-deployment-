@@ -28,6 +28,8 @@ from django.utils import timezone
 
 from django.contrib import messages
 from django.db.models import Avg
+from .forms import AddressForm
+from .models import Address
 from .models import (
     Category,
     SubCategory,
@@ -41,106 +43,7 @@ from .models import (
     Review
 )
 
-# @login_required
-# def dashboardview(request):
-#     # user informantion 
-#     username = request.user.username
-#     # categories withs sub category and to avoid n+1
-#     categories = Category.objects.prefetch_related("subcategories").all()
-#     # whishlist
-#     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
-#     wishlist_product_ids = list(
-#         wishlist.items.values_list("product_id", flat=True)
-#     )
-#     wishlist_count = wishlist.items.count()
-    
-#     # search functionality
-#     query = request.GET.get('q', '').strip()
-#     if query:
-#         # product exact match → OPEN PRODUCT DETAIL
-#         product = Product.objects.filter(
-#             name__iexact=query
-#         ).first()
-#         if product:
-#             return redirect('product_detail', product_id=product.id)
-#         #  subcategory → SHOW PRODUCTS
-#         subcategory = SubCategory.objects.filter(
-#             name__icontains=query
-#         ).first()
-#         if subcategory:
-#             return redirect(
-#                 'subcategory',
-#                 subcategory_id=subcategory.id
-#             )
-#         #  CATEGORY MATCH → SHOW SUBCATEGORIES
-#         category = Category.objects.filter(
-#             name__icontains=query
-#         ).first()
-
-#         if category:
-#             return redirect(
-#                 'category',
-#                 category_id=category.id
-#             )
-#         #  PARTIAL Product  search → SHOW RESULTS PAGE
-#         products = Product.objects.filter(
-#             name__icontains=query
-#         )
-#         if products.exists():
-#             return render(request, "products.html", {
-#                 "products": products,
-#                 "title": f"Search Results for '{query}'",
-#                 "username": username,
-#                 "wishlist_count": wishlist_count
-#             })
-
-
-#     # RECENTLY VIEWED 
-#     recent_ids = request.session.get('recently_viewed', [])
-#     recently_viewed_queryset = Product.objects.filter(
-#         id__in=recent_ids
-#     )
-#     recently_viewed = sorted(
-#         recently_viewed_queryset,
-#         key=lambda x: recent_ids.index(x.id)
-#     )
-#     # RECOMMENDED 
-#     recommended = Product.objects.exclude(
-#         id__in=recent_ids
-#     ).order_by('?')[:4]
-#     # TRENDING PRODUCTS (mostly added to cart)
-#     trending_products = Product.objects.annotate(
-#     cart_count=Count('cartitem')
-#     ).order_by('-cart_count')[:4]
-
-#     most_purchased = Product.objects.annotate(
-#     total_orders=Count("orderitem")
-#     ).order_by("-total_orders")[:4]
-
-
-#     #  just arrived last added 8 produts
-#     just_arrived = Product.objects.order_by('-id')[:8]
-#     cart, _ = Cart.objects.get_or_create(user=request.user)
-
-    
-#     cart_count = cart.items.count()
-#     #rendering
-
-#     context = {
-#         "username": username,
-#         "categories": categories,
-#         "recently_viewed": recently_viewed,
-#         "recommended": recommended,
-#         "just_arrived": just_arrived,
-#         "wishlist_product_ids": wishlist_product_ids,
-#         "wishlist_count": wishlist_count,
-#         "cart_count": cart_count ,
-#         "trending_products": trending_products,
-#         "most_purchased": most_purchased,
-       
-#     }
-#     return render(request, "dashboard.html", context)
 def dashboardview(request):
 
     #  user info safe
@@ -188,29 +91,7 @@ def dashboardview(request):
                 "wishlist_count": wishlist_count
             })
 
-    #  recently viewed
-    # recent_ids = request.session.get('recently_viewed', [])
-    # recently_viewed_queryset = Product.objects.filter(id__in=recent_ids)
-
-    # recently_viewed = sorted(
-    #     recently_viewed_queryset,
-    #     key=lambda x: recent_ids.index(x.id)
-    # )
-    # recent_db = RecentlyViewed.objects.filter(
-    #     user=request.user
-    # ).select_related('product')[:5]
-
-    # recently_viewed = [item.product for item in recent_db]
-
-    # # -------- FALLBACK (if DB empty) --------
-    # if not recently_viewed:
-    #     session_ids = request.session.get('recently_viewed', [])
-    #     qs = Product.objects.filter(id__in=session_ids)
-
-    #     recently_viewed = sorted(
-    #         qs,
-    #         key=lambda x: session_ids.index(x.id)
-    #     )
+ 
     recently_viewed = []
 
     if request.user.is_authenticated:
@@ -426,87 +307,7 @@ def product_detail(request, product_id):
         "can_review": can_review,
         "user_review": user_review
     })
-# @login_required
-# def product_detail(request, product_id):
-    
 
-#     product = get_object_or_404(Product, id=product_id)
-#     print("OPENED PRODUCT ID:", product.id)
-#     # Get variants for this product
-#     variants = ProductVariant.objects.filter(product=product)
-
-#     # Get recent list
-#     recent = request.session.get('recently_viewed', [])
-
-#     if product_id in recent:
-#         recent.remove(product_id)
-
-#     recent.insert(0, product_id)
-#     request.session['recently_viewed'] = recent[:5]
-#     if request.user.is_authenticated:
-#         RecentlyViewed.objects.update_or_create(
-#             user=request.user,
-#             product=product
-#         )
-
-#     # wishlist check
-#     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
-
-#     in_wishlist = WishlistItem.objects.filter(
-#         wishlist=wishlist,
-#         product=product
-#     ).exists()
-
-#     # CHECK: user purchased AND delivered
-#     can_review = OrderItem.objects.filter(
-#         order__user=request.user,
-#         product=product,
-#         order__status="Delivered"
-#     ).exists()
-
-#     #  get existing user review (for update UI)
-#     user_review = Review.objects.filter(
-#         product=product,
-#         user=request.user
-#     ).first()
-
-#     # review submit
-#     if request.method == "POST":
-#         print("Saving review for product ID:", product.id)
-
-#         #  block if not delivered
-#         if not can_review:
-#             messages.error(request, "You can review only after delivery.")
-#             return redirect('product_detail', product_id=product.id)
-
-#         rating = request.POST.get("rating")
-#         comment = request.POST.get("comment")
-
-#         if rating:
-#             Review.objects.update_or_create(
-#                 product=product,
-#                 user=request.user,
-#                 defaults={
-#                     "rating": int(rating),
-#                     "comment": comment
-#                 }
-#             )
-
-#         return redirect('product_detail', product_id=product.id)
-
-#     reviews = product.reviews.all().order_by("-created_at")
-
-#     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-
-#     return render(request, "product_detail.html", {
-#         "product": product,
-#         "variants": variants,
-#         "in_wishlist": in_wishlist,
-#         "reviews": reviews,
-#         "avg_rating": avg_rating,
-#         "can_review": can_review,        
-#         "user_review": user_review      
-#     })
 
 @login_required
 def add_to_cart(request, product_id):
@@ -772,44 +573,6 @@ def payment_processing(request):
     cart.items.all().delete()
 
     return render(request,"payment_processing.html")
-# @login_required
-# def payment_processing(request):
-
-#     cart = Cart.objects.get(user=request.user)
-#     items = cart.items.all()
-
-#     if not items:
-#         return redirect("cart")
-
-#     payment_method = request.session.get("payment_method", "COD")
-#     final_total = request.session.get("final_total", 0)
-#     discount = request.session.get("discount", 0)
-
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=final_total,
-#         discount_amount=discount,
-#         payment_method=payment_method,
-#         payment_status="Paid"
-#     )
-
-#     order.estimated_delivery = predict_delivery()
-#     order.save()
-
-#     for item in items:
-#         OrderItem.objects.create(
-#             order=order,
-#             product=item.product,
-#             variant=item.variant,
-#             quantity=item.quantity,
-#             price=item.price
-#         )
-
-#     cart.items.all().delete()
-
-#     return render(request,"payment_processing.html")
-
-
 
 
 @login_required
@@ -817,46 +580,9 @@ def order_success(request):
     order = Order.objects.filter(user=request.user).last()
     return render(request,"order_success.html",{"order":order})
 
-# @login_required
-# def my_orders(request):
 
-#     orders = Order.objects.filter(user=request.user).order_by('-created_at')
 
-#     now = timezone.now()
 
-#     for order in orders:
-
-#         if not order.created_at:
-#             continue
-
-#         diff = now - order.created_at
-
-#         # Order just placed
-#         if diff < timedelta(minutes=1):
-
-#             if order.status != "Placed":
-#                 order.status = "Placed"
-#                 order.save()
-
-#         # Order shipped
-#         elif diff < timedelta(minutes=2):
-
-#             if order.status != "Shipped":
-#                 order.status = "Shipped"
-#                 order.save()
-
-#         # Delivered when predicted delivery time reached
-#         elif order.estimated_delivery and now >= order.estimated_delivery:
-
-#             if order.status != "Delivered":
-#                 order.status = "Delivered"
-
-#                 if not order.delivered_at:
-#                     order.delivered_at = now
-
-#                 order.save()
-
-#     return render(request, "my_orders.html", {"orders": orders})
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required
@@ -1397,36 +1123,6 @@ def find_similar(request, product_id):
     return JsonResponse({"products": data})
 
 
-
-
-
-
-
-# def address_page(request):
-
-#     form = AddressForm()
-
-#     if request.method == "POST":
-#         form = AddressForm(request.POST)
-
-#         if form.is_valid():
-#             address = form.save()
-
-#             # store selected address in session
-#             request.session["selected_address"] = address.id
-
-#             return redirect("place_order")
-
-#     addresses = Address.objects.all()
-
-#     return render(request,"address.html",{
-#         "form":form,
-#         "addresses":addresses
-#     })
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import AddressForm
-from .models import Address
-
 def address_page(request):
 
     if request.method == "POST":
@@ -1483,7 +1179,6 @@ def order_placed(request):
     return render(request,"order_placed.html",{
         "address":address
     })
-
 
 def edit_address(request, id):
     address = get_object_or_404(Address, id=id)

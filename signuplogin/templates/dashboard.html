@@ -388,6 +388,37 @@
     </form>
     <div class="nav-links">
 
+    
+
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'wishlist' %}">
+            Wishlist (<span id="wishlist-count">{{ wishlist_count }}</span>)
+        </a>
+    {% else %}
+        <a href="{% url 'signup' %}">
+            Wishlist (0)
+        </a>
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'cart' %}">
+            Cart (<span id="cart-count">{{ cart_count }}</span>)
+        </a>
+    {% else %}
+        <a href="{% url 'signup' %}">
+            Cart (0)
+        </a>
+    {% endif %}
+    {% if request.user.is_authenticated %}
+        <a href="#" style="background:#f0fdf4; padding:6px 12px; border-radius:20px;">
+            coins💰 {{ request.user.profile.coins }}
+        </a>
+    {% endif %}
+
+</div>
+
+    {% comment %} <div class="nav-links">
+
     {% if request.user.is_authenticated %}
         <a href="{% url 'wishlist' %}">
             Wishlist (<span id="wishlist-count">{{ wishlist_count }}</span>)
@@ -408,7 +439,7 @@
         </a>
     {% endif %}
 
-</div>
+</div> {% endcomment %}
 
  
 
