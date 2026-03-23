@@ -89,7 +89,19 @@ class logoutview(View):
     def get(self, request):
         logout(request)
         return redirect("login")
+import threading
+from django.core.mail import send_mail
+from django.conf import settings
 
+def send_otp_async(email, otp_code):
+    print("thread running",settings.DEFAULT_FROM_EMAIL)
+    send_mail(
+        "Password Reset OTP",
+        f"Your OTP is {otp_code}",
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False,
+    )
 
 class ForgotPasswordView(View):
     def get(self, request):
@@ -103,13 +115,17 @@ class ForgotPasswordView(View):
             otp_code = str(random.randint(100000, 999999))
             OTP.objects.create(user=user, code=otp_code)
 
-            send_mail(
-                "Password Reset OTP",
-                f"Your OTP is {otp_code}",
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False,
-            )
+            # send_mail(
+            #     "Password Reset OTP",
+            #     f"Your OTP is {otp_code}",
+            #     settings.EMAIL_HOST_USER,
+            #     [email],
+            #     fail_silently=False,
+            # )
+            threading.Thread(
+            target=send_otp_async,
+            args=(email, otp_code)
+            ).start()
             request.session['reset_email'] = email
             return redirect('verify_reset_otp')
 

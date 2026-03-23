@@ -829,7 +829,7 @@ def profile(request):
 
     profile, created = Profile.objects.get_or_create(user=request.user)
 
-    next_page = request.GET.get("next")  # 👈 check where to go after save
+    next_page = request.GET.get("next")  #  check where to go after save
 
     if request.method == "POST":
         profile.phone = request.POST.get("phone")

@@ -1,6 +1,4 @@
 
-
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +19,12 @@
 --border:#e5e7eb;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter'}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter';
+}
 
 body{
 background:var(--bg);
@@ -39,7 +42,7 @@ font-weight:700;
 
 /* CONTAINER */
 .container{
-max-width:1100px;
+max-width:1000px;
 margin:30px auto;
 padding:0 20px;
 }
@@ -47,8 +50,8 @@ padding:0 20px;
 /* CARD */
 .order-card{
 background:var(--card);
-border-radius:18px;
-padding:25px;
+border-radius:16px;
+padding:20px;
 margin-bottom:20px;
 border:1px solid var(--border);
 display:flex;
@@ -89,18 +92,36 @@ margin-bottom:5px;
 .date{
 font-size:13px;
 color:var(--muted);
-margin-bottom:15px;
+margin-bottom:10px;
 }
 
 /* ITEMS */
-.item{
-background:#f9fafb;
-padding:10px;
-border-radius:10px;
-margin-bottom:8px;
-font-size:14px;
+.order-item{
 display:flex;
-justify-content:space-between;
+align-items:center;
+gap:12px;
+margin-bottom:10px;
+}
+
+.order-img{
+width:60px;
+height:60px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.item-info{
+display:flex;
+flex-direction:column;
+}
+
+.item-name{
+font-weight:600;
+}
+
+.item-qty{
+font-size:13px;
+color:var(--muted);
 }
 
 /* RIGHT */
@@ -132,30 +153,23 @@ font-size:13px;
 font-weight:700;
 margin-top:6px;
 display:block;
-}
-.order-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0;
+text-align:center;
 }
 
-.order-img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
+.btn-return{
+background:black;
+color:white;
 }
 
-.item-info {
-    display: flex;
-    flex-direction: column;
+.btn-invoice{
+background:#f3f4f6;
+color:black;
 }
 
-.btn-return{background:black;color:white}
-.btn-invoice{background:#f3f4f6;color:black}
-.btn-cancel{border:1px solid red;color:red}
-
+.btn-cancel{
+border:1px solid red;
+color:red;
+}
 </style>
 </head>
 
@@ -171,65 +185,60 @@ display:block;
 {% for order in orders %}
 <div class="order-card">
 
-<!-- LEFT -->
-<div class="left">
+    <!-- LEFT -->
+    <div class="left">
 
-{% if order.display_status == "Placed" %}
-<div class="status placed">Order Received</div>
-{% elif order.display_status == "Shipped" %}
-<div class="status shipped">In Transit</div>
-{% elif order.display_status == "Delivered" %}
-<div class="status delivered">Delivered</div>
-{% elif order.display_status == "Cancelled" %}
-<div class="status cancelled">Cancelled</div>
-{% endif %}
+        {% if order.display_status == "Placed" %}
+        <div class="status placed">Order Received</div>
+        {% elif order.display_status == "Shipped" %}
+        <div class="status shipped">In Transit</div>
+        {% elif order.display_status == "Delivered" %}
+        <div class="status delivered">Delivered</div>
+        {% elif order.display_status == "Cancelled" %}
+        <div class="status cancelled">Cancelled</div>
+        {% endif %}
 
-<div class="order-id">Order #{{ order.id }}</div>
-<div class="date">{{ order.created_at|date:"d M Y" }}</div>
+        <div class="order-id">Order #{{ order.id }}</div>
+        <div class="date">{{ order.created_at|date:"d M Y" }}</div>
 
-{% comment %} {% for item in order.items.all %} {% endcomment %}
-{% comment %} <div class="item">
+        <!-- ITEMS -->
+        {% for item in order.items.all %}
+        <div class="order-item">
+            <img src="{{ item.product.image.url }}" class="order-img">
 
-    <span>{{ item.product.name }}</span>
-    <span>x{{ item.quantity }}</span>
-</div>
-{% endfor %}
+            <div class="item-info">
+                <div class="item-name">{{ item.product.name }}</div>
+                <div class="item-qty">Qty: {{ item.quantity }}</div>
+            </div>
+        </div>
+        {% endfor %}
 
-</div> {% endcomment %}
-{% for item in order.items.all %}
-<div class="order-item">
-    <img src="{{ item.product.image.url }}" class="order-img">
-
-    <div class="item-info">
-        <p class="item-name">{{ item.product.name }}</p>
-        <p class="item-qty">Qty: {{ item.quantity }}</p>
     </div>
-</div>
-{% endfor %}
-<!-- RIGHT -->
-<div class="right">
 
-<div class="price">₹{{ order.total_amount }}</div>
+    <!-- RIGHT -->
+    <div class="right">
 
-{% if order.discount_amount > 0 %}
-<div class="saved">Saved ₹{{ order.discount_amount }}</div>
-{% endif %}
+        <div class="price">₹{{ order.total_amount }}</div>
 
-{% if order.display_status == "Delivered" %}
+        {% if order.discount_amount > 0 %}
+        <div class="saved">Saved ₹{{ order.discount_amount }}</div>
+        {% endif %}
 
-{% if not order.returns.all %}
-<a href="{% url 'return_request' order.id %}" class="btn btn-return">Return</a>
-{% endif %}
+        {% if order.display_status == "Delivered" %}
 
-<a href="{% url 'download_invoice' order.id %}" class="btn btn-invoice">Invoice</a>
+            {% if not order.returns.all %}
+            <a href="{% url 'return_request' order.id %}" class="btn btn-return">Return</a>
+            {% endif %}
 
-{% endif %}
+            <a href="{% url 'download_invoice' order.id %}" class="btn btn-invoice">Invoice</a>
 
-{% if order.display_status != "Delivered" and order.display_status != "Cancelled" %}
-<a href="{% url 'cancel_order' order.id %}" class="btn btn-cancel">Cancel</a>
-{% endif %}
+        {% endif %}
 
-</div>
+        {% if order.display_status != "Delivered" and order.display_status != "Cancelled" %}
+        <a href="{% url 'cancel_order' order.id %}" class="btn btn-cancel">Cancel</a>
+        {% endif %}
+
+    </div>
 
 </div>
 {% endfor %}
@@ -237,4 +246,7 @@ display:block;
 </div>
 
 </body>
-</html>
+
+</html> 
+
+

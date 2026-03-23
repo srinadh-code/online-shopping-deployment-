@@ -143,6 +143,18 @@ AUTHENTICATION_BACKENDS = [
 MEDIA_URL='/media/'
 MEDIA_ROOT=os.path.join( BASE_DIR,'media')
 
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+print("API KEY:", os.getenv("SENDGRID_API_KEY"))
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+
+DEFAULT_FROM_EMAIL = "kavyaachhe@gmail.com"
+
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -153,14 +165,4 @@ MEDIA_ROOT=os.path.join( BASE_DIR,'media')
 # EMAIL_HOST_USER = 'apikey'
 # EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-# DEFAULT_FROM_EMAIL = 'srinadhyalagandula2002@gmail.com'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
-DEFAULT_FROM_EMAIL = 'kavyaachhe@gmail.com'
+# DEFAULT_FROM_EMAIL = 'kavyaachhe@gmail.com'
