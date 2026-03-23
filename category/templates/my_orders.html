@@ -133,6 +133,24 @@ font-weight:700;
 margin-top:6px;
 display:block;
 }
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.order-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+}
 
 .btn-return{background:black;color:white}
 .btn-invoice{background:#f3f4f6;color:black}
@@ -169,15 +187,25 @@ display:block;
 <div class="order-id">Order #{{ order.id }}</div>
 <div class="date">{{ order.created_at|date:"d M Y" }}</div>
 
-{% for item in order.items.all %}
-<div class="item">
+{% comment %} {% for item in order.items.all %} {% endcomment %}
+{% comment %} <div class="item">
+
     <span>{{ item.product.name }}</span>
     <span>x{{ item.quantity }}</span>
 </div>
 {% endfor %}
 
-</div>
+</div> {% endcomment %}
+{% for item in order.items.all %}
+<div class="order-item">
+    <img src="{{ item.product.image.url }}" class="order-img">
 
+    <div class="item-info">
+        <p class="item-name">{{ item.product.name }}</p>
+        <p class="item-qty">Qty: {{ item.quantity }}</p>
+    </div>
+</div>
+{% endfor %}
 <!-- RIGHT -->
 <div class="right">
 

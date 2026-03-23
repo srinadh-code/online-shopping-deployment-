@@ -116,13 +116,29 @@ button{
 }
 
 .message-box{
-    background:#d4bda8;
-    color:white;
+    background:#d4edda;
+    color:#155724;
     padding:10px;
-    border-radius:20px;
+    border-radius:10px;
     margin-bottom:20px;
     text-align:center;
 }
+.address-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px 20px;
+    background:#28a745;
+    color:white;
+    border-radius:20px;
+    text-decoration:none;
+    font-weight:500;
+}
+
+.address-btn:hover{
+    background:#218838;
+}
+
 </style>
 </head>
 
@@ -133,6 +149,7 @@ button{
 Welcome back  
 <h2>{{ request.user.username }}</h2>
 
+
 <h3>💰 Coins: {{ request.user.profile.coins }}</h3>
 </div>
 
@@ -140,85 +157,118 @@ Welcome back
 
 <div class="profile-card">
 
-{% if messages %}
-<div class="message-box">
-{% for message in messages %}{{ message }}{% endfor %}
-</div>
-{% endif %}
 
 <form method="POST" enctype="multipart/form-data" id="profileForm">
 {% csrf_token %}
+<input type="hidden" name="next" value="{{ request.GET.next }}">
 
-<div style="display:flex;gap:20px;align-items:center;margin-bottom:30px" class="full-width">
+<div style="display:flex;gap:20px;align-items:center;margin-bottom:30px">
 
-<div class="img-container">
+    <!-- SINGLE IMAGE (with camera + upload) -->
+    <div class="img-container">
 
-{% if profile.profile_image %}
-<img src="{{ profile.profile_image.url }}" id="profilePreview">
-{% else %}
-<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="profilePreview">
+        {% if profile.profile_image %}
+        <img src="{{ profile.profile_image.url }}" id="profilePreview">
+        {% else %}
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="profilePreview">
+        {% endif %}
+
+        <button type="button" class="camera-btn" onclick="openOptions(event)">📷</button>
+
+        <div id="uploadOptions" class="popup-menu">
+            <div onclick="openCamera()">📷 Take photo</div>
+            <div onclick="openGallery()">🖼️ Upload photo</div>
+            <div onclick="closeOptions()">❌ Cancel</div>
+        </div>
+
+        <input type="file" id="imageUpload" name="profile_image" hidden>
+
+    </div>
+
+    <!--  NAME + WELCOME -->
+    <div>
+        <p>Welcome back</p>
+        <h2>{{ user.username }}</h2>
+    </div>
+
+</div>
+    <!--  MESSAGE -->
+{% if messages %}
+<div class="message-box">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+
+</div>
 {% endif %}
 
-<button type="button" class="camera-btn" onclick="openOptions(event)">📷</button>
 
-<div id="uploadOptions" class="popup-menu">
-    <div onclick="openCamera()">📷 Take photo</div>
-    <div onclick="openGallery()">🖼️ Upload photo</div>
-    <div onclick="closeOptions()">❌ Cancel</div>
+<!--  HEADER (IMAGE + NAME) -->
+{% comment %} <div style="display:flex;gap:20px;align-items:center;margin-bottom:30px">
+
+    <div class="img-container">
+        {% if profile.profile_image %}
+        <img src="{{ profile.profile_image.url }}" id="profilePreview">
+        {% else %}
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="profilePreview">
+        {% endif %}
+    </div>
+
+    <div>
+        <p>Welcome back</p>
+        <h2>{{ user.username }}</h2>
+    </div>
+
+</div> {% endcomment %}
+
+
+<!-- ✅ FORM GRID -->
+<div class="form-grid">
+
+    <div>
+        <label>Phone</label>
+        <div style="display:flex; gap:8px;">
+            <select name="country_code">
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+            </select>
+
+            <input type="tel" name="phone" value="{{ profile.phone|slice:'3:' }}" required>
+        </div>
+    </div>
+
+    <div>
+        <label>City</label>
+        <input type="text" name="city" value="{{ profile.city }}" required>
+    </div>
+
+    <div class="full-width">
+        <label>Address</label>
+        <textarea name="address" required>{{ profile.address }}</textarea>
+    </div>
+
+    <div>
+        <label>State</label>
+        <input type="text" name="state" value="{{ profile.state }}" required>
+    </div>
+
+    <div>
+        <label>Pincode</label>
+        <input type="text" name="pincode" value="{{ profile.pincode }}" required>
+    </div>
+
+    <div class="full-width" style="display:flex; gap:10px;">
+
+    <button type="submit">Save Changes</button>
+
+    <!-- 🔥 NEW BUTTON -->
+    <a href="{% url 'address' %}" class="address-btn">Go to Address →</a>
+
 </div>
 
-<input type="file" id="imageUpload" name="profile_image" hidden>
-
 </div>
-
-<div>
-<p>Welcome back</p>
-<h2>{{ user.username }}</h2>
-</div>
-
-</div>
-
-<div>
-<label>Phone</label>
-<div style="display:flex; gap:8px;">
-<select name="country_code">
-<option value="+91">+91</option>
-<option value="+1">+1</option>
-<option value="+44">+44</option>
-</select>
-
-<input type="tel"
-name="phone"
-value="{{ profile.phone|slice:'3:' }}"
-maxlength="10"
-placeholder="Enter 10 digit number"
-required>
-</div>
-</div>
-
-<div>
-<label>City</label>
-<input type="text" name="city" value="{{ profile.city }}" required>
-</div>
-
-<div class="full-width">
-<label>Address</label>
-<textarea name="address" required>{{ profile.address }}</textarea>
-</div>
-
-<div>
-<label>State</label>
-<input type="text" name="state" value="{{ profile.state }}" required>
-</div>
-
-<div>
-<label>Pincode</label>
-<input type="text" name="pincode" value="{{ profile.pincode }}" maxlength="6" required>
-</div>
-
-<div class="full-width">
-<button type="submit">Save Changes</button>
-</div>
+   
 
 </form>
 

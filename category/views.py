@@ -549,13 +549,6 @@ def payment_processing(request):
     return render(request,"payment_processing.html")
 
 
-# @login_required
-# def order_success(request):
-#     order = Order.objects.filter(user=request.user).last()
-#     return render(request,"order_success.html",{"order":order})
-
-
-
 
 @login_required
 def order_success(request):
@@ -665,15 +658,7 @@ def remove_from_wishlist(request, item_id):
 def reset_orders(request):
     Order.objects.filter(user=request.user).delete()
     return HttpResponse("Orders Reset Done ")
-# def order_success(request):
-#     user = request.user
-#     # Count how many orders user has
-#     order_count = user.order_set.count()   
-#     # First order check
-#     is_first_order = order_count == 1
-#     return render(request, "order_success.html", {
-#         "is_first_order": is_first_order
-#     })
+
 from django.shortcuts import get_object_or_404, redirect
 
 @login_required
@@ -816,10 +801,35 @@ def download_invoice(request, order_id):
     return response
 
 
+# @login_required
+# def profile(request):
+
+#     profile, created = Profile.objects.get_or_create(user=request.user)
+
+#     if request.method == "POST":
+#         profile.phone = request.POST.get("phone")
+#         profile.address = request.POST.get("address")
+#         profile.city = request.POST.get("city")
+#         profile.state = request.POST.get("state")
+#         profile.pincode = request.POST.get("pincode")
+
+#         if request.FILES.get("profile_image"):
+#             profile.profile_image = request.FILES.get("profile_image")
+
+#         profile.save()
+
+#         return redirect("profile")
+
+#     return render(request, "profile.html", {"profile": profile})
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 @login_required
 def profile(request):
 
     profile, created = Profile.objects.get_or_create(user=request.user)
+
+    next_page = request.GET.get("next")  # 👈 check where to go after save
 
     if request.method == "POST":
         profile.phone = request.POST.get("phone")
@@ -832,6 +842,13 @@ def profile(request):
             profile.profile_image = request.FILES.get("profile_image")
 
         profile.save()
+
+        #  success message
+        messages.success(request, "Profile updated successfully!")
+
+        #  redirect logic
+        if next_page == "address":
+            return redirect("address")  # your address page url name
 
         return redirect("profile")
 

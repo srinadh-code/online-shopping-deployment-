@@ -1,421 +1,6 @@
 {% comment %} 
 
 
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.name }} | Premium Store</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --brand: #2563eb;
-            --dark: #0f172a;
-            --muted: #64748b;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --error: #ef4444;
-            --success: #22c55e;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg);
-            color: var(--dark);
-        }
-
-        /* HEADER */
-        .nav-bar {
-            background: var(--surface);
-            padding: 1.25rem 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
-        }
-
-        .nav-logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            margin: 24px 8%;
-            text-decoration: none;
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .back-btn:hover { color: var(--brand); transform: translateX(-4px); }
-
-        /* PRODUCT CARD */
-        .product-card {
-            max-width: 1100px;
-            margin: 0 auto 60px;
-            display: grid;
-            grid-template-columns: 450px 1fr;
-            background: var(--surface);
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-
-        /* IMAGE SECTION */
-        .image-outer {
-            background: #f1f5f9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-        }
-
-        .image-inner {
-            width: 100%; max-width: 320px; height: 320px;
-            background: white; border-radius: 20px;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.03);
-            transition: 0.4s ease;
-        }
-
-        .image-inner img { max-width: 90%; max-height: 90%; object-fit: contain; transition: 0.5s; }
-        .image-inner:hover img { transform: scale(1.1); }
-
-        .wish-float {
-            position: absolute; top: 20px; right: 20px;
-            background: white; border: none; width: 44px; height: 44px;
-            border-radius: 50%; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-size: 20px;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* DETAILS PANES */
-        .details-pane { padding: 50px; }
-        .tag { color: var(--brand); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-        .title { font-size: 32px; font-weight: 800; margin: 0; }
-        .price-row { margin: 15px 0 25px; display: flex; align-items: baseline; gap: 15px; }
-        .curr-price { font-size: 28px; font-weight: 800; }
-        .stock-pill { padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-
-        /* SIZE SELECTOR & VALIDATION */
-        .size-header { font-weight: 700; font-size: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; }
-        #size-error { color: var(--error); font-size: 13px; font-weight: 700; margin-bottom: 10px; display: none; }
-        
-        .size-options { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; }
-        .size-options label {
-            flex: 1; min-width: 80px; height: 48px; border: 2px solid var(--border);
-            border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 14px;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
-        .size-options input { display: none; }
-        .size-options label:has(input:checked) { border-color: var(--brand); background: #eff6ff; color: var(--brand); }
-
-        .shake { animation: shake 0.4s ease-in-out; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-6px); } }
-
-        /* CONTROLS */
-        .controls-row { display: flex; gap: 15px; align-items: center; margin-bottom: 30px; }
-        .qty-box { display: flex; align-items: center; border: 2px solid var(--border); border-radius: 12px; padding: 4px; }
-        .qty-box button { width: 38px; height: 38px; border: none; background: none; font-weight: bold; cursor: pointer; border-radius: 8px; }
-        .qty-box button:hover { background: #f1f5f9; }
-        .qty-box input { width: 40px; text-align: center; border: none; font-weight: 800; }
-
-        .btn { flex: 1; height: 52px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; color: white; }
-        .btn-cart { background: var(--dark); }
-        .btn-buy { background: var(--brand); }
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
-
-        /* REVIEWS & STARS */
-        .star { font-size: 26px; color: #cbd5e1; cursor: pointer; transition: 0.2s; margin-right: 4px; }
-        .star.active { color: #fbbf24; }
-        .review-card { background: #f8fafc; padding: 20px; border-radius: 16px; margin-bottom: 15px; }
-
-        /* SIMILAR PRODUCTS */
-        .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 30px; }
-        .sim-card { background: white; border: 1px solid var(--border); padding: 15px; border-radius: 16px; text-align: center; }
-        .sim-card img { width: 100%; height: 120px; object-fit: contain; }
-
-        @media (max-width: 900px) { .product-card { grid-template-columns: 1fr; } }
-        .size-box {
-    display: inline-block;
-    border: 1px solid #ccc;
-    padding: 12px 20px;
-    margin: 6px;
-    border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.size-box.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.stock-text {
-    font-size: 11px;
-    color: red;
-    margin-top: 5px;
-}
-
-.size-box.selected {
-    border: 2px solid #2563eb;
-    background: #2563eb;
-    color: white;
-    font-weight: 700;
-    transform: scale(1.03);
-}
-
-.size-box.selected .stock-text {
-    color: #e0f2fe;
-}
-    </style>
-</head>
-<body>
-
-<div class="nav-bar">
-    <div class="nav-logo">DETAILS.</div>
-    <div style="font-size: 13px;">Welcome, <b>{{ request.user.username }}</b></div>
-</div>
-
-<a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
-
-<div class="product-card">
-    <div class="image-outer">
-        <div class="image-inner">
-            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-        </div>
-        <button id="wishlist-btn" class="wish-float" onclick="toggleWishlist({{ product.id }})">
-            {% if in_wishlist %}❤️{% else %}🤍{% endif %}
-        </button>
-        <button onclick="showSimilar({{product.id}})" style="margin-top:20px; background:white; border:1px solid var(--border); padding:8px 20px; border-radius:100px; font-size:12px; font-weight:700; cursor:pointer;">Explore Similar</button>
-    </div>
-
-    <div class="details-pane">
-        <div class="tag">Premium Piece</div>
-        <h1 class="title">{{ product.name }}</h1>
-        
-        <div class="price-row">
-            <span class="curr-price">₹{{ product.price }}</span>
-            {% if product.stock > 0 %}
-                <span class="stock-pill">In Stock ({{ product.stock }})</span>
-            {% else %}
-                <span class="stock-pill" style="background:#fee2e2; color:#b91c1c; border:none;">Out of Stock</span>
-            {% endif %}
-        </div>
-
-        {% if first_discount > 0 %}
-        <div style="background: #f0fdf4; border: 1px dashed var(--success); padding: 15px; border-radius: 12px; margin-bottom: 25px;">
-            <div style="font-weight: 800; color: var(--success); font-size: 14px;">FIRST ORDER DISCOUNT 🎉</div>
-            <div style="font-size: 16px; font-weight: 800;">₹{{ final_price }} <span style="font-weight:400; font-size:13px; color:var(--muted);">(Save ₹{{ first_discount }})</span></div>
-        </div>
-        {% endif %}
-
-        <p style="color:var(--muted); line-height:1.6; margin-bottom:30px;">{{ product.description }}</p>
-
-        <form method="POST" action="{% url 'add_to_cart' product.id %}" onsubmit="return validateSize(event)">
-            {% csrf_token %}
-
-            <div class="size-header">
-                <span>SELECT SIZE</span>
-            </div>
-            
-            <div id="size-error"> Please select a size</div>
-
-         
-            <div class="size-options" id="size-container">
-    {% for variant in variants %}
-    <label class="size-box {% if variant.stock == 0 %}disabled{% endif %}">
-        
-        <input type="radio"
-               name="variant_id"
-               value="{{ variant.id }}"
-               class="size-radio"
-               data-stock="{{ variant.stock }}"
-               {% if variant.stock == 0 %}disabled{% endif %}>
-        
-        <div class="size-label">
-            {{ variant.attribute_value.value }}
-        </div>
-
-        <div class="stock-text">
-            {% if variant.stock == 0 %}
-                Out of Stock
-            {% elif variant.stock > 0 and variant.stock <= 5 %}
-                Only {{ variant.stock }} left
-            {% endif %}
-        </div>
-
-    </label>
-
-    {% endfor %}
-</div>
-
-            <div class="size-header">QUANTITY</div>
-            <div class="controls-row">
-                <div class="qty-box">
-                    <button type="button" onclick="decrease()">-</button>
-                    <input type="number" name="quantity" id="quantity" value="1" readonly>
-                    <button type="button" onclick="increase()">+</button>
-                </div>
-
-                <div class="action-btns" style="display:flex; gap:10px; flex:1;">
-                    {% if product.stock > 0 %}
-                        <button type="submit" class="btn btn-cart">Add to Cart</button>
-                        <button type="submit" formaction="{% url 'buy_now' product.id %}" class="btn btn-buy">Buy Now</button>
-                    {% else %}
-                        <button class="btn btn-cart" style="flex:1; opacity:0.5;" disabled>Unavailable</button>
-                    {% endif %}
-                </div>
-            </div>
-        </form>
-
-        <div style="border-top: 1px solid var(--border); padding-top: 40px; margin-top: 40px;">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h3 style="margin:0;">Customer Reviews</h3>
-                <span style="font-weight: 800; color: #fbbf24; font-size: 20px;">{% if avg_rating %}{{ avg_rating|floatformat:1 }} ★{% else %}New{% endif %}</span>
-            </div>
-
-         
-
-            {% for review in reviews %}
-            <div class="review-card">
-                <div style="display:flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span style="font-weight: 700;">{{ review.user.username }}</span>
-                    <span>{% for i in "12345"|slice:":review.rating" %}<span style="color:#fbbf24;">★</span>{% endfor %}</span>
-                </div>
-                <p style="margin:0; font-size: 14px; color: var(--muted);">{{ review.comment }}</p>
-            </div>
-            {% empty %}
-            <p style="color:var(--muted);">No reviews yet. Be the first!</p>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-<div id="similar-section" style="max-width: 1100px; margin: 0 auto 100px; padding: 0 20px;">
-    <h3 style="font-weight: 800;">suggiesting for you</h3>
-    <div id="similar-products" class="similar-grid"></div>
-</div>
-
-<script>
-   
-let selectedVariantId = null;
-let selectedStock = 0;
-
-const qtyInput = document.getElementById("quantity");
-const sizeRadios = document.querySelectorAll(".size-radio");
-
-sizeRadios.forEach(radio => {
-    radio.addEventListener("change", function () {
-
-        selectedVariantId = this.value;
-        selectedStock = parseInt(this.dataset.stock);
-
-        // reset quantity when new size selected
-        qtyInput.value = 1;
-    });
-});
-function increase() {
-
-    // no size selected
-    if (!selectedVariantId) {
-        alert("Select size first");
-        return;
-    }
-
-    let current = parseInt(qtyInput.value);
-
-    // limit by variant stock
-    if (current < selectedStock) {
-        qtyInput.value = current + 1;
-    } else {
-        alert("Only " + selectedStock + " available for this size");
-    }
-}
-function decrease() {
-    let current = parseInt(qtyInput.value);
-
-    if (current > 1) {
-        qtyInput.value = current - 1;
-    }
-}
-    // 2. Size Validation Functionality
-    function validateSize(event) {
-        const radios = document.getElementsByClassName('size-radio');
-        let checked = false;
-        for (let r of radios) { if (r.checked) checked = true; }
-
-        if (!checked) {
-            event.preventDefault();
-            const err = document.getElementById('size-error');
-            const cont = document.getElementById('size-container');
-            err.style.display = 'block';
-            cont.classList.add('shake');
-            setTimeout(() => cont.classList.remove('shake'), 400);
-            return false;
-        }
-        return true;
-    }
-
-    // 3. Wishlist Toggle Functionality
-    function toggleWishlist(pid){
-        fetch(`/toggle-wishlist/${pid}/`).then(r => r.json()).then(data => {
-            document.getElementById("wishlist-btn").innerHTML = data.status === "added" ? "❤️" : "🤍";
-        });
-    }
-
-    // 4. Star Rating Functionality
-    document.addEventListener("DOMContentLoaded", function(){
-        const stars = document.querySelectorAll(".star");
-        const ratingInput = document.getElementById("rating-input");
-        const radios = document.getElementsByClassName('size-radio');
-
-        // Hide error when size is picked
-        for (let r of radios) {
-            r.addEventListener('change', () => document.getElementById('size-error').style.display = 'none');
-        }
-
-        stars.forEach(s => {
-            s.addEventListener("click", () => {
-                let val = s.getAttribute("data-value");
-                ratingInput.value = val;
-                stars.forEach((st, i) => {
-                    if(i < val) st.classList.add('active');
-                    else st.classList.remove('active');
-                });
-            });
-        });
-    });
-
-    // 5. Similar Products AJAX Functionality
-    function showSimilar(pid){
-        fetch(`/find-similar/${pid}/`).then(r => r.json()).then(data => {
-            const container = document.getElementById("similar-products");
-            container.innerHTML = "";
-            data.products.forEach(p => {
-                container.innerHTML += `
-                <div class="sim-card">
-                    <a href="/product/${p.id}/">
-                    <img src="${p.image}">
-                    <div style="font-weight:700; font-size:14px; margin:10px 0;">${p.name}</div>
-                    <div style="color:var(--brand); font-weight:800;">₹${p.price}</div>
-                    <p>View Item</p></a>
-                </div>`;
-            });
-            document.getElementById("similar-section").scrollIntoView({behavior:"smooth"});
-        });
-    }
-</script>
-
-</body>
-</html> {% endcomment %}
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -717,11 +302,6 @@ object-fit:contain;
 <div class="price-row">
 <span class="curr-price">₹{{ product.price }}</span>
 
-{% comment %} {% if product.stock > 0 %}
-<span class="stock-pill">In Stock ({{product.stock}})</span>
-{% else %}
-<span class="stock-pill" style="background:#fee2e2;color:#b91c1c;">Out of Stock</span>
-{% endif %} {% endcomment %}
 </div>
 
 
@@ -988,6 +568,494 @@ document.getElementById("similar-section")
 });
 }
 
+</script>
+
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ product.name }} | Premium Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand: #2563eb;
+            --brand-soft: #eff6ff;
+            --dark: #0f172a;
+            --muted: #64748b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --error: #ef4444;
+            --success: #10b981;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            line-height: 1.5;
+        }
+
+        /* Nav */
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px; }
+
+        /* Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Layout Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 2.5rem;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Image Section */
+        .image-section {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .image-viewer {
+            background: #f1f5f9;
+            border-radius: 24px;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-viewer img {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+        }
+
+        .wish-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Details Section */
+        .details-section h1 { font-size: 2.5rem; margin: 0.5rem 0; font-weight: 800; }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .price-tag { font-size: 2rem; font-weight: 800; color: var(--dark); margin: 1rem 0; }
+
+        .discount-banner {
+            background: #f0fdf4;
+            border: 1px dashed var(--success);
+            padding: 1rem;
+            border-radius: 16px;
+            margin: 1.5rem 0;
+        }
+
+        /* Sizes */
+        .section-label { font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; color: var(--muted); }
+
+        .size-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .size-variant { cursor: pointer; position: relative; }
+        .size-variant input { position: absolute; opacity: 0; }
+
+        .size-ui {
+            display: block;
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .size-variant input:checked + .size-ui {
+            border-color: var(--brand);
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        /* SIMILAR PRODUCTS SECTION - CORRECTED FOR HORIZONTAL NO UNDERLINE */
+        .similar-grid {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            /* Scrollbar styling for a cleaner look */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .similar-grid::-webkit-scrollbar {
+            height: 6px;
+        }
+        .similar-grid::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .sim-item {
+            flex: 0 0 220px; /* Fixed width for horizontal items */
+            text-decoration: none !important; /* Forces no underline */
+            color: inherit;
+        }
+
+        .sim-item:hover { transform: translateY(-5px); }
+
+        .sim-card-ui {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            height: 100%;
+        }
+
+        .sim-card-ui img {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+
+        /* Controls */
+        .action-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .qty-selector button {
+            background: white;
+            border: 1px solid var(--border);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .qty-selector input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-dark { background: var(--dark); color: white; }
+        .btn-primary { background: var(--brand); color: white; }
+
+        /* Reviews */
+        .review-box { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .stars-input { font-size: 1.5rem; margin-bottom: 1rem; }
+        .star { cursor: pointer; color: #cbd5e1; }
+        .star.active { color: #fbbf24; }
+
+        .review-card {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .product-grid { grid-template-columns: 1fr; padding: 1.5rem; }
+            .image-section { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav-bar">
+    <div class="nav-logo">PREMIUM.</div>
+    <div style="font-size: 0.9rem;">Hi, <b>{{ request.user.username }}</b></div>
+</nav>
+
+<main class="main-container">
+    <a href="{% url 'dashboard' %}" class="back-link">← Back to shop</a>
+
+    <div class="product-grid">
+        <div class="image-section">
+            <div class="image-viewer">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                <button id="wishlist-btn" class="wish-btn" onclick="toggleWishlist({{product.id}})">
+                    {% if in_wishlist %}❤️{% else %}🤍{% endif %}
+                </button>
+            </div>
+            <button onclick="showSimilar({{product.id}})" style="width:100%; margin-top:1rem; background:none; border:1px solid var(--border); padding:10px; border-radius:12px; cursor:pointer; font-weight:600; color:var(--muted)">
+                🔍 View Similar Products
+            </button>
+        </div>
+
+        <div class="details-section">
+            <span class="badge">Limited Edition</span>
+            <h1>{{ product.name }}</h1>
+            
+            <div class="price-tag">₹{{ product.price }}</div>
+
+            {% if first_discount > 0 %}
+            <div class="discount-banner">
+                <div style="font-weight:800; color:var(--success); font-size:0.8rem;">SPECIAL OFFER</div>
+                <div style="font-size:1.1rem; font-weight:800">₹{{final_price}} <span style="font-weight:400; color:var(--muted); font-size:0.9rem; text-decoration:line-through">₹{{product.price}}</span></div>
+            </div>
+            {% endif %}
+
+            <p style="color:var(--muted); margin-bottom:2rem;">{{ product.description }}</p>
+
+            <form method="POST" action="{% url 'add_to_cart' product.id %}" onsubmit="return validateSize(event)">
+                {% csrf_token %}
+
+                <div class="section-label">SELECT SIZE</div>
+                <div id="size-error" style="color:var(--error); font-size:0.8rem; margin-bottom:0.5rem; display:none;">⚠️ Please select a size before adding to cart</div>
+                
+                <div class="size-grid" id="size-container">
+                    {% for variant in variants %}
+                    <label class="size-variant {% if variant.stock == 0 %}disabled{% endif %}">
+                        <input type="radio" name="variant_id" value="{{variant.id}}" class="size-radio" data-stock="{{variant.stock}}" {% if variant.stock == 0 %}disabled{% endif %}>
+                        <span class="size-ui">
+                            {{variant.attribute_value.value}}
+                            {% if variant.stock > 0 and variant.stock <= 5 %}
+                            <div style="font-size:9px; color:var(--error)">Only {{variant.stock}} left</div>
+                            {% endif %}
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="section-label">QUANTITY</div>
+                <div class="action-row">
+                    <div class="qty-selector">
+                        <button type="button" onclick="decrease()">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" readonly>
+                        <button type="button" onclick="increase()">+</button>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-dark">Add to Cart</button>
+                    <button type="submit" formaction="{% url 'buy_now' product.id %}" class="btn btn-primary">Buy Now</button>
+                </div>
+            </form>
+
+            <div class="review-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                    <h3 style="margin:0">Reviews</h3>
+                    <div style="font-weight:800; color:#fbbf24">★ {{avg_rating|default:"New"}}</div>
+                </div>
+
+                {% if can_review %}
+                <form method="POST" style="margin-bottom:3rem; background:var(--bg); padding:1.5rem; border-radius:20px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" id="rating-input" value="{{user_review.rating|default:''}}">
+                    <div class="stars-input" id="star-box">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <textarea name="comment" placeholder="Share your experience..." style="width:100%; padding:1rem; border-radius:12px; border:1px solid var(--border); outline:none; font-family:inherit;">{{user_review.comment|default:''}}</textarea>
+                    <button type="submit" class="btn btn-dark" style="margin-top:1rem; padding:0.6rem 1.5rem; flex:none;">
+                        {{ user_review|yesno:"Update Review,Post Review" }}
+                    </button>
+                </form>
+                {% endif %}
+
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div style="font-weight:700">{{review.user.username}}</div>
+                    <div style="color:#fbbf24; font-size:0.8rem; margin:4px 0">
+                        {% for i in "12345"|slice:":review.rating" %}★{% endfor %}
+                    </div>
+                    <p style="margin:0.5rem 0 0; color:var(--muted); font-size:0.95rem;">{{review.comment}}</p>
+                </div>
+                {% empty %}
+                <p style="text-align:center; color:var(--muted)">No reviews yet. Be the first to try it!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div id="similar-section" style="margin-top: 5rem;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 2rem;">Recommended for you</h3>
+        <div id="similar-products" class="similar-grid">
+            </div>
+    </div>
+</main>
+
+<script>
+    let selectedVariantId = null;
+    let selectedStock = 0;
+    const qtyInput = document.getElementById("quantity");
+
+    document.querySelectorAll(".size-radio").forEach(radio => {
+        radio.addEventListener("change", function() {
+            selectedVariantId = this.value;
+            selectedStock = parseInt(this.dataset.stock);
+            qtyInput.value = 1;
+            document.getElementById("size-error").style.display = "none";
+        });
+    });
+
+    function increase() {
+        if (!selectedVariantId) { alert("Please select a size first"); return; }
+        let current = parseInt(qtyInput.value);
+        if (current < selectedStock) { qtyInput.value = current + 1; } 
+        else { alert("Maximum stock reached (" + selectedStock + ")"); }
+    }
+
+    function decrease() {
+        let current = parseInt(qtyInput.value);
+        if (current > 1) qtyInput.value = current - 1;
+    }
+
+    function validateSize(event) {
+        if (!selectedVariantId) {
+            event.preventDefault();
+            document.getElementById("size-error").style.display = "block";
+            return false;
+        }
+        return true;
+    }
+
+    function toggleWishlist(pid) {
+        fetch(`/toggle-wishlist/${pid}/`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById("wishlist-btn").innerHTML = data.status === "added" ? "❤️" : "🤍";
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const stars = document.querySelectorAll(".star");
+        const ratingInput = document.getElementById("rating-input");
+
+        function highlightStars(val) {
+            stars.forEach((st, i) => {
+                st.classList.toggle("active", i < val);
+            });
+        }
+
+        stars.forEach(s => {
+            s.addEventListener("click", () => {
+                let val = s.getAttribute("data-value");
+                ratingInput.value = val;
+                highlightStars(val);
+            });
+        });
+
+        if (ratingInput?.value) highlightStars(ratingInput.value);
+    });
+
+    function showSimilar(pid) {
+        fetch(`/find-similar/${pid}/`)
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById("similar-products");
+                container.innerHTML = "";
+                data.products.forEach(p => {
+                    // Added .sim-item wrapper to handle horizontal flex and text-decoration
+                    container.innerHTML += `
+                        <a href="/product/${p.id}/" class="sim-item">
+                            <div class="sim-card-ui">
+                                <img src="${p.image}" alt="${p.name}">
+                                <div style="font-weight:700; margin-bottom:5px; font-size:0.9rem;">${p.name}</div>
+                                <div style="color:var(--brand); font-weight:800">₹${p.price}</div>
+                            </div>
+                        </a>`;
+                });
+                document.getElementById("similar-section").scrollIntoView({ behavior: "smooth" });
+            });
+    }
 </script>
 
 </body>

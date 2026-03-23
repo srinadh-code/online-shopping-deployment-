@@ -417,29 +417,7 @@
 
 </div>
 
-    {% comment %} <div class="nav-links">
-
-    {% if request.user.is_authenticated %}
-        <a href="{% url 'wishlist' %}">
-            Wishlist (<span id="wishlist-count">{{ wishlist_count }}</span>)
-        </a>
-    {% else %}
-        <a href="{% url 'signup' %}">
-            Wishlist (0)
-        </a>
-    {% endif %}
-
-    {% if request.user.is_authenticated %}
-        <a href="{% url 'cart' %}">
-            Cart (<span id="cart-count">{{ cart_count }}</span>)
-        </a>
-    {% else %}
-        <a href="{% url 'signup' %}">
-            Cart (0)
-        </a>
-    {% endif %}
-
-</div> {% endcomment %}
+ 
 
  
 
@@ -515,94 +493,7 @@
 
 
               
-            <!-- RECENT + RECOMMENDED -->
-            {% comment %} <div class="double-row">
-                <div class="section">
-                    <h2>Recently Viewed</h2>
-                    <div class="grid-2">
-                        {% for product in recently_viewed|slice:":4" %}
-                        <div class="card">
-                            <a href="{% url 'product_detail' product.id %}">
-                            <div class="wishlist-icon {% if product.id in wishlist_product_ids %}in-wishlist{% endif %}"
-                                 onclick="toggleWishlist({{ product.id }}, this)">
-                                {% if product.id in wishlist_product_ids %}❤️{% else %}🤍{% endif %}
-                            </div>
-                        
-                                <img src="{{ product.image.url }}">
-                            
-                            <p>{{ product.name }}</p>
-                            <p class="price">₹{{ product.price }}</p>
-                            </a>
-                        </div>
-                        {% empty %}
-                        <p style="opacity: 0.5; font-size: 13px;">No history detected.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>Recommended</h2>
-                    <div class="grid-2">
-                        {% for product in recommended|slice:":4" %}
-                        <div class="card">
-                            <a href="{% url 'product_detail' product.id %}">
-                            <div class="wishlist-icon {% if product.id in wishlist_product_ids %}in-wishlist{% endif %}"
-                                 onclick="toggleWishlist({{ product.id }}, this)">
-                                {% if product.id in wishlist_product_ids %}❤️{% else %}🤍{% endif %}
-                            </div>
-                                <img src="{{ product.image.url }}">
-                            <p>{{ product.name }}</p>
-                            <p class="price">₹{{ product.price }}</p>
-                            </a>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="double-row" style="margin-top: 0;">
-                <div class="section">
-                    <h2>Trending</h2>
-                    <div class="grid-2">
-                        {% for product in trending_products %}
-                        <div class="card">
-                            <a href="{% url 'product_detail' product.id %}">
-                                <img src="{{ product.image.url }}">
-                            
-                            <p>{{ product.name }}</p>
-                            <p class="price">₹{{ product.price }}</p>
-                            </a>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="section">
-    <h2>Most Purchased</h2>
-
-    <div class="grid-2">
-
-        {% for product in most_purchased %}
-
-        <div class="card">
-
-            <a href="{% url 'product_detail' product.id %}">
-                <img src="{{ product.image.url }}">
-            
-
-            <p>{{ product.name }}</p>
-
-            <p class="price">
-                ₹{{ product.price }}
-            </p>
-            </a>
-
-        </div>
-
-        {% endfor %}
-
-    </div>
-
-</div> {% endcomment %}
+  
 
 <!-- TOP: TRENDING + MOST PURCHASED -->
 <div class="double-row">
@@ -837,21 +728,7 @@ function startVoiceSearch(){
     };
 }
 
-{% comment %} function toggleWishlist(productId, element){
-    fetch(`/toggle-wishlist/${productId}/`)
-    .then(response => response.json())
-    .then(data => {
-        if(data.status === "added"){
-            element.innerHTML = "❤️";
-            element.classList.add('in-wishlist');
-        } else {
-            element.innerHTML = "🤍";
-            element.classList.remove('in-wishlist');
-        }
-    })
-    .catch(error => console.log(error));
-    
-} {% endcomment %}
+
  function toggleWishlist(productId, element){
     fetch(`/toggle-wishlist/${productId}/`)
     .then(response => response.json())
