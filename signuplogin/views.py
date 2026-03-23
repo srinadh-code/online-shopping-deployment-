@@ -11,17 +11,77 @@ from django.contrib import messages
 from django.conf import settings
 
 
+# class signupview(View):
+
+#     def get(self, request):
+#         return render(request, "signup.html")
+   
+#     def post(self, request):
+#         serializer = SignupSerializer(data=request.POST)
+#         if serializer.is_valid():
+#             serializer.save()
+#             messages.success(request, " Account created successfully! Please login.")
+#             return redirect("login")
+#         return render(request, "signup.html", {
+#             "errors": serializer.errors
+#         })
+
+import threading
+
+#  async email (recommended)
+def send_welcome_email(email, username):
+    try:
+        send_mail(
+            "Welcome to SRIA NEXT GEN 🛍️",
+            f"""
+Hi {username},
+
+🎉 Your account has been created successfully!
+
+Welcome to SRIA NEXT GEN Online Shopping.
+
+✨ "Shopping is not just buying, it's an experience."
+
+We're excited to have you.
+
+🎁 Special Offer Just for You:
+Get 30% OFF on your first order!
+
+Start shopping now and grab your favorites.
+
+✨ Enjoy seamless shopping experience.
+
+Happy Shopping 🛒
+- SRIA Team
+""",
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        print("Email Error:", e)
+
+
 class signupview(View):
 
     def get(self, request):
         return render(request, "signup.html")
-   
+
     def post(self, request):
         serializer = SignupSerializer(data=request.POST)
+
         if serializer.is_valid():
-            serializer.save()
-            messages.success(request, " Account created successfully! Please login.")
+            user = serializer.save()   #  create user
+
+            #  SEND EMAIL (async - fast response)
+            threading.Thread(
+                target=send_welcome_email,
+                args=(user.email, user.username)
+            ).start()
+
+            messages.success(request, "Account created successfully! Check your email.")
             return redirect("login")
+
         return render(request, "signup.html", {
             "errors": serializer.errors
         })
@@ -48,36 +108,6 @@ class loginview(View):
         if user is not None:
             login(request, user)
 
-            #  SEND EMAIL AFTER LOGIN
-#             subject = "Welcome Back to SRIA NEXT GEN 🛍️"
-#             message = f"""
-# Hi {user.username},
-
-# Welcome back to SRIA NEXT GEN ONLINE SHOPPPING!
-
-# ✨ "Shopping is not just buying, it's an experience."
-
-# We're excited to have you again.
-
-# 🎁 Special Offer Just for You:
-# Get 30% OFF on your first order!
-
-# Start shopping now and grab your favorites.
-
-# Happy Shopping 🛒
-# - SRIA Team
-# """
-
-#             send_mail(
-#                 subject,
-#                 message,
-#                 settings.DEFAULT_FROM_EMAIL,
-#                 [user.email],
-#                 fail_silently=True,  # avoid crash if email fails
-#             )
-#             print(user.email)
-            
-
             return redirect("dashboard")
 
         else:
@@ -89,9 +119,7 @@ class logoutview(View):
     def get(self, request):
         logout(request)
         return redirect("login")
-import threading
-from django.core.mail import send_mail
-from django.conf import settings
+
 
 def send_otp_async(email, otp_code):
     print("thread running",settings.DEFAULT_FROM_EMAIL)
